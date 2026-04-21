@@ -1,0 +1,505 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>水母银河 · AI PM & Builder</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Barlow:wght@300;400;500;600&family=Noto+Serif+SC:wght@400;700&family=Noto+Sans+SC:wght@300;400&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#FFFCF8;--bg2:#FFF7F0;
+  --text:#1A1828;--muted:rgba(26,24,40,.48);--subtle:rgba(26,24,40,.06);
+  --pink:#FF8FAB;--pink-l:#FFE3EC;--pink-d:rgba(255,143,171,.12);--pink-b:rgba(255,143,171,.28);
+  --blue:#6CB8E8;--blue-l:#D5EDFB;--blue-d:rgba(108,184,232,.12);--blue-b:rgba(108,184,232,.3);
+  --yellow:#FFCA5F;--yellow-l:#FFF3CC;--yellow-d:rgba(255,202,95,.14);--yellow-b:rgba(255,202,95,.36);
+  --border:rgba(26,24,40,.08);
+  --serif:'Instrument Serif','Noto Serif SC',serif;
+  --sans:'Barlow','Noto Sans SC',sans-serif;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{background:#060008;color:var(--text);font-family:var(--sans);font-weight:300;line-height:1.65;-webkit-font-smoothing:antialiased;overflow-x:hidden}
+a{color:inherit;text-decoration:none}
+::selection{background:var(--pink-d)}
+
+/* ── Background canvas ─────────────────────── */
+#bg-scene{position:fixed;inset:0;z-index:0;pointer-events:none}
+#bg-canvas{width:100%;height:100%;display:block}
+
+/* ── Liquid glass mixin ───────────────────── */
+/* shared liquid-glass variables used across components */
+
+/* ── Nav ─────────────────────────────────── */
+nav{
+  position:fixed;top:0;left:0;right:0;z-index:100;
+  display:flex;align-items:center;justify-content:space-between;
+  padding:0 clamp(24px,5vw,80px);height:64px;
+  background:rgba(255,255,255,.08);
+  backdrop-filter:blur(28px) saturate(180%);-webkit-backdrop-filter:blur(28px) saturate(180%);
+  border-bottom:1px solid rgba(255,255,255,.28);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.45),0 2px 24px rgba(255,150,190,.10);
+}
+.nav-logo{font-family:var(--serif);font-style:italic;font-size:18px;letter-spacing:.04em;color:var(--text);cursor:pointer;opacity:.9;transition:opacity .2s}
+.nav-logo:hover{opacity:1}
+.nav-links{display:flex;gap:2px}
+.nav-links a{padding:6px 16px;font-size:13px;font-weight:400;color:var(--muted);border-radius:9999px;transition:color .2s;letter-spacing:.03em}
+.nav-links a:hover{color:var(--text)}
+.nav-right{display:flex;align-items:center;gap:10px}
+.lang-btn{font-size:11px;letter-spacing:.14em;color:var(--muted);cursor:pointer;padding:5px 13px;border-radius:9999px;border:1px solid rgba(255,255,255,.35);transition:all .2s;font-weight:400;background:rgba(255,255,255,.10);backdrop-filter:blur(12px)}
+.lang-btn:hover{color:var(--text);border-color:rgba(255,255,255,.6);background:rgba(255,255,255,.18)}
+.nav-cta{
+  display:inline-flex;align-items:center;gap:6px;
+  padding:9px 22px;border-radius:9999px;
+  background:var(--pink);color:#fff;font-size:15px;font-weight:600;letter-spacing:.04em;
+  transition:all .25s;cursor:pointer;box-shadow:0 4px 16px rgba(255,143,171,.35);
+}
+.nav-cta:hover{background:#ff7099;transform:translateY(-1px);box-shadow:0 6px 20px rgba(255,143,171,.45)}
+@media(max-width:720px){.nav-links{display:none}}
+
+/* ── Hero ────────────────────────────────── */
+#hero{
+  min-height:100vh;
+  display:grid;grid-template-columns:1fr 1fr;
+  align-items:center;gap:40px;
+  padding:88px clamp(24px,4vw,64px) 64px clamp(80px,12vw,200px);
+  position:relative;z-index:1;
+}
+@media(max-width:880px){
+  #hero{grid-template-columns:1fr;padding:96px 24px 56px;text-align:center}
+  .hero-photo-col{order:-1}
+}
+
+/* Left */
+.hero-left{
+  max-width:620px;display:flex;flex-direction:column;gap:0;
+  background:rgba(255,255,255,.10);
+  backdrop-filter:blur(36px) saturate(180%);-webkit-backdrop-filter:blur(36px) saturate(180%);
+  border:1px solid rgba(255,255,255,.30);border-radius:28px;padding:44px 50px;
+  box-shadow:
+    inset 0 1.5px 0 rgba(255,255,255,.55),
+    inset 0 -1px 0 rgba(255,190,220,.14),
+    0 16px 48px rgba(255,130,180,.12),
+    0 1px 0 rgba(255,255,255,.20);
+}
+@media(max-width:880px){.hero-left{max-width:100%;align-items:center;padding:32px 24px}}
+
+.hero-badge{
+  display:inline-flex;align-items:center;gap:9px;
+  padding:9px 20px;border-radius:9999px;
+  background:var(--pink-d);border:1px solid var(--pink-b);
+  font-size:12px;font-weight:500;letter-spacing:.16em;text-transform:uppercase;
+  color:var(--pink);margin-bottom:30px;width:fit-content;
+}
+.badge-dot{width:7px;height:7px;border-radius:50%;background:var(--pink);animation:pdot 2s ease-in-out infinite}
+@keyframes pdot{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.4;transform:scale(.75)}}
+
+.hero-name{
+  font-family:var(--serif);font-style:italic;
+  font-size:clamp(62px,8vw,108px);
+  line-height:.9;letter-spacing:-.02em;color:var(--text);margin-bottom:10px;
+}
+.hero-sub{
+  font-family:var(--serif);font-style:italic;
+  font-size:clamp(17px,2.2vw,26px);
+  color:var(--muted);margin-bottom:32px;letter-spacing:.07em;
+}
+
+/* Bio */
+.hero-bio{
+  margin-bottom:30px;
+  padding:28px 32px;border-radius:20px;
+  background:rgba(255,255,255,.12);
+  backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);
+  border:1px solid rgba(255,255,255,.32);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.5),0 4px 16px rgba(255,140,180,.08);
+  font-size:17px;color:rgba(26,24,40,.72);line-height:1.95;
+}
+.hero-bio p+p{margin-top:10px}
+.hero-bio strong{color:var(--text);font-weight:500}
+
+/* Skill chips */
+.skill-chips{display:flex;flex-wrap:wrap;gap:9px;margin-bottom:36px}
+@media(max-width:880px){.skill-chips{justify-content:center}}
+.chip{
+  font-size:15px;padding:9px 20px;border-radius:9999px;font-weight:400;letter-spacing:.03em;
+  transition:transform .2s,box-shadow .2s;cursor:default;
+  backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.50);
+}
+.chip:hover{transform:translateY(-2px);box-shadow:inset 0 1px 0 rgba(255,255,255,.60),0 6px 18px rgba(255,140,180,.15)}
+.chip-pink{background:rgba(255,143,171,.14);border:1px solid rgba(255,143,171,.35);color:var(--pink)}
+.chip-blue{background:rgba(108,184,232,.14);border:1px solid rgba(108,184,232,.38);color:#3a8fc4}
+.chip-yellow{background:rgba(255,202,95,.16);border:1px solid rgba(255,202,95,.40);color:#b87c00}
+
+/* CTAs */
+.hero-ctas{display:flex;gap:10px;flex-wrap:wrap}
+@media(max-width:880px){.hero-ctas{justify-content:center}}
+.cta-pink{
+  display:inline-flex;align-items:center;gap:6px;
+  padding:13px 32px;border-radius:9999px;
+  background:var(--pink);color:#fff;font-size:15px;font-weight:600;letter-spacing:.04em;
+  transition:all .25s;cursor:pointer;box-shadow:0 4px 18px rgba(255,143,171,.3);
+}
+.cta-pink:hover{background:#ff7099;transform:translateY(-2px);box-shadow:0 8px 24px rgba(255,143,171,.4)}
+.cta-outline{
+  display:inline-flex;align-items:center;gap:6px;
+  padding:13px 32px;border-radius:9999px;
+  border:1px solid rgba(255,255,255,.38);color:var(--text);
+  font-size:15px;font-weight:400;letter-spacing:.02em;
+  background:rgba(255,255,255,.12);
+  backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.55);
+  transition:all .25s;cursor:pointer;
+}
+.cta-outline:hover{border-color:rgba(255,255,255,.55);background:rgba(255,255,255,.22);transform:translateY(-1px)}
+.cta-blue{
+  display:inline-flex;align-items:center;gap:6px;
+  padding:13px 32px;border-radius:9999px;
+  border:1px solid var(--blue-b);color:#3a8fc4;
+  background:var(--blue-d);
+  font-size:15px;font-weight:400;letter-spacing:.02em;
+  transition:all .25s;cursor:pointer;
+}
+.cta-blue:hover{background:rgba(108,184,232,.2);transform:translateY(-1px)}
+
+/* Right — Photo */
+.hero-photo-col{display:flex;align-items:center;justify-content:center;position:relative}
+.photo-wrap{position:relative;width:clamp(230px,25vw,380px)}
+
+.photo-card{
+  border-radius:28px;overflow:hidden;position:relative;
+  border:1px solid rgba(255,255,255,.38);
+  box-shadow:
+    inset 0 1.5px 0 rgba(255,255,255,.60),
+    inset 0 -1px 0 rgba(255,180,210,.18),
+    0 24px 60px rgba(255,130,175,.18),
+    0 0 0 8px rgba(255,200,225,.12);
+  animation:float 6.5s ease-in-out infinite alternate;
+}
+@keyframes float{0%{transform:translateY(-10px) rotate(-.5deg)}100%{transform:translateY(10px) rotate(.5deg)}}
+.photo-card img{width:100%;height:auto;display:block;object-fit:cover}
+
+/* Decorative rings behind photo */
+.photo-ring{
+  position:absolute;border-radius:50%;pointer-events:none;z-index:-1;
+}
+.ring1{
+  width:120%;height:120%;top:50%;left:50%;transform:translate(-50%,-50%);
+  background:radial-gradient(circle,rgba(255,143,171,.12) 0%,rgba(108,184,232,.08) 50%,transparent 75%);
+  animation:pglow 4.5s ease-in-out infinite alternate;
+}
+.ring2{
+  width:92%;height:auto;aspect-ratio:1;
+  top:50%;left:50%;transform:translate(-50%,-50%);
+  border:2px solid rgba(255,143,171,.18);
+  animation:ring2 6s ease-in-out infinite alternate;
+}
+@keyframes pglow{from{opacity:.6;transform:translate(-50%,-50%) scale(.94)}to{opacity:1;transform:translate(-50%,-50%) scale(1.06)}}
+@keyframes ring2{from{transform:translate(-50%,-50%) scale(.9);opacity:.4}to{transform:translate(-50%,-50%) scale(1.1);opacity:.7}}
+
+/* Floating badge */
+.photo-badge{
+  position:absolute;bottom:-18px;right:-12px;
+  display:flex;flex-direction:column;align-items:flex-start;
+  padding:13px 17px;border-radius:18px;
+  background:rgba(255,255,255,.12);
+  backdrop-filter:blur(24px) saturate(180%);-webkit-backdrop-filter:blur(24px) saturate(180%);
+  border:1px solid rgba(255,255,255,.40);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.60),0 8px 28px rgba(255,130,175,.14);
+  z-index:2;
+}
+.badge-val{font-family:var(--serif);font-style:italic;font-size:24px;color:var(--pink);line-height:1;margin-bottom:3px}
+.badge-lab{font-size:10px;letter-spacing:.06em;color:var(--muted);font-weight:400}
+
+/* Second floating tag (top-left) */
+.photo-tag2{
+  position:absolute;top:-16px;left:-14px;
+  display:flex;align-items:center;gap:8px;
+  padding:10px 14px;border-radius:14px;
+  background:rgba(255,255,255,.12);
+  backdrop-filter:blur(24px) saturate(180%);-webkit-backdrop-filter:blur(24px) saturate(180%);
+  border:1px solid rgba(255,255,255,.40);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.60),0 6px 20px rgba(255,130,175,.12);
+  z-index:2;font-size:12px;color:var(--text);
+}
+.tag2-dot{width:8px;height:8px;border-radius:50%;background:var(--blue);flex-shrink:0}
+
+/* ── Stats strip ─────────────────────────── */
+.stats-strip{
+  position:relative;z-index:1;
+  display:grid;grid-template-columns:repeat(4,1fr);
+  background:rgba(255,255,255,.08);
+  border-top:1px solid rgba(255,255,255,.28);
+  border-bottom:1px solid rgba(255,255,255,.18);
+  backdrop-filter:blur(28px) saturate(180%);-webkit-backdrop-filter:blur(28px) saturate(180%);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.45),0 -4px 24px rgba(255,150,190,.08);
+}
+@media(max-width:600px){.stats-strip{grid-template-columns:repeat(2,1fr)}}
+.stat{
+  padding:26px clamp(16px,3vw,44px);
+  border-right:1px solid rgba(255,255,255,.18);
+  transition:background .2s;
+}
+.stat:last-child{border-right:none}
+.stat:hover{background:rgba(255,255,255,.12)}
+.stat-n{
+  font-family:var(--serif);font-style:italic;
+  font-size:32px;line-height:1;margin-bottom:5px;
+}
+.stat-n.pink{color:var(--pink)}
+.stat-n.blue{color:var(--blue)}
+.stat-n.yellow{color:#e0a020}
+.stat-n.green{color:#6bbe9e}
+.stat-l{font-size:11px;letter-spacing:.05em;color:var(--muted);font-weight:400}
+
+/* ── Divider ─────────────────────────────── */
+.divider{width:100%;height:1px;background:linear-gradient(90deg,transparent,var(--border),transparent)}
+
+/* ── Scroll hint ─────────────────────────── */
+.scroll-hint{
+  position:absolute;bottom:28px;left:50%;transform:translateX(-50%);
+  display:flex;flex-direction:column;align-items:center;gap:6px;
+  font-size:9px;letter-spacing:.2em;text-transform:uppercase;color:var(--muted);
+  pointer-events:none;animation:shint 2.5s ease-in-out infinite;
+}
+@keyframes shint{0%,100%{opacity:.35;transform:translateX(-50%) translateY(0)}50%{opacity:.65;transform:translateX(-50%) translateY(5px)}}
+
+/* ── Reveal ──────────────────────────────── */
+.reveal{opacity:0;transform:translateY(20px);transition:opacity .7s cubic-bezier(.22,1,.36,1),transform .7s cubic-bezier(.22,1,.36,1)}
+.reveal.vis{opacity:1;transform:none}
+.d1{transition-delay:.07s}.d2{transition-delay:.14s}.d3{transition-delay:.21s}.d4{transition-delay:.28s}.d5{transition-delay:.35s}
+</style>
+</head>
+<body>
+
+<!-- ── Background canvas ── -->
+<div id="bg-scene" aria-hidden="true"><canvas id="bg-canvas"></canvas></div>
+
+<nav>
+  <span class="nav-logo" onclick="scrollTo({top:0,behavior:'smooth'})">水母银河</span>
+  <div class="nav-links">
+    <a href="#projects" data-i18n="zh:作品;en:Projects">作品</a>
+    <a href="#services" data-i18n="zh:服务;en:Services">服务</a>
+    <a href="#career" data-i18n="zh:经历;en:Career">经历</a>
+    <a href="#contact" data-i18n="zh:联系;en:Contact">联系</a>
+  </div>
+  <div class="nav-right">
+    <span class="lang-btn" id="langToggle">EN</span>
+    <a href="mailto:maropion@163.com" class="nav-cta" data-i18n="zh:聊一聊;en:Let's talk">聊一聊</a>
+  </div>
+</nav>
+
+<section id="hero">
+
+  <!-- ── Left ── -->
+  <div class="hero-left">
+
+    <div class="hero-badge reveal d1">
+      <span class="badge-dot"></span>
+      <span data-i18n="zh:AI 产品经理 · Builder · 独立开发者;en:AI Product Manager · Builder · Maker">AI 产品经理 · Builder · 独立开发者</span>
+    </div>
+
+    <h1 class="hero-name reveal d2">水母银河</h1>
+    <div class="hero-sub reveal d2">Maropion</div>
+
+    <div class="hero-bio reveal d3">
+      <p class="zh"><strong>会计学出身的 AI 产品经理。</strong>曾在美团主导 AI Agent 开发与数据洞察，在初创公司独立交付 AI 产品从 0 到 1。</p>
+      <p class="zh">熟悉 RAG、Multi-Agent、Prompt Engineering，能从写 PRD 到部署上线。港城大 <strong>MSc AI in Business</strong> 2026 秋入学。</p>
+      <p class="en" style="display:none"><strong>Accounting grad turned AI PM.</strong> Built AI Agents at Meituan, shipped 0→1 AI products at two startups. Proficient in RAG · Multi-Agent · Prompt Eng. Incoming MSc <strong>AI in Business</strong>, CityU HK, Fall 2026.</p>
+    </div>
+
+    <div class="skill-chips reveal d4">
+      <span class="chip chip-pink">Harness Engineering</span>
+      <span class="chip chip-pink">Multi-Agent · CrewAI</span>
+      <span class="chip chip-pink">RAG · LiteLLM</span>
+      <span class="chip chip-blue">Python · FastAPI</span>
+      <span class="chip chip-blue">TypeScript · React 18</span>
+      <span class="chip chip-blue">Docker · Railway</span>
+      <span class="chip chip-blue">Swift · Metal</span>
+      <span class="chip chip-yellow">PRD 全流程</span>
+      <span class="chip chip-yellow">IELTS 6.5 · JLPT N2</span>
+    </div>
+
+    <div class="hero-ctas reveal d5">
+      <a href="#contact" class="cta-pink" data-i18n="zh:聊合作;en:Let's connect">聊合作</a>
+      <a href="#projects" class="cta-outline" data-i18n="zh:看作品;en:View Work">看作品</a>
+      <a href="uploads/resume.pdf" download class="cta-blue" data-i18n="zh:下载简历;en:Download CV">下载简历</a>
+    </div>
+
+  </div>
+
+  <!-- ── Right — Photo ── -->
+  <div class="hero-photo-col reveal d2">
+    <div class="photo-wrap">
+      <div class="photo-ring ring1"></div>
+      <div class="photo-ring ring2"></div>
+      <div class="photo-tag2">
+        <span class="tag2-dot"></span>
+        <span class="zh">香港城市大学 MSc AIB</span>
+        <span class="en" style="display:none">CityU HK · MSc AIB</span>
+      </div>
+      <div class="photo-card">
+        <img src="photo.jpg" alt="Maropion">
+      </div>
+      <div class="photo-badge">
+        <span class="badge-val">3+</span>
+        <span class="badge-lab" data-i18n="zh:年 AI 产品经验;en:Yrs AI Product Exp.">年 AI 产品经验</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="scroll-hint">
+    <svg width="14" height="22" viewBox="0 0 14 22" fill="none"><rect x="5.5" y="1" width="3" height="7" rx="1.5" fill="currentColor"/><rect x=".7" y=".7" width="12.6" height="20.6" rx="6.3" stroke="currentColor" stroke-width="1.2"/></svg>
+    <span>scroll</span>
+  </div>
+
+</section>
+
+<!-- Stats -->
+<div class="stats-strip">
+  <div class="stat reveal"><div class="stat-n pink">3</div><div class="stat-l" data-i18n="zh:独立开源项目;en:Open-source Projects">独立开源项目</div></div>
+  <div class="stat reveal d1"><div class="stat-n blue">97%</div><div class="stat-l" data-i18n="zh:AI 评审效率提升;en:Review Efficiency ↑">AI 评审效率提升</div></div>
+  <div class="stat reveal d2"><div class="stat-n yellow">30h</div><div class="stat-l" data-i18n="zh:最快 MVP 交付;en:Fastest MVP Ship">最快 MVP 交付</div></div>
+  <div class="stat reveal d3"><div class="stat-n green">V35</div><div class="stat-l" data-i18n="zh:Agent 产品迭代次数;en:Agent Iterations">Agent 产品迭代次数</div></div>
+</div>
+<div class="divider"></div>
+
+<script>
+// Lang
+let lang=localStorage.getItem('lang')||'zh';
+function applyI18n(el){const v=el.dataset.i18n;if(!v)return;const m={};v.split(';').forEach(p=>{const[k,...r]=p.split(':');m[k.trim()]=r.join(':')});if(m[lang])el.textContent=m[lang]}
+function applyLang(){
+  document.documentElement.lang=lang;
+  document.querySelectorAll('[data-i18n]').forEach(applyI18n);
+  document.querySelectorAll('.zh').forEach(el=>el.style.display=lang==='zh'?'':'none');
+  document.querySelectorAll('.en').forEach(el=>el.style.display=lang==='en'?'':'none');
+  document.getElementById('langToggle').textContent=lang==='zh'?'EN':'中';
+  localStorage.setItem('lang',lang);
+}
+document.getElementById('langToggle').addEventListener('click',()=>{lang=lang==='zh'?'en':'zh';applyLang()});
+applyLang();
+
+// Reveal
+const ro=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting)e.target.classList.add('vis')}),{threshold:.1});
+document.querySelectorAll('.reveal').forEach(el=>ro.observe(el));
+</script>
+
+<script>
+/* ── 4K pink aurora / flowing-light background ── */
+(function(){
+  const canvas = document.getElementById('bg-canvas');
+  const ctx    = canvas.getContext('2d');
+  const dpr    = Math.min(window.devicePixelRatio||1, 3);
+
+  let W, H;
+  function resize(){
+    W = window.innerWidth; H = window.innerHeight;
+    canvas.width  = W * dpr;
+    canvas.height = H * dpr;
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  }
+  resize();
+  window.addEventListener('resize', resize);
+
+  /* Orbs: cx,cy (relative), rx,ry (relative to max dim),
+           hue, alpha, ampX, ampY, freqX, freqY, phX, phY */
+  const ORBS = [
+    [0.22, 0.38, 0.58, 0.48, 338, 0.82, 0.11, 0.09, 3.8e-4, 3.0e-4, 0.0, 1.0],
+    [0.72, 0.28, 0.54, 0.44, 318, 0.74, 0.13, 0.10, 4.5e-4, 3.5e-4, 1.8, 0.5],
+    [0.50, 0.78, 0.65, 0.55, 350, 0.70, 0.08, 0.12, 3.2e-4, 4.2e-4, 3.5, 2.0],
+    [0.12, 0.62, 0.46, 0.38, 305, 0.64, 0.10, 0.07, 4.1e-4, 3.8e-4, 0.8, 3.2],
+    [0.86, 0.62, 0.52, 0.43, 330, 0.72, 0.07, 0.11, 5.0e-4, 3.0e-4, 2.6, 1.5],
+    [0.40, 0.18, 0.44, 0.36, 315, 0.60, 0.14, 0.07, 3.5e-4, 5.0e-4, 4.2, 0.8],
+    [0.78, 0.52, 0.50, 0.41, 342, 0.66, 0.09, 0.10, 4.8e-4, 3.6e-4, 1.2, 2.8],
+  ];
+
+  /* Streaks: baseY, lenX, thickness, hue, alpha, freq, phase */
+  const STREAKS = [
+    [0.26, 0.90, 0.038, 340, 0.30, 1.2e-4, 0.0],
+    [0.50, 0.74, 0.028, 322, 0.24, 1.5e-4, 2.1],
+    [0.68, 0.82, 0.033, 352, 0.26, 1.0e-4, 4.0],
+    [0.38, 0.66, 0.022, 312, 0.20, 1.8e-4, 1.3],
+  ];
+
+  function frame(ts){
+    ctx.clearRect(0, 0, W, H);
+
+    /* ── Base gradient ── */
+    const bg = ctx.createRadialGradient(W*.50, H*.40, 0, W*.50, H*.40, Math.max(W,H)*.92);
+    bg.addColorStop(0.00, '#FFECF3');
+    bg.addColorStop(0.30, '#FFD8EA');
+    bg.addColorStop(0.62, '#FFBFDC');
+    bg.addColorStop(1.00, '#F5A0C5');
+    ctx.fillStyle = bg;
+    ctx.fillRect(0, 0, W, H);
+
+    /* ── Glowing orbs ── */
+    const R = Math.max(W, H);
+    ORBS.forEach(([cx,cy,rx,ry,hue,alpha,ax,ay,fx,fy,px,py]) => {
+      const x  = (cx + ax * Math.sin(ts*fx + px)) * W;
+      const y  = (cy + ay * Math.cos(ts*fy + py)) * H;
+      const rr = rx * R * 0.56;
+
+      ctx.save();
+      ctx.translate(x, y);
+      ctx.scale(1, (ry/rx) * 0.78);
+
+      const g = ctx.createRadialGradient(0,0,0, 0,0,rr);
+      g.addColorStop(0.00, `hsla(${hue},100%,90%,${alpha})`);
+      g.addColorStop(0.28, `hsla(${hue}, 96%,86%,${alpha*0.55})`);
+      g.addColorStop(0.60, `hsla(${hue}, 88%,82%,${alpha*0.18})`);
+      g.addColorStop(1.00, `hsla(${hue}, 80%,78%,0)`);
+
+      ctx.fillStyle = g;
+      ctx.beginPath();
+      ctx.arc(0, 0, rr, 0, Math.PI*2);
+      ctx.fill();
+      ctx.restore();
+    });
+
+    /* ── Flowing light streaks (流光) ── */
+    STREAKS.forEach(([by,len,thick,hue,alpha,freq,ph]) => {
+      const yC  = (by + 0.06*Math.sin(ts*freq*2 + ph)) * H;
+      const xOff= 0.10 * Math.sin(ts*freq + ph);
+      const x0  = ((0.5 - len/2) + xOff) * W;
+      const x1  = x0 + len * W;
+      const thk = thick * H;
+
+      const sg = ctx.createLinearGradient(x0, 0, x1, 0);
+      sg.addColorStop(0.00, `hsla(${hue},100%,92%,0)`);
+      sg.addColorStop(0.14, `hsla(${hue},100%,92%,${alpha})`);
+      sg.addColorStop(0.50, `hsla(${hue+8},100%,96%,${alpha*1.35})`);
+      sg.addColorStop(0.86, `hsla(${hue},100%,92%,${alpha})`);
+      sg.addColorStop(1.00, `hsla(${hue},100%,92%,0)`);
+
+      /* soft multi-pass to fake Gaussian spread */
+      for(let i=0; i<7; i++){
+        const t2   = i/6;
+        const fade = Math.sin(t2*Math.PI);
+        const dy   = (t2-0.5) * thk * 5;
+        ctx.globalAlpha = alpha * fade * 0.55;
+        ctx.fillStyle   = sg;
+        ctx.fillRect(x0, yC+dy, x1-x0, thk*0.65);
+      }
+      ctx.globalAlpha = 1;
+    });
+
+    /* ── Central bloom pulse ── */
+    const bpx = W*(0.50 + 0.04*Math.sin(ts*2.8e-4));
+    const bpy = H*(0.36 + 0.03*Math.cos(ts*3.2e-4));
+    const bp  = ctx.createRadialGradient(bpx,bpy,0, bpx,bpy,W*0.32);
+    bp.addColorStop(0.0, `rgba(255,245,252,${0.48+0.12*Math.sin(ts*5e-4)})`);
+    bp.addColorStop(0.4, 'rgba(255,225,242,0.18)');
+    bp.addColorStop(1.0, 'rgba(255,200,232,0)');
+    ctx.fillStyle = bp;
+    ctx.fillRect(0, 0, W, H);
+
+    requestAnimationFrame(frame);
+  }
+  requestAnimationFrame(frame);
+})();
+</script>
+</body>
+</html>
