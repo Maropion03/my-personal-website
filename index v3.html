@@ -396,14 +396,26 @@ nav{
   display:grid;grid-template-columns:1fr 1fr;
   position:relative;overflow:hidden;
 }
-.proj-half-img{position:relative;overflow:hidden;background:#0a0618}
-.proj-half-img img{width:100%;height:100%;object-fit:cover;display:block;transition:transform .7s ease}
-.proj-slide:hover .proj-half-img img{transform:scale(1.04)}
-.proj-half-overlay{
-  position:absolute;inset:0;
-  background:linear-gradient(135deg,rgba(13,8,24,.35) 0%,transparent 55%);
-  pointer-events:none;
+.proj-half-img{
+  position:relative;
+  display:flex;align-items:center;justify-content:center;
+  padding:36px;overflow:hidden;
+  background:#060c18;
 }
+/* Per-project radial background glow */
+.proj-slide:nth-child(1) .proj-half-img{background:radial-gradient(ellipse 80% 60% at 50% 50%,rgba(255,100,155,.12) 0%,#060c18 65%)}
+.proj-slide:nth-child(2) .proj-half-img{background:radial-gradient(ellipse 80% 60% at 50% 50%,rgba(80,160,240,.10) 0%,#060c18 65%)}
+.proj-slide:nth-child(3) .proj-half-img{background:radial-gradient(ellipse 80% 60% at 50% 50%,rgba(255,200,80,.09) 0%,#060c18 65%)}
+.proj-half-img img{
+  width:auto;height:auto;max-width:94%;max-height:84%;
+  object-fit:contain;display:block;border-radius:12px;
+  transition:transform .5s ease,box-shadow .5s ease;
+}
+/* Per-project image glow */
+.proj-slide:nth-child(1) .proj-half-img img{box-shadow:0 0 48px rgba(255,100,155,.25),0 8px 32px rgba(0,0,0,.55)}
+.proj-slide:nth-child(2) .proj-half-img img{box-shadow:0 0 48px rgba(80,160,240,.22),0 8px 32px rgba(0,0,0,.55)}
+.proj-slide:nth-child(3) .proj-half-img img{box-shadow:0 0 48px rgba(255,200,80,.20),0 8px 32px rgba(0,0,0,.55)}
+.proj-slide:hover .proj-half-img img{transform:scale(1.02)}
 .proj-slide-num{
   position:absolute;bottom:28px;left:28px;
   font-size:11px;letter-spacing:3px;
@@ -429,11 +441,59 @@ nav{
 #projects .proj-link{font-size:13px}
 .proj-half-abstract{
   display:flex;flex-direction:column;justify-content:center;
-  padding:60px clamp(36px,5vw,76px);
+  padding:40px clamp(28px,4vw,60px);
   background:rgba(192,132,252,.05);
   border-right:1px solid rgba(192,132,252,.18);
   overflow-y:auto;
 }
+/* ── Paper flowchart ── */
+.paper-chart{display:flex;flex-direction:column;align-items:center;gap:4px;width:100%;font-family:var(--sans)}
+.pc-section{display:flex;flex-direction:column;align-items:center;gap:5px;width:100%}
+.pc-label{
+  font-size:9px;letter-spacing:2px;text-transform:uppercase;
+  padding:3px 14px;border-radius:20px;
+}
+.pc-label.purple{color:var(--purple);border:1px solid rgba(192,132,252,.35);background:rgba(192,132,252,.08)}
+.pc-label.yellow{color:var(--yellow);border:1px solid rgba(255,202,95,.3);background:rgba(255,202,95,.06)}
+.pc-dual{display:flex;gap:8px;width:100%}
+.pc-col{flex:1;display:flex;flex-direction:column;align-items:center;gap:0}
+.pc-chan-box{
+  width:100%;border-radius:10px;padding:10px 8px;
+  display:flex;flex-direction:column;align-items:center;gap:3px;
+}
+.pc-chan-box.pink{border:1px solid rgba(255,143,171,.28);background:rgba(255,143,171,.04)}
+.pc-chan-box.blue{border:1px solid rgba(108,184,232,.28);background:rgba(108,184,232,.04)}
+.pc-chanhead{font-size:8px;letter-spacing:1px;text-transform:uppercase;color:rgba(255,255,255,.35);margin-bottom:2px}
+.pc-item{font-size:11px;color:rgba(255,255,255,.72);text-align:center;line-height:1.3}
+.pc-hi-pink{color:var(--pink)!important;font-weight:700}
+.pc-hi-blue{color:var(--blue)!important;font-weight:700}
+.pc-hi-yellow{color:var(--yellow)!important;font-weight:700}
+.pc-hi-purple{color:var(--purple)!important;font-weight:700}
+.pc-down{font-size:12px;color:rgba(255,255,255,.2);line-height:1.2}
+.pc-sep{width:1px;height:100%;background:rgba(255,255,255,.08)}
+.pc-merge{font-size:14px;color:rgba(255,255,255,.2);letter-spacing:20px;margin:2px 0}
+.pc-vline{width:1px;height:12px;background:rgba(192,132,252,.3);margin:0 auto}
+.pc-agent{
+  width:100%;border-radius:8px;
+  border:1px solid rgba(192,132,252,.22);
+  background:rgba(192,132,252,.06);
+  padding:8px 12px;display:flex;flex-wrap:wrap;align-items:center;gap:5px;
+}
+.pc-agent.judge{background:rgba(192,132,252,.11);border-color:rgba(192,132,252,.4)}
+.pc-role{font-size:12px;color:#fff;font-weight:600;flex:1;min-width:0}
+.pc-badge{
+  font-size:8px;padding:1px 5px;border-radius:4px;
+  background:rgba(192,132,252,.2);border:1px solid rgba(192,132,252,.4);color:var(--purple);
+}
+.pc-badge.rag{background:rgba(108,184,232,.15);border-color:rgba(108,184,232,.35);color:var(--blue)}
+.pc-llm{font-size:9px;color:rgba(255,255,255,.3);width:100%}
+.pc-out-wrap{display:flex;gap:8px;width:100%}
+.pc-out{
+  flex:1;border-radius:8px;padding:9px 8px;text-align:center;
+  border:1px solid rgba(255,202,95,.22);background:rgba(255,202,95,.04);
+}
+.pc-out-name{font-size:11px;color:rgba(255,255,255,.78)}
+.pc-out-sub{font-size:9px;color:var(--yellow);margin-top:3px}
 .proj-nav{
   position:fixed;right:28px;top:50%;transform:translateY(-50%);
   display:flex;flex-direction:column;gap:12px;
@@ -728,10 +788,76 @@ nav{
   <!-- ④ 财务舞弊研究 -->
   <div class="proj-slide">
     <div class="proj-half-abstract">
-      <p class="abstract-title">融合检索增强生成与多智能体协同的上市公司财务舞弊深度识别研究</p>
-      <p style="font-size:12px;color:rgba(255,255,255,.55);line-height:1.75;margin:12px 0">As financial fraud in capital markets becomes increasingly covert, this study constructs a dual-channel perception network (TextCNN + FinBERT) fused with a multi-agent debate framework for deep cross-source semantic verification.</p>
-      <p class="abstract-kw">Keywords: Financial Fraud Detection · RAG · Multi-Agent · FinBERT · ChromaDB</p>
-      <span style="display:block;margin-top:36px;font-size:11px;letter-spacing:3px;color:rgba(255,255,255,.25);text-transform:uppercase">04 / 04</span>
+      <div class="paper-chart">
+
+        <!-- 感知层 -->
+        <div class="pc-section">
+          <span class="pc-label purple">感知层 · Perception</span>
+          <div class="pc-dual">
+            <div class="pc-col">
+              <div class="pc-chan-box pink">
+                <span class="pc-chanhead">外部通道</span>
+                <span class="pc-item">财经新闻</span>
+                <span class="pc-down">↓</span>
+                <span class="pc-item pc-hi-pink">TextCNN</span>
+                <span class="pc-down">↓</span>
+                <span class="pc-item">风险线索集</span>
+              </div>
+            </div>
+            <div class="pc-sep"></div>
+            <div class="pc-col">
+              <div class="pc-chan-box blue">
+                <span class="pc-chanhead">内部通道</span>
+                <span class="pc-item">MD&amp;A 文本</span>
+                <span class="pc-down">↓</span>
+                <span class="pc-item pc-hi-blue">FinBERT</span>
+                <span class="pc-down">↓</span>
+                <span class="pc-item">ChromaDB</span>
+              </div>
+            </div>
+          </div>
+          <div class="pc-merge">↓ &ensp; ↓</div>
+        </div>
+
+        <!-- 认知层 -->
+        <div class="pc-section">
+          <span class="pc-label purple">认知层 · Cognition</span>
+          <div class="pc-agent">
+            <span class="pc-role">外部监控 Agent</span>
+            <span class="pc-llm">MiniMax M2.5 · T=0.3</span>
+          </div>
+          <div class="pc-vline"></div>
+          <div class="pc-agent">
+            <span class="pc-role">内部审计 Agent</span>
+            <span class="pc-badge rag">RAG</span>
+            <span class="pc-llm">DeepSeek V3.2 · T=0.2</span>
+          </div>
+          <div class="pc-vline"></div>
+          <div class="pc-agent judge">
+            <span class="pc-role">主审法官 Agent</span>
+            <span class="pc-badge">CoT</span>
+            <span class="pc-llm">Qwen3-Max · T=0.1</span>
+          </div>
+          <div class="pc-vline"></div>
+        </div>
+
+        <!-- 输出层 -->
+        <div class="pc-section">
+          <span class="pc-label yellow">输出层 · Output</span>
+          <div class="pc-out-wrap">
+            <div class="pc-out">
+              <div class="pc-out-name">舞弊风险概率</div>
+              <div class="pc-out-sub">F1: 0.316 ↑33% Recall</div>
+            </div>
+            <div class="pc-out">
+              <div class="pc-out-name">可解释审计底稿</div>
+              <div class="pc-out-sub">全链路证据溯源</div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+      <span style="display:block;margin-top:18px;font-size:10px;letter-spacing:3px;color:rgba(255,255,255,.2);text-transform:uppercase;text-align:center">04 / 04</span>
     </div>
     <div class="proj-half-info">
       <p class="proj-time" style="color:var(--purple)" data-i18n="zh:2025-11 – 2026-03 · 学术;en:Nov 2025 – Mar 2026 · Academic">2025-11 – 2026-03 · 学术</p>
