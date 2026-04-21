@@ -10,12 +10,12 @@
 <style>
 :root{
   --bg:#FFFCF8;--bg2:#FFF7F0;
-  --text:#1A1828;--muted:rgba(26,24,40,.48);--subtle:rgba(26,24,40,.06);
+  --text:#F4EEF9;--muted:rgba(244,238,249,.55);--subtle:rgba(255,255,255,.06);
   --pink:#FF8FAB;--pink-l:#FFE3EC;--pink-d:rgba(255,143,171,.12);--pink-b:rgba(255,143,171,.28);
   --blue:#6CB8E8;--blue-l:#D5EDFB;--blue-d:rgba(108,184,232,.12);--blue-b:rgba(108,184,232,.3);
   --yellow:#FFCA5F;--yellow-l:#FFF3CC;--yellow-d:rgba(255,202,95,.14);--yellow-b:rgba(255,202,95,.36);
   --purple:#c084fc;
-  --border:rgba(26,24,40,.08);
+  --border:rgba(255,255,255,.14);
   --serif:'Instrument Serif','Noto Serif SC',serif;
   --sans:'Barlow','Noto Sans SC',sans-serif;
 }
@@ -25,9 +25,24 @@ body{background:#060008;color:var(--text);font-family:var(--sans);font-weight:30
 a{color:inherit;text-decoration:none}
 ::selection{background:var(--pink-d)}
 
-/* ── Background canvas ─────────────────────── */
-#bg-scene{position:fixed;inset:0;z-index:0;pointer-events:none}
-#bg-canvas{width:100%;height:100%;display:block}
+/* ── Background ─────────────────────────────── */
+#bg-scene{
+  position:fixed;inset:0;z-index:0;pointer-events:none;
+  background:#0d0818;
+}
+#bg-scene::before{
+  content:'';position:absolute;inset:0;
+  background:
+    radial-gradient(ellipse 72% 58% at 22% 32%, rgba(255,100,155,.20) 0%, transparent 65%),
+    radial-gradient(ellipse 58% 48% at 78% 68%, rgba(100,165,240,.13) 0%, transparent 62%),
+    radial-gradient(ellipse 52% 64% at 52% 98%, rgba(170,90,255,.11) 0%, transparent 58%),
+    radial-gradient(ellipse 40% 32% at 60% 15%, rgba(255,160,200,.10) 0%, transparent 55%);
+  animation:bgpulse 9s ease-in-out infinite alternate;
+}
+@keyframes bgpulse{
+  0%{opacity:.75}
+  100%{opacity:1}
+}
 
 /* ── Liquid glass mixin ───────────────────── */
 /* shared liquid-glass variables used across components */
@@ -115,10 +130,10 @@ nav{
   backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);
   border:1px solid rgba(255,255,255,.32);
   box-shadow:inset 0 1px 0 rgba(255,255,255,.5),0 4px 16px rgba(255,140,180,.08);
-  font-size:17px;color:rgba(26,24,40,.72);line-height:1.95;
+  font-size:17px;color:rgba(255,255,255,.72);line-height:1.95;
 }
 .hero-bio p+p{margin-top:10px}
-.hero-bio strong{color:var(--text);font-weight:500}
+.hero-bio strong{color:#fff;font-weight:500}
 
 /* Skill chips */
 .skill-chips{display:flex;flex-wrap:wrap;gap:9px;margin-bottom:36px}
@@ -131,8 +146,8 @@ nav{
 }
 .chip:hover{transform:translateY(-2px);box-shadow:inset 0 1px 0 rgba(255,255,255,.60),0 6px 18px rgba(255,140,180,.15)}
 .chip-pink{background:rgba(255,143,171,.14);border:1px solid rgba(255,143,171,.35);color:var(--pink)}
-.chip-blue{background:rgba(108,184,232,.14);border:1px solid rgba(108,184,232,.38);color:#3a8fc4}
-.chip-yellow{background:rgba(255,202,95,.16);border:1px solid rgba(255,202,95,.40);color:#b87c00}
+.chip-blue{background:rgba(108,184,232,.14);border:1px solid rgba(108,184,232,.38);color:var(--blue)}
+.chip-yellow{background:rgba(255,202,95,.16);border:1px solid rgba(255,202,95,.40);color:var(--yellow)}
 
 /* CTAs */
 .hero-ctas{display:flex;gap:10px;flex-wrap:wrap}
@@ -158,7 +173,7 @@ nav{
 .cta-blue{
   display:inline-flex;align-items:center;gap:6px;
   padding:13px 32px;border-radius:9999px;
-  border:1px solid var(--blue-b);color:#3a8fc4;
+  border:1px solid var(--blue-b);color:var(--blue);
   background:var(--blue-d);
   font-size:15px;font-weight:400;letter-spacing:.02em;
   transition:all .25s;cursor:pointer;
@@ -251,7 +266,7 @@ nav{
 }
 .stat-n.pink{color:var(--pink)}
 .stat-n.blue{color:var(--blue)}
-.stat-n.yellow{color:#e0a020}
+.stat-n.yellow{color:var(--yellow)}
 .stat-n.green{color:#6bbe9e}
 .stat-l{font-size:11px;letter-spacing:.05em;color:var(--muted);font-weight:400}
 
@@ -369,6 +384,75 @@ nav{
   margin-top:10px;font-size:11px;color:var(--purple);letter-spacing:.04em;
 }
 
+/* ── Full-screen Project Slides ── */
+#projects{
+  position:relative;height:100vh;
+  overflow-y:scroll;scroll-snap-type:y mandatory;
+  scrollbar-width:none;z-index:1;
+}
+#projects::-webkit-scrollbar{display:none}
+.proj-slide{
+  height:100vh;scroll-snap-align:start;
+  display:grid;grid-template-columns:1fr 1fr;
+  position:relative;overflow:hidden;
+}
+.proj-half-img{position:relative;overflow:hidden;background:#0a0618}
+.proj-half-img img{width:100%;height:100%;object-fit:cover;display:block;transition:transform .7s ease}
+.proj-slide:hover .proj-half-img img{transform:scale(1.04)}
+.proj-half-overlay{
+  position:absolute;inset:0;
+  background:linear-gradient(135deg,rgba(13,8,24,.35) 0%,transparent 55%);
+  pointer-events:none;
+}
+.proj-slide-num{
+  position:absolute;bottom:28px;left:28px;
+  font-size:11px;letter-spacing:3px;
+  color:rgba(255,255,255,.3);text-transform:uppercase;
+  font-family:var(--sans);
+}
+.proj-half-info{
+  display:flex;flex-direction:column;justify-content:center;
+  padding:60px clamp(36px,5vw,76px);
+  background:rgba(13,8,24,.55);
+  backdrop-filter:blur(28px) saturate(150%);-webkit-backdrop-filter:blur(28px) saturate(150%);
+  border-left:1px solid rgba(255,255,255,.1);
+  overflow-y:auto;
+}
+.proj-slide-header{margin-bottom:36px}
+.proj-slide-header .sec-eyebrow{margin-bottom:4px}
+.proj-slide-header .sec-title{margin-bottom:0;font-size:clamp(28px,3.5vw,44px)}
+#projects .proj-time{font-size:11px;letter-spacing:1.5px;text-transform:uppercase;margin-bottom:8px;font-weight:500}
+#projects .proj-name{font-size:clamp(20px,2.2vw,28px);font-weight:700;color:#fff;margin-bottom:14px;line-height:1.2}
+#projects .proj-desc{font-size:14px;color:rgba(255,255,255,.6);line-height:1.72;margin-bottom:20px;max-width:460px}
+#projects .tag-row{margin-bottom:22px}
+#projects .proj-links{gap:20px}
+#projects .proj-link{font-size:13px}
+.proj-half-abstract{
+  display:flex;flex-direction:column;justify-content:center;
+  padding:60px clamp(36px,5vw,76px);
+  background:rgba(192,132,252,.05);
+  border-right:1px solid rgba(192,132,252,.18);
+  overflow-y:auto;
+}
+.proj-nav{
+  position:fixed;right:28px;top:50%;transform:translateY(-50%);
+  display:flex;flex-direction:column;gap:12px;
+  z-index:200;opacity:0;transition:opacity .3s;pointer-events:none;
+}
+.proj-nav.visible{opacity:1;pointer-events:all}
+.proj-nav-dot{
+  width:8px;height:8px;border-radius:50%;
+  border:1.5px solid rgba(255,255,255,.35);background:transparent;
+  cursor:pointer;padding:0;transition:all .25s;display:block;
+}
+.proj-nav-dot.active{transform:scale(1.4)}
+@media(max-width:700px){
+  .proj-slide{grid-template-columns:1fr;grid-template-rows:50vh 50vh}
+  .proj-half-info{padding:24px 20px;border-left:none;border-top:1px solid rgba(255,255,255,.1)}
+  .proj-half-abstract{padding:24px 20px;border-right:none;border-bottom:1px solid rgba(192,132,252,.18)}
+  .proj-nav{display:none}
+}
+
 /* ── Services section ────────────────────── */
 #services .svc-grid{
   display:grid;grid-template-columns:repeat(4,1fr);gap:16px;
@@ -473,7 +557,7 @@ nav{
 <body>
 
 <!-- ── Background canvas ── -->
-<div id="bg-scene" aria-hidden="true"><canvas id="bg-canvas"></canvas></div>
+<div id="bg-scene" aria-hidden="true"></div>
 
 <nav>
   <span class="nav-logo" onclick="scrollTo({top:0,behavior:'smooth'})">水母银河</span>
@@ -566,137 +650,113 @@ nav{
 
 <!-- ══════════════ PROJECTS ══════════════ -->
 <section id="projects">
-<div class="section-wrap">
-  <p class="sec-eyebrow reveal" style="color:var(--pink)" data-i18n="zh:作品集;en:Works">作品集</p>
-  <h2 class="sec-title reveal d1" data-i18n="zh:我做过什么;en:Selected Projects">我做过什么</h2>
 
-  <div class="tl-track">
-
-    <!-- ① Spirit Construct — left:screenshot  right:text -->
-    <div class="tl-row reveal">
-      <div class="tl-left">
-        <div class="glass-card">
-          <div class="proj-img">
-            <img src="references/spirit-construct-first.png" alt="Spirit Construct 界面截图" loading="lazy">
-          </div>
-        </div>
+  <!-- ① Spirit Construct -->
+  <div class="proj-slide">
+    <div class="proj-half-img">
+      <img src="references/spirit-construct-first.png" alt="Spirit Construct 界面截图" loading="lazy">
+      <div class="proj-half-overlay"></div>
+      <span class="proj-slide-num">01 / 04</span>
+    </div>
+    <div class="proj-half-info">
+      <div class="proj-slide-header">
+        <p class="sec-eyebrow" style="color:var(--pink)" data-i18n="zh:作品集;en:Projects">作品集</p>
+        <h2 class="sec-title" data-i18n="zh:我做过什么;en:Selected Work">我做过什么</h2>
       </div>
-      <div class="tl-node"><div class="tl-dot" style="background:var(--pink);border-color:rgba(255,143,171,.4)"></div></div>
-      <div class="tl-right">
-        <div class="glass-card">
-          <div class="proj-body">
-            <p class="proj-time" style="color:var(--pink)" data-i18n="zh:2026-01 · 至今;en:Jan 2026 · Present">2026-01 · 至今</p>
-            <h3 class="proj-name">Spirit Construct · 灵构</h3>
-            <p class="proj-desc" data-i18n="zh:面向AI产品经理的垂直SaaS工具，Vibe Coding模式30小时完成MVP，含大模型ROI计算器与可视化参数调试场；采用Serverless边缘路由大幅压降服务器成本。;en:Vertical SaaS for AI PMs — MVP shipped in 30h via Vibe Coding. Features LLM ROI calculator and visual parameter debugger with serverless edge routing.">面向AI产品经理的垂直SaaS工具，Vibe Coding模式30小时完成MVP，含大模型ROI计算器与可视化参数调试场；采用Serverless边缘路由大幅压降服务器成本。</p>
-            <div class="tag-row">
-              <span class="tag tag-pink">SaaS</span>
-              <span class="tag tag-blue">SSE流式输出</span>
-              <span class="tag tag-yellow">Serverless</span>
-              <span class="tag tag-pink">Fetch API</span>
-            </div>
-            <div class="proj-links">
-              <a class="proj-link" style="color:var(--pink)" href="https://spirit-construct-maropion.top/" target="_blank" rel="noopener" aria-label="Spirit Construct 线上演示">↗ <span data-i18n="zh:线上演示;en:Live Demo">线上演示</span></a>
-              <a class="proj-link" style="color:rgba(255,255,255,.45)" href="https://github.com/Maropion03/Spirit-Construct-AIPM-stack" target="_blank" rel="noopener" aria-label="Spirit Construct GitHub">⎇ GitHub</a>
-            </div>
-          </div>
-        </div>
+      <p class="proj-time" style="color:var(--pink)" data-i18n="zh:2026-01 · 至今;en:Jan 2026 · Present">2026-01 · 至今</p>
+      <h3 class="proj-name">Spirit Construct · 灵构</h3>
+      <p class="proj-desc" data-i18n="zh:面向AI产品经理的垂直SaaS工具，Vibe Coding模式30小时完成MVP，含大模型ROI计算器与可视化参数调试场；采用Serverless边缘路由大幅压降服务器成本。;en:Vertical SaaS for AI PMs — MVP shipped in 30h via Vibe Coding. Features LLM ROI calculator and visual parameter debugger with serverless edge routing.">面向AI产品经理的垂直SaaS工具，Vibe Coding模式30小时完成MVP，含大模型ROI计算器与可视化参数调试场；采用Serverless边缘路由大幅压降服务器成本。</p>
+      <div class="tag-row">
+        <span class="tag tag-pink">SaaS</span>
+        <span class="tag tag-blue">SSE流式输出</span>
+        <span class="tag tag-yellow">Serverless</span>
+        <span class="tag tag-pink">Fetch API</span>
+      </div>
+      <div class="proj-links">
+        <a class="proj-link" style="color:var(--pink)" href="https://spirit-construct-maropion.top/" target="_blank" rel="noopener" aria-label="Spirit Construct 线上演示">↗ <span data-i18n="zh:线上演示;en:Live Demo">线上演示</span></a>
+        <a class="proj-link" style="color:rgba(255,255,255,.45)" href="https://github.com/Maropion03/Spirit-Construct-AIPM-stack" target="_blank" rel="noopener" aria-label="Spirit Construct GitHub">⎇ GitHub</a>
       </div>
     </div>
+  </div>
 
-    <!-- ② PRD评审工作台 — left:text  right:screenshot -->
-    <div class="tl-row reveal d1">
-      <div class="tl-left">
-        <div class="glass-card">
-          <div class="proj-body">
-            <p class="proj-time" style="color:var(--blue)" data-i18n="zh:2026-01 – 2026-03;en:Jan – Mar 2026">2026-01 – 2026-03</p>
-            <h3 class="proj-name">PRD 智能评审工作台</h3>
-            <p class="proj-desc" data-i18n="zh:基于CrewAI多Agent架构设计6维度评审系统，FastAPI+SSE实现实时流式推送，单次评审从人工2h缩短至AI辅助3min，支持PDF/Markdown双格式导出，Docker部署上线。;en:6-dimension PRD review system built on CrewAI multi-agent. FastAPI+SSE streaming. Review time cut from 2h manual to 3min AI-assisted. PDF/MD export, Dockerized.">基于CrewAI多Agent架构设计6维度评审系统，FastAPI+SSE实现实时流式推送，单次评审从人工2h缩短至AI辅助3min，支持PDF/Markdown双格式导出，Docker部署上线。</p>
-            <div class="tag-row">
-              <span class="tag tag-blue">Multi-Agent</span>
-              <span class="tag tag-yellow">FastAPI + SSE</span>
-              <span class="tag tag-pink">Docker</span>
-              <span class="tag tag-blue">CrewAI</span>
-            </div>
-            <div class="proj-links">
-              <a class="proj-link" style="color:var(--blue)" href="https://awesome-requirement-review-agent-production.up.railway.app/single-page-shell.html" target="_blank" rel="noopener" aria-label="PRD评审工作台线上演示">↗ <span data-i18n="zh:线上演示;en:Live Demo">线上演示</span></a>
-              <a class="proj-link" style="color:rgba(255,255,255,.45)" href="https://github.com/Maropion03/awesome-requirement-review-agent" target="_blank" rel="noopener" aria-label="PRD评审工作台 GitHub">⎇ GitHub</a>
-            </div>
-          </div>
-        </div>
+  <!-- ② PRD评审工作台 -->
+  <div class="proj-slide">
+    <div class="proj-half-img">
+      <img src="references/评审助手页.png" alt="PRD智能评审工作台界面截图" loading="lazy">
+      <div class="proj-half-overlay"></div>
+      <span class="proj-slide-num">02 / 04</span>
+    </div>
+    <div class="proj-half-info">
+      <p class="proj-time" style="color:var(--blue)" data-i18n="zh:2026-01 – 2026-03;en:Jan – Mar 2026">2026-01 – 2026-03</p>
+      <h3 class="proj-name">PRD 智能评审工作台</h3>
+      <p class="proj-desc" data-i18n="zh:基于CrewAI多Agent架构设计6维度评审系统，FastAPI+SSE实现实时流式推送，单次评审从人工2h缩短至AI辅助3min，支持PDF/Markdown双格式导出，Docker部署上线。;en:6-dimension PRD review system built on CrewAI multi-agent. FastAPI+SSE streaming. Review time cut from 2h manual to 3min AI-assisted. PDF/MD export, Dockerized.">基于CrewAI多Agent架构设计6维度评审系统，FastAPI+SSE实现实时流式推送，单次评审从人工2h缩短至AI辅助3min，支持PDF/Markdown双格式导出，Docker部署上线。</p>
+      <div class="tag-row">
+        <span class="tag tag-blue">Multi-Agent</span>
+        <span class="tag tag-yellow">FastAPI + SSE</span>
+        <span class="tag tag-pink">Docker</span>
+        <span class="tag tag-blue">CrewAI</span>
       </div>
-      <div class="tl-node"><div class="tl-dot" style="background:var(--blue);border-color:rgba(108,184,232,.4)"></div></div>
-      <div class="tl-right">
-        <div class="glass-card">
-          <div class="proj-img">
-            <img src="references/评审助手页.png" alt="PRD智能评审工作台界面截图" loading="lazy">
-          </div>
-        </div>
+      <div class="proj-links">
+        <a class="proj-link" style="color:var(--blue)" href="https://awesome-requirement-review-agent-production.up.railway.app/single-page-shell.html" target="_blank" rel="noopener" aria-label="PRD评审工作台线上演示">↗ <span data-i18n="zh:线上演示;en:Live Demo">线上演示</span></a>
+        <a class="proj-link" style="color:rgba(255,255,255,.45)" href="https://github.com/Maropion03/awesome-requirement-review-agent" target="_blank" rel="noopener" aria-label="PRD评审工作台 GitHub">⎇ GitHub</a>
       </div>
     </div>
+  </div>
 
-    <!-- ③ LLM Eval Studio — left:screenshot  right:text -->
-    <div class="tl-row reveal d2">
-      <div class="tl-left">
-        <div class="glass-card">
-          <div class="proj-img">
-            <img src="references/LLM评测平台.png" alt="LLM Eval Studio 界面截图" loading="lazy">
-          </div>
-        </div>
+  <!-- ③ LLM Eval Studio -->
+  <div class="proj-slide">
+    <div class="proj-half-img">
+      <img src="references/LLM评测平台.png" alt="LLM Eval Studio 界面截图" loading="lazy">
+      <div class="proj-half-overlay"></div>
+      <span class="proj-slide-num">03 / 04</span>
+    </div>
+    <div class="proj-half-info">
+      <p class="proj-time" style="color:var(--yellow)" data-i18n="zh:2025-11 – 2026-03;en:Nov 2025 – Mar 2026">2025-11 – 2026-03</p>
+      <h3 class="proj-name">LLM Eval Studio</h3>
+      <p class="proj-desc" data-i18n="zh:Prompt调试台与LLM多维Judge评测平台，支持自定义评分标准（Faithfulness/Relevance/Coherence）与测试用例批量管理，内置系统Prompt与上下文注入。;en:Prompt debugger and multi-dimension LLM judge platform. Custom scoring criteria (Faithfulness/Relevance/Coherence), batch test-case management, system-prompt injection.">Prompt调试台与LLM多维Judge评测平台，支持自定义评分标准（Faithfulness/Relevance/Coherence）与测试用例批量管理，内置系统Prompt与上下文注入。</p>
+      <div class="tag-row">
+        <span class="tag tag-yellow">Prompt Eng</span>
+        <span class="tag tag-pink">LLM Eval</span>
+        <span class="tag tag-yellow">Judge系统</span>
       </div>
-      <div class="tl-node"><div class="tl-dot" style="background:var(--yellow);border-color:rgba(255,202,95,.4)"></div></div>
-      <div class="tl-right">
-        <div class="glass-card">
-          <div class="proj-body">
-            <p class="proj-time" style="color:var(--yellow)" data-i18n="zh:2025-11 – 2026-03;en:Nov 2025 – Mar 2026">2025-11 – 2026-03</p>
-            <h3 class="proj-name">LLM Eval Studio</h3>
-            <p class="proj-desc" data-i18n="zh:Prompt调试台与LLM多维Judge评测平台，支持自定义评分标准（Faithfulness/Relevance/Coherence）与测试用例批量管理，内置系统Prompt与上下文注入。;en:Prompt debugger and multi-dimension LLM judge platform. Custom scoring criteria (Faithfulness/Relevance/Coherence), batch test-case management, system-prompt injection.">Prompt调试台与LLM多维Judge评测平台，支持自定义评分标准（Faithfulness/Relevance/Coherence）与测试用例批量管理，内置系统Prompt与上下文注入。</p>
-            <div class="tag-row">
-              <span class="tag tag-yellow">Prompt Eng</span>
-              <span class="tag tag-pink">LLM Eval</span>
-              <span class="tag tag-yellow">Judge系统</span>
-            </div>
-            <div class="proj-links">
-              <span class="proj-link" style="color:rgba(255,255,255,.3)" data-i18n="zh:内部工具;en:Internal Tool">内部工具</span>
-            </div>
-          </div>
-        </div>
+      <div class="proj-links">
+        <span class="proj-link" style="color:rgba(255,255,255,.3)" data-i18n="zh:内部工具;en:Internal Tool">内部工具</span>
       </div>
     </div>
+  </div>
 
-    <!-- ④ 财务舞弊研究 — left:abstract  right:text -->
-    <div class="tl-row reveal d3">
-      <div class="tl-left">
-        <div class="glass-card">
-          <div class="proj-abstract">
-            <p class="abstract-title">融合检索增强生成与多智能体协同的上市公司财务舞弊深度识别研究</p>
-            <p>As financial fraud in capital markets becomes increasingly covert, this study constructs a dual-channel perception network (TextCNN + FinBERT) fused with a multi-agent debate framework for deep cross-source semantic verification.</p>
-            <p class="abstract-kw">Keywords: Financial Fraud Detection · RAG · Multi-Agent · FinBERT · ChromaDB</p>
-          </div>
-        </div>
+  <!-- ④ 财务舞弊研究 -->
+  <div class="proj-slide">
+    <div class="proj-half-abstract">
+      <p class="abstract-title">融合检索增强生成与多智能体协同的上市公司财务舞弊深度识别研究</p>
+      <p style="font-size:12px;color:rgba(255,255,255,.55);line-height:1.75;margin:12px 0">As financial fraud in capital markets becomes increasingly covert, this study constructs a dual-channel perception network (TextCNN + FinBERT) fused with a multi-agent debate framework for deep cross-source semantic verification.</p>
+      <p class="abstract-kw">Keywords: Financial Fraud Detection · RAG · Multi-Agent · FinBERT · ChromaDB</p>
+      <span style="display:block;margin-top:36px;font-size:11px;letter-spacing:3px;color:rgba(255,255,255,.25);text-transform:uppercase">04 / 04</span>
+    </div>
+    <div class="proj-half-info">
+      <p class="proj-time" style="color:var(--purple)" data-i18n="zh:2025-11 – 2026-03 · 学术;en:Nov 2025 – Mar 2026 · Academic">2025-11 – 2026-03 · 学术</p>
+      <h3 class="proj-name" data-i18n="zh:上市公司财务舞弊识别研究;en:Financial Fraud Detection Research">上市公司财务舞弊识别研究</h3>
+      <p class="proj-desc" data-i18n="zh:独立完成「感知-认知」双层架构设计与核心代码实现。TextCNN+FinBERT双通道提取短频风险与长文语义，RAG靶向召回百份年报，三节点Agent辩论框架核查幻觉。极度不平衡样本下F1显著领跑传统单模型基线。;en:Sole architect of dual-layer perception-cognition system. TextCNN+FinBERT dual-channel extraction, RAG over 100+ annual reports, 3-agent debate for hallucination checking. F1 significantly outperforms single-model baselines on imbalanced samples.">独立完成「感知-认知」双层架构设计与核心代码实现。TextCNN+FinBERT双通道提取短频风险与长文语义，RAG靶向召回百份年报，三节点Agent辩论框架核查幻觉。极度不平衡样本下F1显著领跑传统单模型基线。</p>
+      <div class="tag-row">
+        <span class="tag tag-purple">RAG</span>
+        <span class="tag tag-purple">FinBERT</span>
+        <span class="tag tag-purple">ChromaDB</span>
+        <span class="tag tag-purple">Multi-Agent</span>
       </div>
-      <div class="tl-node"><div class="tl-dot" style="background:var(--purple);border-color:rgba(192,132,252,.4)"></div></div>
-      <div class="tl-right">
-        <div class="glass-card">
-          <div class="proj-body">
-            <p class="proj-time" style="color:var(--purple)" data-i18n="zh:2025-11 – 2026-03 · 学术;en:Nov 2025 – Mar 2026 · Academic">2025-11 – 2026-03 · 学术</p>
-            <h3 class="proj-name" data-i18n="zh:上市公司财务舞弊识别研究;en:Financial Fraud Detection Research">上市公司财务舞弊识别研究</h3>
-            <p class="proj-desc" data-i18n="zh:独立完成「感知-认知」双层架构设计与核心代码实现。TextCNN+FinBERT双通道提取短频风险与长文语义，RAG靶向召回百份年报，三节点Agent辩论框架核查幻觉。极度不平衡样本下F1显著领跑传统单模型基线。;en:Sole architect of dual-layer perception-cognition system. TextCNN+FinBERT dual-channel extraction, RAG over 100+ annual reports, 3-agent debate for hallucination checking. F1 significantly outperforms single-model baselines on imbalanced samples.">独立完成「感知-认知」双层架构设计与核心代码实现。TextCNN+FinBERT双通道提取短频风险与长文语义，RAG靶向召回百份年报，三节点Agent辩论框架核查幻觉。极度不平衡样本下F1显著领跑传统单模型基线。</p>
-            <div class="tag-row">
-              <span class="tag tag-purple">RAG</span>
-              <span class="tag tag-purple">FinBERT</span>
-              <span class="tag tag-purple">ChromaDB</span>
-              <span class="tag tag-purple">Multi-Agent</span>
-            </div>
-            <div class="proj-links">
-              <span class="proj-link" style="color:var(--purple)" data-i18n="zh:核心研究员;en:Core Researcher">核心研究员</span>
-            </div>
-          </div>
-        </div>
+      <div class="proj-links">
+        <span class="proj-link" style="color:var(--purple)" data-i18n="zh:核心研究员;en:Core Researcher">核心研究员</span>
       </div>
     </div>
+  </div>
 
-  </div><!-- /.tl-track -->
-</div><!-- /.section-wrap -->
+  <!-- Navigation dots -->
+  <div class="proj-nav" id="projNav" aria-label="项目导航">
+    <button class="proj-nav-dot active" data-idx="0" aria-label="项目 1"></button>
+    <button class="proj-nav-dot" data-idx="1" aria-label="项目 2"></button>
+    <button class="proj-nav-dot" data-idx="2" aria-label="项目 3"></button>
+    <button class="proj-nav-dot" data-idx="3" aria-label="项目 4"></button>
+  </div>
+
 </section>
 
 <!-- ══════════════ SERVICES ══════════════ -->
@@ -938,6 +998,37 @@ applyLang();
 const ro=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting)e.target.classList.add('vis')}),{threshold:.1});
 document.querySelectorAll('.reveal').forEach(el=>ro.observe(el));
 
+// Project slide navigation dots
+(function(){
+  var sec=document.getElementById('projects');
+  if(!sec)return;
+  var slides=[].slice.call(sec.querySelectorAll('.proj-slide'));
+  var nav=document.getElementById('projNav');
+  var dots=nav?[].slice.call(nav.querySelectorAll('.proj-nav-dot')):[];
+  var colors=['var(--pink)','var(--blue)','var(--yellow)','var(--purple)'];
+  function setActive(idx){
+    dots.forEach(function(d,i){
+      var on=i===idx;
+      d.classList.toggle('active',on);
+      d.style.background=on?colors[idx]:'';
+      d.style.borderColor=on?colors[idx]:'';
+    });
+  }
+  new IntersectionObserver(function(es){
+    if(nav)nav.classList.toggle('visible',es[0].isIntersecting);
+  },{threshold:.1}).observe(sec);
+  var slideObs=new IntersectionObserver(function(es){
+    es.forEach(function(e){
+      if(e.isIntersecting){var idx=slides.indexOf(e.target);if(idx>=0)setActive(idx);}
+    });
+  },{root:sec,threshold:.5});
+  slides.forEach(function(s){slideObs.observe(s);});
+  dots.forEach(function(d,i){
+    d.addEventListener('click',function(){slides[i].scrollIntoView({behavior:'smooth'});});
+  });
+  setActive(0);
+})();
+
 // WeChat copy
 function copyWechat(){
   navigator.clipboard.writeText('MRP18565682722').then(()=>{
@@ -951,120 +1042,5 @@ function copyWechat(){
 }
 </script>
 
-<script>
-/* ── 4K pink aurora / flowing-light background ── */
-(function(){
-  const canvas = document.getElementById('bg-canvas');
-  const ctx    = canvas.getContext('2d');
-  const dpr    = Math.min(window.devicePixelRatio||1, 3);
-
-  let W, H;
-  function resize(){
-    W = window.innerWidth; H = window.innerHeight;
-    canvas.width  = W * dpr;
-    canvas.height = H * dpr;
-    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-  }
-  resize();
-  window.addEventListener('resize', resize);
-
-  /* Orbs: cx,cy (relative), rx,ry (relative to max dim),
-           hue, alpha, ampX, ampY, freqX, freqY, phX, phY */
-  const ORBS = [
-    [0.22, 0.38, 0.58, 0.48, 338, 0.82, 0.11, 0.09, 3.8e-4, 3.0e-4, 0.0, 1.0],
-    [0.72, 0.28, 0.54, 0.44, 318, 0.74, 0.13, 0.10, 4.5e-4, 3.5e-4, 1.8, 0.5],
-    [0.50, 0.78, 0.65, 0.55, 350, 0.70, 0.08, 0.12, 3.2e-4, 4.2e-4, 3.5, 2.0],
-    [0.12, 0.62, 0.46, 0.38, 305, 0.64, 0.10, 0.07, 4.1e-4, 3.8e-4, 0.8, 3.2],
-    [0.86, 0.62, 0.52, 0.43, 330, 0.72, 0.07, 0.11, 5.0e-4, 3.0e-4, 2.6, 1.5],
-    [0.40, 0.18, 0.44, 0.36, 315, 0.60, 0.14, 0.07, 3.5e-4, 5.0e-4, 4.2, 0.8],
-    [0.78, 0.52, 0.50, 0.41, 342, 0.66, 0.09, 0.10, 4.8e-4, 3.6e-4, 1.2, 2.8],
-  ];
-
-  /* Streaks: baseY, lenX, thickness, hue, alpha, freq, phase */
-  const STREAKS = [
-    [0.26, 0.90, 0.038, 340, 0.30, 1.2e-4, 0.0],
-    [0.50, 0.74, 0.028, 322, 0.24, 1.5e-4, 2.1],
-    [0.68, 0.82, 0.033, 352, 0.26, 1.0e-4, 4.0],
-    [0.38, 0.66, 0.022, 312, 0.20, 1.8e-4, 1.3],
-  ];
-
-  function frame(ts){
-    ctx.clearRect(0, 0, W, H);
-
-    /* ── Base gradient ── */
-    const bg = ctx.createRadialGradient(W*.50, H*.40, 0, W*.50, H*.40, Math.max(W,H)*.92);
-    bg.addColorStop(0.00, '#FFECF3');
-    bg.addColorStop(0.30, '#FFD8EA');
-    bg.addColorStop(0.62, '#FFBFDC');
-    bg.addColorStop(1.00, '#F5A0C5');
-    ctx.fillStyle = bg;
-    ctx.fillRect(0, 0, W, H);
-
-    /* ── Glowing orbs ── */
-    const R = Math.max(W, H);
-    ORBS.forEach(([cx,cy,rx,ry,hue,alpha,ax,ay,fx,fy,px,py]) => {
-      const x  = (cx + ax * Math.sin(ts*fx + px)) * W;
-      const y  = (cy + ay * Math.cos(ts*fy + py)) * H;
-      const rr = rx * R * 0.56;
-
-      ctx.save();
-      ctx.translate(x, y);
-      ctx.scale(1, (ry/rx) * 0.78);
-
-      const g = ctx.createRadialGradient(0,0,0, 0,0,rr);
-      g.addColorStop(0.00, `hsla(${hue},100%,90%,${alpha})`);
-      g.addColorStop(0.28, `hsla(${hue}, 96%,86%,${alpha*0.55})`);
-      g.addColorStop(0.60, `hsla(${hue}, 88%,82%,${alpha*0.18})`);
-      g.addColorStop(1.00, `hsla(${hue}, 80%,78%,0)`);
-
-      ctx.fillStyle = g;
-      ctx.beginPath();
-      ctx.arc(0, 0, rr, 0, Math.PI*2);
-      ctx.fill();
-      ctx.restore();
-    });
-
-    /* ── Flowing light streaks (流光) ── */
-    STREAKS.forEach(([by,len,thick,hue,alpha,freq,ph]) => {
-      const yC  = (by + 0.06*Math.sin(ts*freq*2 + ph)) * H;
-      const xOff= 0.10 * Math.sin(ts*freq + ph);
-      const x0  = ((0.5 - len/2) + xOff) * W;
-      const x1  = x0 + len * W;
-      const thk = thick * H;
-
-      const sg = ctx.createLinearGradient(x0, 0, x1, 0);
-      sg.addColorStop(0.00, `hsla(${hue},100%,92%,0)`);
-      sg.addColorStop(0.14, `hsla(${hue},100%,92%,${alpha})`);
-      sg.addColorStop(0.50, `hsla(${hue+8},100%,96%,${alpha*1.35})`);
-      sg.addColorStop(0.86, `hsla(${hue},100%,92%,${alpha})`);
-      sg.addColorStop(1.00, `hsla(${hue},100%,92%,0)`);
-
-      /* soft multi-pass to fake Gaussian spread */
-      for(let i=0; i<7; i++){
-        const t2   = i/6;
-        const fade = Math.sin(t2*Math.PI);
-        const dy   = (t2-0.5) * thk * 5;
-        ctx.globalAlpha = alpha * fade * 0.55;
-        ctx.fillStyle   = sg;
-        ctx.fillRect(x0, yC+dy, x1-x0, thk*0.65);
-      }
-      ctx.globalAlpha = 1;
-    });
-
-    /* ── Central bloom pulse ── */
-    const bpx = W*(0.50 + 0.04*Math.sin(ts*2.8e-4));
-    const bpy = H*(0.36 + 0.03*Math.cos(ts*3.2e-4));
-    const bp  = ctx.createRadialGradient(bpx,bpy,0, bpx,bpy,W*0.32);
-    bp.addColorStop(0.0, `rgba(255,245,252,${0.48+0.12*Math.sin(ts*5e-4)})`);
-    bp.addColorStop(0.4, 'rgba(255,225,242,0.18)');
-    bp.addColorStop(1.0, 'rgba(255,200,232,0)');
-    ctx.fillStyle = bp;
-    ctx.fillRect(0, 0, W, H);
-
-    requestAnimationFrame(frame);
-  }
-  requestAnimationFrame(frame);
-})();
-</script>
 </body>
 </html>
