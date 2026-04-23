@@ -1,0 +1,5 @@
+{"type":"click","text":"📁\n    \n      作品集 · Projects\n      展示你做过的项目，卡片式布局，可附截图、链接、技术标签。参考图里有完整的 Case Studies 样式。","choice":"projects","id":null,"timestamp":1776738976723}
+{"type":"click","text":"⚡\n    \n      服务 · Services\n      你能提供的服务或技能方向（如：UI设计、品牌策划、视频剪辑…），以图标卡片或列表呈现。","choice":"services","id":null,"timestamp":1776738977031}
+{"type":"click","text":"🗂\n    \n      经历 · Experience\n      教育 / 实习 / 工作经历，时间线样式，左图右文，参考图第2张就是这种布局。","choice":"career","id":null,"timestamp":1776738977376}
+{"type":"click","text":"💌\n    \n      联系 · Contact\n      邮箱、微信、社交媒体链接，或者加一个简单的表单。通常放在最底部作为 CTA 收尾。","choice":"contact","id":null,"timestamp":1776738977697}
+{"type":"click","text":"✨\n    \n      关于我 · About（可选）\n      首页英雄区已经有自我介绍，这里可以做一个更详细的展开：个人故事、价值观、兴趣爱好。","choice":"about","id":null,"timestamp":1776738977972}

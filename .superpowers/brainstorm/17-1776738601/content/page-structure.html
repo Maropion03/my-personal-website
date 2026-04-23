@@ -1,0 +1,40 @@
+<h2>页面结构怎么组织？</h2>
+<p class="subtitle">这决定了用户浏览体验和你后续的维护方式</p>
+
+<div class="options">
+  <div class="option" data-choice="a" onclick="toggleSelect(this)">
+    <div class="letter">A</div>
+    <div class="content">
+      <h3>单页滚动（推荐）</h3>
+      <p>所有内容在 <code>index v3.html</code> 里，点导航平滑滚动到各 section。体验流畅、无跳转白屏，和参考图的风格完全一致。</p>
+      <div class="pros-cons" style="margin-top:12px">
+        <div class="pros"><h4>优势</h4><ul><li>无页面切换，体验丝滑</li><li>背景动画全程连贯</li><li>液态玻璃导航栏始终可见</li></ul></div>
+        <div class="cons"><h4>代价</h4><ul><li>单文件会变大</li><li>内容多时需要懒加载</li></ul></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="option" data-choice="b" onclick="toggleSelect(this)">
+    <div class="letter">B</div>
+    <div class="content">
+      <h3>独立 HTML 页面</h3>
+      <p>每个板块是独立文件（projects.html、contact.html…），点导航跳转到新页面。</p>
+      <div class="pros-cons" style="margin-top:12px">
+        <div class="pros"><h4>优势</h4><ul><li>文件结构清晰</li><li>各页可单独定制风格</li></ul></div>
+        <div class="cons"><h4>代价</h4><ul><li>跳转时有白屏闪烁</li><li>背景动画需要每页重新初始化</li><li>共用样式需单独管理</li></ul></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="option" data-choice="c" onclick="toggleSelect(this)">
+    <div class="letter">C</div>
+    <div class="content">
+      <h3>视差分屏切换</h3>
+      <p>仍在单文件内，但每个 section 占满整屏，切换时有淡入/上滑动效，比普通滚动更有设计感。</p>
+      <div class="pros-cons" style="margin-top:12px">
+        <div class="pros"><h4>优势</h4><ul><li>视觉冲击力强</li><li>每屏焦点集中</li></ul></div>
+        <div class="cons"><h4>代价</h4><ul><li>实现稍复杂</li><li>移动端适配需要额外工作</li></ul></div>
+      </div>
+    </div>
+  </div>
+</div>

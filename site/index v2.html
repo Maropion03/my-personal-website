@@ -1,0 +1,606 @@
+﻿<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>姘存瘝閾舵渤 路 AI PM & Builder</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Barlow:wght@300;400;500;600&family=Noto+Serif+SC:wght@400;700&family=Noto+Sans+SC:wght@300;400&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg:#fff8fc;--bg2:#f4f8ff;
+  --text:#322948;--muted:rgba(50,41,72,.62);
+  --accent:#ff72b5;--accent-bg:rgba(255,114,181,.14);--accent-border:rgba(255,114,181,.28);
+  --accent2:#79bfff;--accent3:#ffd86d;
+  --hero-zoom:1.06;
+  --heading:'Instrument Serif','Noto Serif SC',serif;
+  --body:'Barlow','Noto Sans SC',sans-serif;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{background:
+  radial-gradient(1200px 700px at 10% -5%,rgba(255,114,181,.14),transparent 60%),
+  radial-gradient(1000px 600px at 100% 0%,rgba(121,191,255,.17),transparent 62%),
+  radial-gradient(900px 500px at 40% 100%,rgba(255,216,109,.12),transparent 68%),
+  var(--bg);
+  color:var(--text);font-family:var(--body);font-weight:300;line-height:1.65;-webkit-font-smoothing:antialiased;overflow-x:hidden}
+::selection{background:rgba(255,114,181,.28)}
+a{color:inherit;text-decoration:none}
+
+/* 鈹€鈹€ Liquid Glass 鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€ */
+.glass{
+  background:rgba(255,255,255,.42);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);
+  box-shadow:inset 0 1px 1px rgba(255,255,255,.65),0 8px 24px rgba(50,41,72,.08);position:relative;overflow:hidden;
+}
+.glass::before{
+  content:'';position:absolute;inset:0;border-radius:inherit;padding:1.4px;
+  background:linear-gradient(180deg,rgba(255,255,255,.86) 0%,rgba(255,255,255,.34) 22%,transparent 42%,transparent 58%,rgba(255,255,255,.34) 78%,rgba(255,255,255,.86) 100%);
+  -webkit-mask:linear-gradient(#fff 0 0) content-box,linear-gradient(#fff 0 0);-webkit-mask-composite:xor;mask-composite:exclude;pointer-events:none;
+}
+.glass-strong{
+  background:rgba(255,255,255,.58);backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px);
+  box-shadow:4px 10px 20px rgba(50,41,72,.14),inset 0 1px 1px rgba(255,255,255,.8);position:relative;overflow:hidden;
+}
+.glass-strong::before{
+  content:'';position:absolute;inset:0;border-radius:inherit;padding:1.4px;
+  background:linear-gradient(180deg,rgba(255,255,255,.95) 0%,rgba(255,255,255,.4) 22%,transparent 42%,transparent 58%,rgba(255,255,255,.4) 78%,rgba(255,255,255,.95) 100%);
+  -webkit-mask:linear-gradient(#fff 0 0) content-box,linear-gradient(#fff 0 0);-webkit-mask-composite:xor;mask-composite:exclude;pointer-events:none;
+}
+
+/* 鈹€鈹€ Stars (CSS generated) 鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€ */
+#stars{position:fixed;inset:0;z-index:0;pointer-events:none;opacity:.22}
+
+/* 鈹€鈹€ Nav 鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€ */
+nav{position:fixed;top:16px;left:0;right:0;z-index:100;padding:0 clamp(24px,4vw,64px);display:flex;align-items:center;justify-content:space-between}
+.nav-logo{font-family:var(--heading);font-style:italic;font-size:18px;letter-spacing:.04em;color:var(--text);opacity:.9;cursor:pointer}
+.nav-center{display:flex;align-items:center;gap:2px;padding:4px 5px;border-radius:9999px}
+.nav-center a{padding:6px 14px;font-size:13px;font-weight:400;color:rgba(50,41,72,.72);border-radius:9999px;transition:color .2s}
+.nav-center a:hover{color:var(--text)}
+.nav-right{display:flex;align-items:center;gap:12px}
+.pill{display:inline-flex;align-items:center;gap:6px;padding:7px 16px;border-radius:9999px;font-size:12px;font-weight:500;cursor:pointer;transition:all .25s}
+.pill-white{background:linear-gradient(120deg,var(--accent),var(--accent2));color:#fff}
+.pill-white:hover{filter:brightness(1.08)}
+.pill-glass{color:var(--text)}
+.lang-btn{font-size:11px;letter-spacing:.12em;color:var(--muted);cursor:pointer;padding:5px 11px;border-radius:9999px;transition:color .2s}
+.lang-btn:hover{color:var(--text)}
+
+/* 鈹€鈹€ Hero 鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€ */
+#hero{min-height:100vh;padding:100px clamp(24px,4vw,64px) 40px;position:relative;overflow:hidden;display:flex;align-items:flex-end}
+@media(max-width:860px){#hero{padding:116px 20px 28px;align-items:center}}
+.hero-photo-stage{position:absolute;inset:0;z-index:0;overflow:hidden}
+.hero-photo-image{
+  width:100%;height:100%;object-fit:cover;object-position:center 18%;
+  transform:scale(var(--hero-zoom)) rotate(-1deg);
+  filter:saturate(1.14) contrast(1.05) brightness(.8);
+  animation:portrait-drift 14s ease-in-out infinite alternate;
+}
+@keyframes portrait-drift{from{transform:scale(var(--hero-zoom)) translateY(0) rotate(-1deg)}to{transform:scale(calc(var(--hero-zoom) + .03)) translateY(-1.4%) rotate(-.2deg)}}
+.hero-photo-wash{position:absolute;inset:0;background:linear-gradient(118deg,rgba(255,112,179,.52) 0%,rgba(121,191,255,.4) 44%,rgba(255,216,109,.35) 100%);mix-blend-mode:multiply}
+.hero-photo-noise{position:absolute;inset:0;background:
+  radial-gradient(circle at 14% 20%,rgba(255,255,255,.2) 0%,transparent 32%),
+  radial-gradient(circle at 84% 64%,rgba(255,255,255,.16) 0%,transparent 28%);
+  opacity:.65}
+.hero-vignette{position:absolute;inset:0;background:linear-gradient(to bottom,rgba(16,12,26,.18) 0%,rgba(16,12,26,.42) 42%,rgba(16,12,26,.68) 100%)}
+.hero-content{position:relative;z-index:2;max-width:980px}
+.hero-label{font-size:11px;font-weight:600;letter-spacing:.22em;text-transform:uppercase;margin-bottom:20px;display:inline-flex;align-items:center;gap:8px;padding:6px 14px;border-radius:9999px;color:#fff}
+.hero-main{font-size:clamp(54px,11.5vw,158px);line-height:.84;letter-spacing:-.035em;font-family:var(--heading);margin-bottom:18px;color:#f7f2ff;text-transform:uppercase}
+.hero-main span{display:block;text-shadow:0 16px 36px rgba(26,18,38,.24)}
+.hero-main .slice-a{transform:translateX(clamp(0px,4.2vw,42px));color:#c7edff}
+.hero-main .slice-b{transform:translateX(clamp(-2px,-1.2vw,-14px));background:linear-gradient(90deg,#ffe9ff 0%,#c7edff 44%,#ffe27e 100%);-webkit-background-clip:text;color:transparent}
+.hero-main .slice-c{transform:translateX(clamp(0px,2vw,24px));color:#fff9d8}
+.hero-sub{font-family:var(--heading);font-style:italic;font-size:clamp(14px,2vw,24px);color:rgba(255,255,255,.9);margin-bottom:20px;letter-spacing:.08em}
+.hero-tagline{font-size:clamp(15px,1.6vw,20px);color:rgba(255,255,255,.9);margin-bottom:34px;line-height:1.8;font-weight:400;max-width:560px}
+.hero-tagline em{color:#fff4b9;font-style:normal;font-weight:600}
+.hero-ctas{display:flex;gap:12px;flex-wrap:wrap}
+.hero-loader{position:absolute;right:clamp(18px,5vw,60px);bottom:clamp(26px,7vh,78px);z-index:2;width:86px;height:86px}
+.hero-loader .ring{position:absolute;inset:0;border-radius:50%;border:1.5px solid rgba(255,255,255,.55);border-top-color:transparent;animation:ring-spin 5.6s linear infinite}
+.hero-loader .ring.alt{inset:14px;border-color:rgba(255,234,181,.8);border-right-color:transparent;animation-duration:3.2s;animation-direction:reverse}
+.hero-loader .core{position:absolute;inset:30px;border-radius:50%;background:radial-gradient(circle at 35% 30%,#fff,#ffd86d);box-shadow:0 0 18px rgba(255,216,109,.6)}
+@keyframes ring-spin{to{transform:rotate(1turn)}}
+@media(max-width:860px){
+  .hero-content{max-width:100%}
+  .hero-main{font-size:clamp(48px,19vw,96px)}
+  .hero-main .slice-a,.hero-main .slice-b,.hero-main .slice-c{transform:none}
+  .hero-tagline{max-width:100%}
+  .hero-loader{width:64px;height:64px;right:14px;bottom:22px}
+  .hero-loader .core{inset:22px}
+}
+.hero-fade{position:absolute;bottom:0;left:0;right:0;height:200px;background:linear-gradient(to bottom,transparent,var(--bg));z-index:1;pointer-events:none}
+
+/* 鈹€鈹€ Section styles 鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€ */
+section{position:relative;z-index:1}
+.container{max-width:1100px;margin:0 auto;padding:0 clamp(24px,4vw,64px)}
+.section-badge{display:inline-flex;align-items:center;padding:5px 14px;border-radius:9999px;font-size:11px;font-weight:500;letter-spacing:.15em;text-transform:uppercase;color:var(--accent);margin-bottom:16px}
+.section-title{font-family:var(--heading);font-style:italic;font-size:clamp(30px,4.5vw,48px);line-height:.95;letter-spacing:-.01em;margin-bottom:12px}
+.section-sub{font-size:14px;color:var(--muted);font-weight:300}
+.section-header{text-align:center;margin-bottom:64px}
+.divider{width:100%;height:1px;background:linear-gradient(90deg,transparent,rgba(255,255,255,.06),transparent);margin:0}
+
+/* 鈹€鈹€ Project cards 鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€ */
+#projects{padding:100px 0 80px}
+.projects-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+@media(max-width:900px){.projects-grid{grid-template-columns:1fr}}
+.proj-card{border-radius:20px;transition:transform .3s;cursor:pointer}
+.proj-card:hover{transform:translateY(-4px)}
+.proj-card.open{transform:none}
+.proj-top{padding:28px 24px 22px}
+.proj-tag{display:inline-flex;padding:4px 12px;border-radius:9999px;font-size:10px;letter-spacing:.12em;text-transform:uppercase;font-weight:500;color:var(--accent);margin-bottom:16px}
+.proj-title{font-family:var(--heading);font-style:italic;font-size:20px;margin-bottom:8px;line-height:1.2}
+.proj-desc{font-size:13px;color:var(--muted);line-height:1.65;margin-bottom:18px}
+.proj-metrics{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:18px}
+.metric{text-align:center;padding:8px 14px;border-radius:12px;min-width:56px}
+.metric-val{font-family:var(--heading);font-style:italic;font-size:20px;color:var(--text);line-height:1}
+.metric-lab{font-size:10px;color:var(--muted);margin-top:4px;letter-spacing:.04em}
+.tech-stack{display:flex;flex-wrap:wrap;gap:5px;margin-bottom:16px}
+.tech{font-size:10px;letter-spacing:.04em;padding:3px 9px;border-radius:8px;color:var(--muted);font-family:'Barlow',monospace;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.06)}
+.proj-links{display:flex;gap:8px;flex-wrap:wrap}
+.link-btn{font-size:12px;padding:6px 14px;border-radius:9999px;transition:all .2s;display:inline-flex;align-items:center;gap:5px}
+.link-demo{background:var(--accent-bg);color:var(--accent);border:1px solid var(--accent-border)}
+.link-demo:hover{background:var(--accent-bg)}
+.link-gh{background:rgba(255,255,255,.04);color:var(--muted);border:1px solid rgba(255,255,255,.08)}
+.link-gh:hover{color:var(--text)}
+.expand-btn{display:flex;align-items:center;justify-content:space-between;width:100%;padding:14px 24px;background:rgba(255,255,255,.015);border-top:1px solid rgba(255,255,255,.05);font-size:12px;color:var(--muted);cursor:pointer;transition:all .2s;border:none;outline:none;font-family:var(--body)}
+.expand-btn:hover{color:var(--accent)}
+.expand-icon{transition:transform .3s;font-size:14px}
+.proj-card.open .expand-icon{transform:rotate(180deg)}
+.proj-detail{max-height:0;overflow:hidden;transition:max-height .5s ease}
+.proj-card.open .proj-detail{max-height:1200px}
+.detail-inner{padding:24px;border-top:1px solid rgba(255,255,255,.04);display:flex;flex-direction:column;gap:18px}
+.case-label{font-size:11px;letter-spacing:.15em;text-transform:uppercase;font-weight:600;margin-bottom:4px}
+.case-text{font-size:13px;color:var(--muted);line-height:1.75}
+.case-result{border-radius:12px;padding:14px 18px;background:var(--accent-bg);border:1px solid var(--accent-border)}
+.case-result .case-label{color:var(--accent)}
+.arch-box{background:rgba(255,255,255,.02);border:1px solid rgba(255,255,255,.05);border-radius:10px;padding:14px;font-family:'Barlow',monospace;font-size:11px;color:var(--muted);line-height:1.9;overflow-x:auto;white-space:pre}
+
+/* 鈹€鈹€ Services 鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€ */
+#services{padding:80px 0}
+.services-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+@media(max-width:800px){.services-grid{grid-template-columns:1fr}}
+.svc-card{border-radius:20px;padding:32px 26px;transition:transform .3s}
+.svc-card:hover{transform:translateY(-3px)}
+.svc-icon{width:42px;height:42px;border-radius:9999px;display:flex;align-items:center;justify-content:center;margin-bottom:18px;font-size:18px}
+.svc-title{font-family:var(--heading);font-style:italic;font-size:19px;margin-bottom:10px}
+.svc-desc{font-size:13px;color:var(--muted);line-height:1.75;margin-bottom:18px}
+.svc-items{display:flex;flex-direction:column;gap:6px}
+.svc-item{font-size:12px;color:rgba(255,255,255,.6);padding-left:14px;position:relative}
+.svc-item::before{content:'鈫?;position:absolute;left:0;color:var(--accent);font-size:11px}
+.svc-cta{margin-top:22px;display:inline-flex;align-items:center;gap:5px;font-size:12px;padding:8px 18px;border-radius:9999px;color:var(--text);transition:all .2s;cursor:pointer;border:none;outline:none;font-family:var(--body)}
+.svc-cta:hover{color:var(--accent)}
+
+/* 鈹€鈹€ Career 鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€ */
+#career{padding:80px 0}
+.career-wrap{display:grid;grid-template-columns:1fr 1fr;gap:60px;align-items:start}
+@media(max-width:760px){.career-wrap{grid-template-columns:1fr}}
+.career-label{font-size:11px;letter-spacing:.18em;text-transform:uppercase;color:var(--accent);margin-bottom:22px;font-weight:500}
+.tl-item{display:flex;gap:14px;padding-bottom:26px;position:relative}
+.tl-item::before{content:'';position:absolute;left:5.5px;top:16px;bottom:0;width:1px;background:rgba(255,255,255,.06)}
+.tl-item:last-child::before{display:none}
+.tl-dot{width:12px;height:12px;border-radius:50%;border:2px solid rgba(255,255,255,.2);background:var(--bg);flex-shrink:0;margin-top:4px}
+.tl-co{font-size:13px;font-weight:500;color:var(--text);margin-bottom:2px}
+.tl-role{font-size:12px;color:var(--accent);margin-bottom:2px}
+.tl-date{font-size:11px;color:var(--muted)}
+.edu-block{border-radius:14px;padding:22px;margin-bottom:14px}
+.edu-school{font-family:var(--heading);font-style:italic;font-size:16px;margin-bottom:4px}
+.edu-degree{font-size:12px;color:var(--muted);margin-bottom:6px}
+.edu-detail{font-size:11px;color:var(--accent);opacity:.8}
+.skills-cloud{display:flex;flex-wrap:wrap;gap:7px;margin-top:20px}
+.skill{font-size:12px;padding:5px 13px;border-radius:9999px;color:var(--muted);transition:color .2s;cursor:default;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.06)}
+.skill:hover{color:var(--text)}
+.skill.hot{color:var(--accent);border-color:var(--accent-border)}
+
+/* 鈹€鈹€ Contact 鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€ */
+#contact{padding:80px 0 100px}
+.contact-inner{max-width:680px;margin:0 auto;text-align:center}
+.contact-title{font-family:var(--heading);font-style:italic;font-size:clamp(32px,5vw,52px);margin-bottom:14px;line-height:.95}
+.contact-sub{font-size:14px;color:var(--muted);margin-bottom:48px;line-height:1.75;font-weight:300}
+.contact-links{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+@media(max-width:600px){.contact-links{grid-template-columns:repeat(2,1fr)}}
+.contact-link{display:flex;flex-direction:column;align-items:center;gap:8px;padding:24px 16px;border-radius:16px;transition:all .25s;font-size:12px;color:var(--muted)}
+.contact-link:hover{transform:translateY(-3px);color:var(--text)}
+.contact-link .ico{font-size:22px;margin-bottom:2px}
+.contact-link .lbl{font-weight:500;color:var(--text);font-size:13px}
+
+/* 鈹€鈹€ Footer 鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€ */
+footer{text-align:center;padding:28px;font-size:11px;color:var(--muted);opacity:.4;border-top:1px solid rgba(255,255,255,.04);position:relative;z-index:1}
+
+/* 鈹€鈹€ Blur Text animation 鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€ */
+.blur-text{visibility:hidden}
+.blur-text.ready{visibility:visible}
+.blur-word{display:inline-block;filter:blur(8px);opacity:0;transform:translateY(24px);transition:filter .55s ease,opacity .55s ease,transform .55s ease}
+.blur-word.visible{filter:blur(0);opacity:1;transform:translateY(0)}
+
+/* 鈹€鈹€ Reveal 鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€ */
+.reveal{opacity:0;transform:translateY(24px);transition:opacity .65s cubic-bezier(.22,1,.36,1),transform .65s cubic-bezier(.22,1,.36,1)}
+.reveal.visible{opacity:1;transform:translateY(0)}
+.reveal-d1{transition-delay:.08s}.reveal-d2{transition-delay:.16s}.reveal-d3{transition-delay:.24s}
+
+/* 鈹€鈹€ Demo modal 鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€ */
+.demo-modal{position:fixed;inset:0;z-index:200;background:rgba(0,0,0,.88);display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity .3s;backdrop-filter:blur(12px)}
+.demo-modal.show{opacity:1;pointer-events:all}
+.demo-box{width:90vw;max-width:1200px;height:80vh;border-radius:20px;overflow:hidden;display:flex;flex-direction:column}
+.demo-bar{display:flex;align-items:center;justify-content:space-between;padding:12px 20px;border-bottom:1px solid rgba(255,255,255,.06);font-size:13px;color:var(--muted)}
+.demo-close{cursor:pointer;color:var(--muted);font-size:18px;background:none;border:none;outline:none;transition:color .2s;font-family:var(--body)}
+.demo-close:hover{color:var(--text)}
+.demo-box iframe{flex:1;border:none;width:100%;height:100%}
+
+/* 鈹€鈹€ Tweaks 鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€ */
+#tweaks{position:fixed;bottom:24px;right:24px;z-index:999;border-radius:18px;padding:20px;width:220px;display:none;box-shadow:0 24px 64px rgba(0,0,0,.5);font-size:13px}
+#tweaks.show{display:block}
+#tweaks h3{font-size:11px;letter-spacing:.15em;text-transform:uppercase;color:var(--muted);margin-bottom:16px;font-weight:500}
+.tw-row{margin-bottom:14px}
+.tw-row label{display:block;font-size:11px;color:var(--muted);margin-bottom:6px}
+.tw-row select{width:100%;background:var(--bg2);border:1px solid rgba(255,255,255,.08);color:var(--text);border-radius:8px;padding:5px 8px;font-size:12px;font-family:var(--body)}
+.tw-row input[type=range]{width:100%;accent-color:var(--accent)}
+</style>
+</head>
+<body>
+<div id="stars"></div>
+
+<!-- Nav -->
+<nav>
+  <span class="nav-logo" onclick="scrollTo({top:0,behavior:'smooth'})">姘存瘝閾舵渤</span>
+  <div class="nav-center glass">
+    <a href="#projects" data-i18n="zh:浣滃搧;en:Projects">浣滃搧</a>
+    <a href="#services" data-i18n="zh:鏈嶅姟;en:Services">鏈嶅姟</a>
+    <a href="#career" data-i18n="zh:缁忓巻;en:Career">缁忓巻</a>
+    <a href="#contact" data-i18n="zh:鑱旂郴;en:Contact">鑱旂郴</a>
+  </div>
+  <div class="nav-right">
+    <span class="lang-btn glass" id="langToggle">EN</span>
+    <a href="mailto:maropion@163.com" class="pill pill-white" data-i18n="zh:鑱婁竴鑱?en:Let's talk">鑱婁竴鑱?/a>
+  </div>
+</nav>
+
+<!-- Hero -->
+<section id="hero">
+  <div class="hero-photo-stage">
+    <img class="hero-photo-image" src="uploads/hero-portrait.jpg" alt="Maropion portrait">
+    <div class="hero-photo-wash"></div>
+    <div class="hero-photo-noise"></div>
+    <div class="hero-vignette"></div>
+  </div>
+  <div class="hero-content">
+    <div class="hero-label glass" data-i18n="zh:AI 产品经理 · Builder · 独立开发者;en:AI Product Manager · Builder · Maker">AI 产品经理 · Builder · 独立开发者</div>
+    <h1 class="hero-main">
+      <span class="slice-a" data-i18n="zh:甜感设计;en:Candy Visual">甜感设计</span>
+      <span class="slice-b" data-i18n="zh:理性落地;en:Rigorous Build">理性落地</span>
+      <span class="slice-c" data-i18n="zh:PERSONAL AI STUDIO;en:PERSONAL AI STUDIO">PERSONAL AI STUDIO</span>
+    </h1>
+    <div class="hero-sub">Maropion · 毛睿平</div>
+    <div class="hero-tagline">
+      <span class="zh">风格要甜，但产品要硬。<br>把 AI 做成真正可交付的<em>结果</em></span>
+      <span class="en" style="display:none">Delightful visuals, rigorous product delivery.<br>Ship AI as measurable <em>outcomes</em>.</span>
+    </div>
+    <div class="hero-ctas">
+      <a href="#contact" class="pill glass-strong" data-i18n="zh:聊合作;en:Let's connect">聊合作</a>
+      <a href="#projects" class="pill glass" data-i18n="zh:看作品;en:View Work">看作品</a>
+      <a href="uploads/resume.pdf" download class="pill glass" style="color:var(--accent)" data-i18n="zh:下载简历;en:Download CV">下载简历</a>
+    </div>
+  </div>
+  <div class="hero-loader" aria-hidden="true">
+    <div class="ring"></div>
+    <div class="ring alt"></div>
+    <div class="core"></div>
+  </div>
+  <div class="hero-fade"></div>
+</section>
+
+<div class="divider"></div>
+
+<!-- Projects -->
+<section id="projects">
+  <div class="container">
+    <div class="section-header reveal">
+      <div class="section-badge glass" data-i18n="zh:浣滃搧灞曠ず;en:Projects">浣滃搧灞曠ず</div>
+      <h2 class="section-title blur-text" data-i18n="zh:浠?PRD 鍒颁笂绾匡紝閮芥槸鎴戝仛鐨?en:From PRD to Production 鈥?All Mine">浠?PRD 鍒颁笂绾匡紝閮芥槸鎴戝仛鐨?/h2>
+      <p class="section-sub" data-i18n="zh:3 涓嫭绔嬮」鐩紝瑕嗙洊 AI Agent / 鍏ㄦ爤 SaaS / LLM 璇勬祴;en:3 independent projects 鈥?AI Agent 路 Full-stack SaaS 路 LLM Evaluation">3 涓嫭绔嬮」鐩紝瑕嗙洊 AI Agent / 鍏ㄦ爤 SaaS / LLM 璇勬祴</p>
+    </div>
+    <div class="projects-grid">
+      <!-- Card 0 -->
+      <div class="proj-card glass reveal reveal-d1" id="card-0">
+        <div class="proj-top">
+          <div class="proj-tag glass" data-i18n="zh:澶?Agent 鏋舵瀯;en:Multi-Agent">澶?Agent 鏋舵瀯</div>
+          <div class="proj-title" data-i18n="zh:PRD 鏅鸿兘璇勫宸ヤ綔鍙?en:PRD Smart Review Agent">PRD 鏅鸿兘璇勫宸ヤ綔鍙?/div>
+          <div class="proj-desc" data-i18n="zh:涓婁紶 PRD锛? 缁村害 AI 骞惰璇勫锛? 鍒嗛挓鍑虹粨鏋勫寲鎶ュ憡;en:Upload a PRD, 6-dimension AI parallel review, structured report in 3 min">涓婁紶 PRD锛? 缁村害 AI 骞惰璇勫锛? 鍒嗛挓鍑虹粨鏋勫寲鎶ュ憡</div>
+          <div class="proj-metrics">
+            <div class="metric glass"><div class="metric-val">97%</div><div class="metric-lab" data-i18n="zh:鎻愭晥;en:faster">鎻愭晥</div></div>
+            <div class="metric glass"><div class="metric-val">6</div><div class="metric-lab" data-i18n="zh:璇勫缁村害;en:dimensions">缁村害</div></div>
+            <div class="metric glass"><div class="metric-val">V35</div><div class="metric-lab" data-i18n="zh:杩唬;en:iterations">杩唬</div></div>
+          </div>
+          <div class="tech-stack"><span class="tech">CrewAI</span><span class="tech">FastAPI</span><span class="tech">SSE</span><span class="tech">Docker</span><span class="tech">Railway</span></div>
+          <div class="proj-links">
+            <a href="#" class="link-btn link-demo" onclick="openDemo('https://awesome-requirement-review-agent-production.up.railway.app/single-page-shell.html',event)">鈻?Live Demo</a>
+            <a href="https://github.com/Maropion03/awesome-requirement-review-agent" target="_blank" class="link-btn link-gh">GitHub</a>
+          </div>
+        </div>
+        <button class="expand-btn" onclick="toggleCard(0)"><span data-i18n="zh:鏌ョ湅妗堜緥;en:Case Study">鏌ョ湅妗堜緥</span><span class="expand-icon">鈻?/span></button>
+        <div class="proj-detail"><div class="detail-inner">
+          <div><div class="case-label" style="color:var(--accent)">馃槫 <span data-i18n="zh:鐥涚偣;en:Problem">鐥涚偣</span></div><p class="case-text" data-i18n="zh:浜у搧璇勫鑰楁椂 2+ 灏忔椂锛岀爺鍙?璁捐/娴嬭瘯涓夋柟瑙嗚鍒嗘暎锛孭RD 缂洪櫡鍒拌仈璋冩墠鏆撮湶銆?en:PRD reviews took 2+ hours. Dev/Design/Test perspectives scattered, defects surfaced only at integration.">浜у搧璇勫鑰楁椂 2+ 灏忔椂锛岀爺鍙?璁捐/娴嬭瘯涓夋柟瑙嗚鍒嗘暎锛孭RD 缂洪櫡鍒拌仈璋冩墠鏆撮湶銆?/p></div>
+          <div><div class="case-label" style="color:rgba(255,255,255,.5)">鈿?<span data-i18n="zh:鎬庝箞鍋?en:Solution">鎬庝箞鍋?/span></div><p class="case-text" data-i18n="zh:CrewAI 澶?Agent锛歄rchestrator 鍗忚皟鐮斿彂/璁捐/娴嬭瘯 3 Agent 骞惰 6 缁村害璇勫銆侳astAPI + SSE 瀹炴椂娴佸紡鎺ㄩ€侊紝3 濂楅璁炬潈閲嶏紝Docker + Railway 閮ㄧ讲銆?en:CrewAI multi-agent: Orchestrator coordinates 3 agents reviewing 6 dimensions in parallel. FastAPI + SSE streaming, 3 weight presets, Docker + Railway deployment.">CrewAI 澶?Agent锛歄rchestrator 鍗忚皟 3 Agent 骞惰 6 缁村害璇勫銆侳astAPI + SSE锛? 濂楅璁炬潈閲嶏紝Docker + Railway銆?/p></div>
+          <div class="case-result"><div class="case-label">鉁?<span data-i18n="zh:缁撴灉;en:Results">缁撴灉</span></div><p class="case-text" data-i18n="zh:璇勫鏃堕棿 2h 鈫?3min锛堚啌97%锛夈€侾DF/Markdown 瀵煎嚭銆傚凡閮ㄧ讲涓婄嚎寮€婧愩€?en:Review time 2h 鈫?3min (鈫?7%). PDF/Markdown export. Deployed and open-sourced.">璇勫 2h 鈫?3min锛堚啌97%锛夈€侾DF/Markdown 瀵煎嚭銆傚凡閮ㄧ讲寮€婧愩€?/p></div>
+          <div class="arch-box">Orchestrator
+鈹溾攢鈹€ Dev Agent     鈫?鍙鎬?+ 鎶€鏈闄?鈹溾攢鈹€ Design Agent  鈫?鍚堢悊鎬?+ 鐢ㄦ埛浠峰€?鈹斺攢鈹€ Test Agent    鈫?瀹屾暣鎬?+ 浼樺厛绾?        鈫?SSE stream 鈫?Frontend</div>
+        </div></div>
+      </div>
+      <!-- Card 1 -->
+      <div class="proj-card glass reveal reveal-d2" id="card-1">
+        <div class="proj-top">
+          <div class="proj-tag glass" data-i18n="zh:鍏ㄦ爤 SaaS;en:Full-stack SaaS">鍏ㄦ爤 SaaS</div>
+          <div class="proj-title" data-i18n="zh:Spirit Construct 路 鐏垫瀯;en:Spirit Construct 路 AIPM Stack">Spirit Construct 路 鐏垫瀯</div>
+          <div class="proj-desc" data-i18n="zh:闈㈠悜 AI PM 鐨勫伐鍏峰钩鍙帮細ROI 璁＄畻鍣ㄣ€佸弬鏁拌皟璇曞満銆丳RD 鐢熸垚鍣?en:AI PM toolkit: ROI Calculator, Model Playground, PRD Generator">闈㈠悜 AI PM 鐨勫伐鍏峰钩鍙帮細ROI 璁＄畻鍣ㄣ€佸弬鏁拌皟璇曞満銆丳RD 鐢熸垚鍣?/div>
+          <div class="proj-metrics">
+            <div class="metric glass"><div class="metric-val">30h</div><div class="metric-lab" data-i18n="zh:鐙珛浜や粯;en:solo ship">浜や粯</div></div>
+            <div class="metric glass"><div class="metric-val">5+</div><div class="metric-lab" data-i18n="zh:妯″潡;en:modules">妯″潡</div></div>
+            <div class="metric glass"><div class="metric-val">0鈫?</div><div class="metric-lab" data-i18n="zh:鍏ㄦ爤;en:full-stack">鍏ㄦ爤</div></div>
+          </div>
+          <div class="tech-stack"><span class="tech">Vanilla JS</span><span class="tech">Supabase</span><span class="tech">Cloudflare</span><span class="tech">SiliconFlow</span></div>
+          <div class="proj-links">
+            <a href="#" class="link-btn link-demo" onclick="openDemo('https://spirit-construct-maropion.top',event)">鈻?Live Demo</a>
+            <a href="https://github.com/Maropion03/Spirit-Construct-AIPM-stack" target="_blank" class="link-btn link-gh">GitHub</a>
+          </div>
+        </div>
+        <button class="expand-btn" onclick="toggleCard(1)"><span data-i18n="zh:鏌ョ湅妗堜緥;en:Case Study">鏌ョ湅妗堜緥</span><span class="expand-icon">鈻?/span></button>
+        <div class="proj-detail"><div class="detail-inner">
+          <div><div class="case-label" style="color:var(--accent)">馃槫 <span data-i18n="zh:鐥涚偣;en:Problem">鐥涚偣</span></div><p class="case-text" data-i18n="zh:闈炴妧鏈?AI PM 缂轰箯妯″瀷閫夊瀷鍜屾垚鏈劅鐭ョ殑瀹炴搷宸ュ叿锛屽彧鑳介潬鎰熻銆?en:Non-tech AI PMs lacked hands-on tools for model selection and cost estimation.">闈炴妧鏈?AI PM 缂轰箯妯″瀷閫夊瀷鍜屾垚鏈劅鐭ョ殑瀹炴搷宸ュ叿銆?/p></div>
+          <div><div class="case-label" style="color:rgba(255,255,255,.5)">鈿?<span data-i18n="zh:鎬庝箞鍋?en:Solution">鎬庝箞鍋?/span></div><p class="case-text" data-i18n="zh:Vibe Coding 30 灏忔椂 MVP 浜や粯銆係erverless 杈圭紭璺敱鎺ф垚鏈€傛牳蹇冿細Break-even ROI 璁＄畻鍣?+ 瀹炴椂鍙傛暟璋冭瘯鍦恒€?en:Vibe Coding, 30h MVP delivery. Serverless edge routing. Core: Break-even ROI calculator + real-time model playground.">Vibe Coding 30h MVP銆係erverless 杈圭紭璺敱銆傛牳蹇冿細ROI 璁＄畻鍣?+ 鍙傛暟璋冭瘯鍦恒€?/p></div>
+          <div class="case-result"><div class="case-label">鉁?<span data-i18n="zh:缁撴灉;en:Results">缁撴灉</span></div><p class="case-text" data-i18n="zh:宸查儴缃蹭釜浜哄煙鍚嶅苟 GitHub 寮€婧愩€傝瘉鏄?AI 杈呭姪鍗曚汉鍏ㄦ爤浜や粯鑳藉姏銆?en:Deployed to personal domain, open-sourced on GitHub. Proved solo full-stack delivery.">宸查儴缃蹭釜浜哄煙鍚嶅苟寮€婧愩€傝瘉鏄庡崟浜哄叏鏍堜氦浠樸€?/p></div>
+        </div></div>
+      </div>
+      <!-- Card 2 -->
+      <div class="proj-card glass reveal reveal-d3" id="card-2">
+        <div class="proj-top">
+          <div class="proj-tag glass" data-i18n="zh:LLM 璇勬祴;en:LLM Evaluation">LLM 璇勬祴</div>
+          <div class="proj-title">Eval Studio</div>
+          <div class="proj-desc" data-i18n="zh:Linear 椋庢牸 LLM 璇勬祴骞冲彴锛屼細璇濋殧绂伙紝澶?Provider锛屽彲瑙嗗寲骞昏鍒嗘瀽;en:Linear-style LLM eval platform 鈥?session-isolated, multi-provider, hallucination analysis">Linear 椋庢牸 LLM 璇勬祴骞冲彴锛屼細璇濋殧绂伙紝澶?Provider锛屽彲瑙嗗寲骞昏鍒嗘瀽</div>
+          <div class="proj-metrics">
+            <div class="metric glass"><div class="metric-val">4+</div><div class="metric-lab" data-i18n="zh:渚涘簲鍟?en:providers">渚涘簲鍟?/div></div>
+            <div class="metric glass"><div class="metric-val">BYOK</div><div class="metric-lab" data-i18n="zh:闅愮;en:privacy">闅愮</div></div>
+            <div class="metric glass"><div class="metric-val">TS</div><div class="metric-lab">React 18</div></div>
+          </div>
+          <div class="tech-stack"><span class="tech">React 18</span><span class="tech">TypeScript</span><span class="tech">FastAPI</span><span class="tech">LiteLLM</span><span class="tech">Recharts</span></div>
+          <div class="proj-links">
+            <a href="https://github.com/Maropion03/Eval-studio" target="_blank" class="link-btn link-gh">GitHub</a>
+          </div>
+        </div>
+        <button class="expand-btn" onclick="toggleCard(2)"><span data-i18n="zh:鏌ョ湅妗堜緥;en:Case Study">鏌ョ湅妗堜緥</span><span class="expand-icon">鈻?/span></button>
+        <div class="proj-detail"><div class="detail-inner">
+          <div><div class="case-label" style="color:var(--accent)">馃槫 <span data-i18n="zh:鐥涚偣;en:Problem">鐥涚偣</span></div><p class="case-text" data-i18n="zh:LLM 杈撳嚭璇勪及渚濊禆鐢靛瓙琛ㄦ牸锛岄毦浠ュ彲瑙嗗寲骞昏鍜屾帹鐞嗛敊璇€?en:LLM evaluation relied on spreadsheets, hard to visualize hallucinations.">LLM 杈撳嚭璇勪及渚濊禆鐢靛瓙琛ㄦ牸锛岄毦浠ュ彲瑙嗗寲骞昏鍜屾帹鐞嗛敊璇€?/p></div>
+          <div><div class="case-label" style="color:rgba(255,255,255,.5)">鈿?<span data-i18n="zh:鎬庝箞鍋?en:Solution">鎬庝箞鍋?/span></div><p class="case-text" data-i18n="zh:Linear 椋庢牸 UI + 娣辫壊妯″紡 + 鐜荤拑鎷熸€併€侭YOK 闅愮鏋舵瀯銆侺iteLLM 缁熶竴灏佽澶氫緵搴斿晢銆?en:Linear-style UI + dark mode + glassmorphism. BYOK privacy. LiteLLM unifying multiple providers.">Linear 椋庢牸 UI + 娣辫壊妯″紡 + 鐜荤拑鎷熸€併€侭YOK 闅愮鏋舵瀯銆侺iteLLM 缁熶竴灏佽銆?/p></div>
+          <div class="case-result"><div class="case-label">鉁?<span data-i18n="zh:缁撴灉;en:Results">缁撴灉</span></div><p class="case-text" data-i18n="zh:鍙鍖?3 缁磋瘎娴嬫寚鏍?+ diff 瑙嗗浘瀹氫綅骞昏銆侻IT 寮€婧愩€?en:Visual 3-axis metrics + diff view for hallucination detection. MIT licensed.">鍙鍖?3 缁存寚鏍?+ diff 瑙嗗浘銆侻IT 寮€婧愩€?/p></div>
+        </div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="divider" style="margin:0 clamp(24px,4vw,64px)"></div>
+
+<!-- Services -->
+<section id="services">
+  <div class="container">
+    <div class="section-header reveal">
+      <div class="section-badge glass" data-i18n="zh:鏈嶅姟鑳藉姏;en:Services">鏈嶅姟鑳藉姏</div>
+      <h2 class="section-title blur-text" data-i18n="zh:鎴戣兘涓轰綘鍋氫粈涔?en:What I can build for you">鎴戣兘涓轰綘鍋氫粈涔?/h2>
+      <p class="section-sub" data-i18n="zh:浜у搧鎬濈淮 + 宸ョ▼钀藉湴锛屼粠鎯虫硶鍒板彲浜や粯;en:Product thinking + engineering delivery">浜у搧鎬濈淮 + 宸ョ▼钀藉湴锛屼粠鎯虫硶鍒板彲浜や粯</p>
+    </div>
+    <div class="services-grid">
+      <div class="svc-card glass reveal reveal-d1">
+        <div class="svc-icon glass-strong">馃</div>
+        <div class="svc-title" data-i18n="zh:AI Agent & Prototype;en:AI Agent & Prototype">AI Agent & Prototype</div>
+        <div class="svc-desc" data-i18n="zh:浠庨渶姹傚埌鍙繍琛?demo锛屽揩閫熼獙璇?AI 搴旂敤鍙鎬?en:From requirements to working demo 鈥?validate AI product ideas fast">浠庨渶姹傚埌鍙繍琛?demo锛屽揩閫熼獙璇?AI 搴旂敤鍙鎬?/div>
+        <div class="svc-items">
+          <div class="svc-item" data-i18n="zh:澶?Agent 宸ヤ綔娴佽璁?en:Multi-agent workflow design">澶?Agent 宸ヤ綔娴佽璁?/div>
+          <div class="svc-item" data-i18n="zh:LLM 鎺ュ叆 & Prompt 浼樺寲;en:LLM integration & Prompt tuning">LLM 鎺ュ叆 & Prompt 浼樺寲</div>
+          <div class="svc-item" data-i18n="zh:鍏ㄦ爤 MVP 蹇€熶氦浠?en:Full-stack MVP delivery">鍏ㄦ爤 MVP 蹇€熶氦浠?/div>
+          <div class="svc-item" data-i18n="zh:RAG 鐭ヨ瘑搴撴惌寤?en:RAG knowledge base">RAG 鐭ヨ瘑搴撴惌寤?/div>
+        </div>
+        <a href="mailto:maropion@163.com?subject=AI%20Agent%20鍜ㄨ" class="svc-cta glass-strong" data-i18n="zh:鍙戣捣鍜ㄨ 鈫?en:Get a quote 鈫?>鍙戣捣鍜ㄨ 鈫?/a>
+      </div>
+      <div class="svc-card glass reveal reveal-d2">
+        <div class="svc-icon glass-strong">馃搳</div>
+        <div class="svc-title" data-i18n="zh:鏁版嵁鍒嗘瀽 & 娲炲療;en:Data Analysis & Insights">鏁版嵁鍒嗘瀽 & 娲炲療</div>
+        <div class="svc-desc" data-i18n="zh:鏈哄櫒瀛︿範杈呭姪锛屽皢鍘熷鏁版嵁杞寲涓哄彲鎵ц鐨勪笟鍔℃礊瀵?en:ML-assisted, turning raw data into actionable insights">鏈哄櫒瀛︿範杈呭姪锛屽皢鍘熷鏁版嵁杞寲涓哄彲鎵ц鐨勪笟鍔℃礊瀵?/div>
+        <div class="svc-items">
+          <div class="svc-item" data-i18n="zh:鐢ㄦ埛琛屼负鍒嗘瀽;en:User behavior analysis">鐢ㄦ埛琛屼负鍒嗘瀽</div>
+          <div class="svc-item" data-i18n="zh:鏂囨湰鎸栨帢 & 鎯呮劅鍒嗘瀽;en:Text mining & sentiment">鏂囨湰鎸栨帢 & 鎯呮劅鍒嗘瀽</div>
+          <div class="svc-item" data-i18n="zh:绔炲搧鏁版嵁璋冪爺;en:Competitive intelligence">绔炲搧鏁版嵁璋冪爺</div>
+          <div class="svc-item" data-i18n="zh:BI 浠〃鐩樻惌寤?en:BI dashboards">BI 浠〃鐩樻惌寤?/div>
+        </div>
+        <a href="mailto:maropion@163.com?subject=鏁版嵁鍒嗘瀽鍜ㄨ" class="svc-cta glass-strong" data-i18n="zh:鍙戣捣鍜ㄨ 鈫?en:Get a quote 鈫?>鍙戣捣鍜ㄨ 鈫?/a>
+      </div>
+      <div class="svc-card glass reveal reveal-d3">
+        <div class="svc-icon glass-strong">馃梻</div>
+        <div class="svc-title" data-i18n="zh:AI 浜у搧鍜ㄨ & PRD;en:AI Product Consulting">AI 浜у搧鍜ㄨ & PRD</div>
+        <div class="svc-desc" data-i18n="zh:鎶?AI 鎯虫硶钀藉湴鎴愭竻鏅扮殑浜у搧瑙勫垝锛岀渷鍘诲弽澶嶆媺榻愭垚鏈?en:Turn AI ideas into clear product plans, eliminating alignment loops">鎶?AI 鎯虫硶钀藉湴鎴愭竻鏅扮殑浜у搧瑙勫垝</div>
+        <div class="svc-items">
+          <div class="svc-item" data-i18n="zh:AI 浜у搧璺嚎鍥?en:AI product roadmap">AI 浜у搧璺嚎鍥?/div>
+          <div class="svc-item" data-i18n="zh:楂樿川閲?PRD 鎾板啓;en:High-quality PRD writing">楂樿川閲?PRD 鎾板啓</div>
+          <div class="svc-item" data-i18n="zh:妯″瀷閫夊瀷 & ROI;en:Model selection & ROI">妯″瀷閫夊瀷 & ROI</div>
+          <div class="svc-item" data-i18n="zh:浜у搧 Demo 鍘熷瀷;en:Product demo prototyping">浜у搧 Demo 鍘熷瀷</div>
+        </div>
+        <a href="mailto:maropion@163.com?subject=AI浜у搧鍜ㄨ" class="svc-cta glass-strong" data-i18n="zh:鍙戣捣鍜ㄨ 鈫?en:Get a quote 鈫?>鍙戣捣鍜ㄨ 鈫?/a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="divider" style="margin:0 clamp(24px,4vw,64px)"></div>
+
+<!-- Career -->
+<section id="career">
+  <div class="container">
+    <div class="section-header reveal">
+      <div class="section-badge glass" data-i18n="zh:缁忓巻鑳屾櫙;en:Background">缁忓巻鑳屾櫙</div>
+      <h2 class="section-title blur-text" data-i18n="zh:浜у搧 脳 鏁版嵁 脳 AI;en:Product 脳 Data 脳 AI">浜у搧 脳 鏁版嵁 脳 AI</h2>
+    </div>
+    <div class="career-wrap">
+      <div class="reveal">
+        <div class="career-label" data-i18n="zh:宸ヤ綔缁忓巻;en:Experience">宸ヤ綔缁忓巻</div>
+        <div>
+          <div class="tl-item"><div class="tl-dot"></div><div><div class="tl-co">涓婃捣瀹堟墸绉戞妧</div><div class="tl-role">AI 浜у搧缁忕悊</div><div class="tl-date">2026.04 鈥?鑷充粖</div></div></div>
+          <div class="tl-item"><div class="tl-dot"></div><div><div class="tl-co">骞垮窞瀹夌偣绉戞妧</div><div class="tl-role">AI 浜у搧缁忕悊</div><div class="tl-date">2026.01 鈥?2026.03</div></div></div>
+          <div class="tl-item"><div class="tl-dot"></div><div><div class="tl-co">缇庡洟 路 鐐硅瘎浜嬩笟閮?/div><div class="tl-role">浜у搧杩愯惀锛圓I / 椋庢帶锛?/div><div class="tl-date">2025.07 鈥?2025.09</div></div></div>
+          <div class="tl-item"><div class="tl-dot"></div><div><div class="tl-co">鍥芥嘲娴烽€氳瘉鍒?/div><div class="tl-role">琛屼笟鐮旂┒</div><div class="tl-date">2025.09 鈥?2025.11</div></div></div>
+          <div class="tl-item"><div class="tl-dot"></div><div><div class="tl-co">淇℃案涓拰浼氳甯堜簨鍔℃墍</div><div class="tl-role">瀹¤瀹炰範鐢?/div><div class="tl-date">2024.06 鈥?2024.09</div></div></div>
+        </div>
+      </div>
+      <div class="reveal reveal-d1">
+        <div class="career-label" data-i18n="zh:鏁欒偛缁忓巻;en:Education">鏁欒偛缁忓巻</div>
+        <div class="edu-block glass">
+          <div class="edu-school">棣欐腐鍩庡競澶у</div>
+          <div class="edu-degree">MSc Artificial Intelligence in Business</div>
+          <div class="edu-detail">2026.09 鈥?2027.06</div>
+        </div>
+        <div class="edu-block glass">
+          <div class="edu-school">骞夸笢璐㈢粡澶у</div>
+          <div class="edu-degree" data-i18n="zh:浼氳瀛?路 鏈;en:Accounting 路 Bachelor">浼氳瀛?路 鏈</div>
+          <div class="edu-detail">GPA 3.86/5 路 Top 10%</div>
+        </div>
+        <div style="margin-top:28px">
+          <div class="career-label" data-i18n="zh:鏍稿績鎶€鑳?en:Skills">鏍稿績鎶€鑳?/div>
+          <div class="skills-cloud">
+            <span class="skill hot">Prompt Engineering</span>
+            <span class="skill hot">Multi-Agent</span>
+            <span class="skill hot">RAG</span>
+            <span class="skill hot">CrewAI</span>
+            <span class="skill">FastAPI</span>
+            <span class="skill">Python</span>
+            <span class="skill">React</span>
+            <span class="skill">SQL</span>
+            <span class="skill">Docker</span>
+            <span class="skill">PRD</span>
+            <span class="skill">Axure</span>
+            <span class="skill">IELTS 6.5</span>
+            <span class="skill">JLPT N2</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="divider" style="margin:0 clamp(24px,4vw,64px)"></div>
+
+<!-- Contact -->
+<section id="contact">
+  <div class="container">
+    <div class="contact-inner reveal">
+      <div class="contact-title blur-text" data-i18n="zh:鏉ヨ亰鑱婂惂;en:Let's build something">鏉ヨ亰鑱婂惂</div>
+      <p class="contact-sub" data-i18n="zh:鏃犺鏄眰鑱屾満浼氥€佹帴鍗曞悎浣滆繕鏄妧鏈帰璁紝闅忔椂娆㈣繋銆?en:Whether it's a job, freelance project, or tech chat 鈥?always open.">鏃犺鏄眰鑱屾満浼氥€佹帴鍗曞悎浣滆繕鏄妧鏈帰璁紝闅忔椂娆㈣繋銆?/p>
+      <div class="contact-links">
+        <a href="mailto:maropion@163.com" class="contact-link glass"><span class="ico">鉁?/span><span class="lbl">Email</span><span>maropion@163.com</span></a>
+        <a href="https://github.com/Maropion03" target="_blank" class="contact-link glass"><span class="ico">鈱?/span><span class="lbl">GitHub</span><span>Maropion03</span></a>
+        <a href="https://awesome-requirement-review-agent-production.up.railway.app/single-page-shell.html" target="_blank" class="contact-link glass"><span class="ico">鈻?/span><span class="lbl">Demo</span><span data-i18n="zh:PRD 璇勫;en:PRD Review">PRD 璇勫</span></a>
+        <a href="https://spirit-construct-maropion.top" target="_blank" class="contact-link glass"><span class="ico">鉁?/span><span class="lbl">Demo</span><span data-i18n="zh:鐏垫瀯;en:Spirit Construct">鐏垫瀯</span></a>
+        <a href="https://ecnucwapzdad.feishu.cn/wiki/C3gswU76FiOSwtkAU9PcCNifnsh" target="_blank" class="contact-link glass"><span class="ico">馃搫</span><span class="lbl" data-i18n="zh:椋炰功鏂囨。;en:Feishu">椋炰功鏂囨。</span></a>
+        <a href="uploads/resume.pdf" download class="contact-link glass"><span class="ico">猬?/span><span class="lbl" data-i18n="zh:绠€鍘?en:CV">绠€鍘?/span><span>PDF</span></a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer><span data-i18n="zh:姘存瘝閾舵渤 路 姣涚澘骞?路 鐢?AI 鎶婃兂娉曞仛鎴愮粨鏋?en:Jellyfish Galaxy 路 Maropion 路 Shipping ideas with AI">姘存瘝閾舵渤 路 姣涚澘骞?路 鐢?AI 鎶婃兂娉曞仛鎴愮粨鏋?/span></footer>
+
+<!-- Demo Modal -->
+<div class="demo-modal" id="demoModal">
+  <div class="demo-box glass">
+    <div class="demo-bar"><span id="demoTitle">Live Demo</span><button class="demo-close" onclick="closeDemo()">鉁?/button></div>
+    <iframe id="demoFrame" src="" sandbox="allow-scripts allow-same-origin allow-forms"></iframe>
+  </div>
+</div>
+
+<!-- Tweaks -->
+<div id="tweaks" class="glass">
+  <h3>Tweaks</h3>
+  <div class="tw-row"><label data-i18n="zh:涓昏壊;en:Accent">涓昏壊</label>
+    <select onchange="setAccent(this.value)">
+      <option value="#ff72b5">Candy Pink</option>
+      <option value="#79bfff">Cloud Blue</option>
+      <option value="#ffd86d">Soft Yellow</option>
+      <option value="#c29bff">Lavender</option>
+    </select></div>
+  <div class="tw-row"><label data-i18n="zh:人像缩放;en:Portrait zoom">人像缩放</label>
+    <input type="range" min="1" max="1.25" step="0.01" value="1.06" oninput="setHeroScale(this.value)"></div>
+</div>
+
+<script>
+// 鈹€鈹€ Language 鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€
+let lang = localStorage.getItem('lang')||'zh';
+function t(el){const v=el.dataset.i18n;if(!v)return;const m={};v.split(';').forEach(p=>{const[k,...r]=p.split(':');m[k.trim()]=r.join(':')});if(m[lang])el.textContent=m[lang]}
+function applyLang(){
+  document.documentElement.lang=lang;
+  document.querySelectorAll('[data-i18n]').forEach(t);
+  document.querySelectorAll('.zh').forEach(el=>el.style.display=lang==='zh'?'':'none');
+  document.querySelectorAll('.en').forEach(el=>el.style.display=lang==='en'?'':'none');
+  document.getElementById('langToggle').textContent=lang==='zh'?'EN':'涓?;
+  localStorage.setItem('lang',lang);
+}
+document.getElementById('langToggle').addEventListener('click',()=>{lang=lang==='zh'?'en':'zh';applyLang()});
+applyLang();
+
+// 鈹€鈹€ Stars 鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€
+(function(){
+  const c=document.createElement('canvas'),x=c.getContext('2d');
+  c.width=2000;c.height=1200;
+  for(let i=0;i<300;i++){
+    const a=.15+Math.random()*.55;
+    x.fillStyle=`rgba(255,255,255,${a})`;
+    x.beginPath();x.arc(Math.random()*2000,Math.random()*1200,Math.random()*1.2+.2,0,Math.PI*2);x.fill();
+  }
+  document.getElementById('stars').style.background=`url(${c.toDataURL()}) repeat`;
+})();
+
+// 鈹€鈹€ BlurText 鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€
+document.querySelectorAll('.blur-text').forEach(el=>{
+  const text=el.textContent.trim();if(!text)return;
+  const words=text.split(/(\s+)/);
+  el.textContent='';el.classList.add('ready');
+  let idx=0;
+  words.forEach(w=>{
+    if(/^\s+$/.test(w)){el.appendChild(document.createTextNode(w));return}
+    const s=document.createElement('span');s.className='blur-word';s.textContent=w;
+    s.style.transitionDelay=`${idx*.07}s`;el.appendChild(s);idx++;
+  });
+});
+const blurObs=new IntersectionObserver(es=>{es.forEach(e=>{if(e.isIntersecting){e.target.querySelectorAll('.blur-word').forEach(w=>w.classList.add('visible'));blurObs.unobserve(e.target)}})},{threshold:.15});
+document.querySelectorAll('.blur-text').forEach(el=>blurObs.observe(el));
+
+// 鈹€鈹€ Reveal 鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€
+const revObs=new IntersectionObserver(es=>{es.forEach(e=>{if(e.isIntersecting)e.target.classList.add('visible')})},{threshold:.1});
+document.querySelectorAll('.reveal').forEach(el=>revObs.observe(el));
+
+// 鈹€鈹€ Nav active 鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€
+const navLinks=document.querySelectorAll('.nav-center a');
+window.addEventListener('scroll',()=>{
+  const y=window.scrollY+90;
+  ['hero','projects','services','career','contact'].forEach(id=>{
+    const el=document.getElementById(id);if(!el)return;
+    if(y>=el.offsetTop&&y<el.offsetTop+el.offsetHeight){
+      navLinks.forEach(a=>a.style.color='');
+      const m=[...navLinks].find(a=>a.getAttribute('href')==='#'+id);
+      if(m)m.style.color='#fff';
+    }
+  });
+},{passive:true});
+
+// 鈹€鈹€ Card expand 鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€
+function toggleCard(i){const c=document.getElementById('card-'+i);const o=c.classList.contains('open');document.querySelectorAll('.proj-card').forEach(x=>x.classList.remove('open'));if(!o)c.classList.add('open')}
+
+// 鈹€鈹€ Demo modal 鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€
+function openDemo(url,e){e&&e.preventDefault();document.getElementById('demoFrame').src=url;document.getElementById('demoTitle').textContent='Live Demo';document.getElementById('demoModal').classList.add('show')}
+function closeDemo(){document.getElementById('demoModal').classList.remove('show');setTimeout(()=>document.getElementById('demoFrame').src='',300)}
+document.getElementById('demoModal').addEventListener('click',function(e){if(e.target===this)closeDemo()});
+
+// 鈹€鈹€ Tweaks 鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€
+function setAccent(c){document.documentElement.style.setProperty('--accent',c);document.documentElement.style.setProperty('--accent-bg',c+'18');document.documentElement.style.setProperty('--accent-border',c+'38')}
+function setHeroScale(v){document.documentElement.style.setProperty('--hero-zoom',v)}
+
+// 鈹€鈹€ Tweaks toggle 鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€
+const tp=document.getElementById('tweaks');
+window.addEventListener('message',e=>{if(e.data?.type==='__activate_edit_mode')tp.classList.add('show');if(e.data?.type==='__deactivate_edit_mode')tp.classList.remove('show')});
+window.parent.postMessage({type:'__edit_mode_available'},'*');
+</script>
+</body>
+</html>
+
