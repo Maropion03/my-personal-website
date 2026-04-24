@@ -290,7 +290,7 @@ nav{
 @keyframes shint{0%,100%{opacity:.35;transform:translateX(-50%) translateY(0)}50%{opacity:.65;transform:translateX(-50%) translateY(5px)}}
 
 /* ── Reveal ──────────────────────────────── */
-.reveal{opacity:0;transform:translateY(20px);transition:opacity .7s cubic-bezier(.22,1,.36,1),transform .7s cubic-bezier(.22,1,.36,1)}
+.reveal{opacity:1;transform:none;transition:opacity .7s cubic-bezier(.22,1,.36,1),transform .7s cubic-bezier(.22,1,.36,1)}
 .reveal.vis{opacity:1;transform:none}
 .d1{transition-delay:.07s}.d2{transition-delay:.14s}.d3{transition-delay:.21s}.d4{transition-delay:.28s}.d5{transition-delay:.35s}
 
@@ -766,12 +766,12 @@ nav{
   display:none;position:fixed;bottom:28px;left:50%;transform:translateX(-50%);
   background:rgba(192,132,252,.15);backdrop-filter:blur(12px);
   border:1px solid rgba(192,132,252,.3);border-radius:10px;
-  padding:8px 20px;font-size:13px;color:#fff;z-index:200;
+  padding:8px 20px;font-size:13px;color:#fff;z-index:400;
   animation:fadeup .3s ease;
 }
 @keyframes fadeup{from{opacity:0;transform:translateX(-50%) translateY(8px)}to{opacity:1;transform:translateX(-50%) translateY(0)}}
 
-/* WeChat QR modal */
+/* Contact QR modal */
 .wechat-modal{
   position:fixed;inset:0;display:none;align-items:center;justify-content:center;
   background:rgba(4,6,10,.62);z-index:280;
@@ -789,12 +789,25 @@ nav{
 }
 .wechat-modal-title{font-size:18px;font-weight:600;color:#fff;letter-spacing:.03em}
 .wechat-modal-sub{margin-top:6px;font-size:13px;line-height:1.7;color:rgba(255,255,255,.55)}
+.wechat-modal-tabs{
+  margin-top:14px;display:flex;gap:8px;
+}
+.wechat-modal-tab{
+  flex:1;border:1px solid rgba(255,255,255,.16);background:rgba(255,255,255,.05);color:rgba(255,255,255,.7);
+  border-radius:9999px;padding:10px 14px;font-size:13px;font-weight:600;cursor:pointer;transition:all .2s;
+}
+.wechat-modal-tab.active{
+  background:rgba(255,143,171,.16);border-color:rgba(255,143,171,.36);color:#fff;
+  box-shadow:0 0 0 1px rgba(255,143,171,.14) inset;
+}
 .wechat-qr-slot{
   margin-top:14px;border-radius:14px;padding:14px;
   background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.12);
   min-height:188px;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:8px;
 }
-.wechat-qr-slot img{max-width:180px;border-radius:10px}
+.wechat-qr-slot img{max-width:220px;width:100%;border-radius:16px;background:#fff}
+.wechat-qr-slot img.is-copyable{cursor:pointer;transition:transform .2s ease, box-shadow .2s ease}
+.wechat-qr-slot img.is-copyable:hover{transform:translateY(-2px);box-shadow:0 10px 28px rgba(255,143,171,.24)}
 .wechat-qr-note{font-size:12px;color:rgba(255,255,255,.48)}
 .wechat-modal-actions{margin-top:12px;display:flex;justify-content:flex-end}
 .wechat-modal-close{
@@ -851,7 +864,7 @@ nav{
         <path d="M12 .75a11.25 11.25 0 0 0-3.56 21.92c.56.1.77-.24.77-.55v-2.1c-3.11.68-3.77-1.32-3.77-1.32-.51-1.28-1.24-1.62-1.24-1.62-1.01-.68.08-.67.08-.67 1.12.08 1.7 1.14 1.7 1.14.99 1.7 2.6 1.2 3.24.92.1-.72.39-1.2.7-1.48-2.49-.28-5.12-1.25-5.12-5.54 0-1.22.44-2.22 1.15-3-.11-.28-.5-1.42.11-2.96 0 0 .94-.3 3.08 1.15a10.6 10.6 0 0 1 5.6 0c2.14-1.45 3.08-1.15 3.08-1.15.61 1.54.22 2.68.11 2.96.72.78 1.15 1.78 1.15 3 0 4.3-2.63 5.25-5.14 5.53.4.35.76 1.03.76 2.08v3.08c0 .31.2.66.78.55A11.25 11.25 0 0 0 12 .75Z"/>
       </svg>
     </a>
-    <a href="#" class="nav-cta js-open-wechat-modal" data-track="cta_nav_wechat_primary" data-i18n="zh:微信优先联系;en:WeChat First">微信优先联系</a>
+    <a href="#" class="nav-cta js-open-wechat-modal" data-track="cta_nav_contact_primary" data-i18n="zh:微信/飞书联系;en:WeChat / Feishu">微信/飞书联系</a>
   </div>
 </nav>
 
@@ -892,9 +905,9 @@ nav{
     </div>
 
     <div class="hero-ctas reveal d5">
-      <a href="#" class="cta-pink js-open-wechat-modal" data-track="cta_hero_wechat_primary" data-i18n="zh:微信优先联系;en:WeChat First">微信优先联系</a>
+      <a href="#" class="cta-pink js-open-wechat-modal" data-track="cta_hero_contact_primary" data-i18n="zh:微信/飞书联系;en:WeChat / Feishu">微信/飞书联系</a>
       <a href="#projects" class="cta-outline" data-i18n="zh:看作品;en:View Work">看作品</a>
-      <a href="uploads/resume.pdf" download class="cta-blue" data-track="cta_hero_download_cv" data-i18n="zh:下载简历;en:Download CV">下载简历</a>
+      <a href="assets/resume.pdf" download="毛睿平-简历.pdf" class="cta-blue" data-track="cta_hero_download_cv" data-i18n="zh:下载简历;en:Download CV">下载简历</a>
     </div>
 
   </div>
@@ -1282,19 +1295,19 @@ nav{
   <h2 class="contact-title reveal d1" data-i18n="zh:有想法？一起聊聊;en:Got an idea? Let's talk.">有想法？一起聊聊</h2>
   <p class="contact-sub reveal d2" data-i18n="zh:欢迎交流岗位机会、内推或项目合作，建议优先通过微信或 LinkedIn 联系;en:Open to job opportunities, referrals, and project collaborations. Best reached via WeChat or LinkedIn.">欢迎交流岗位机会、内推或项目合作，建议优先通过微信或 LinkedIn 联系</p>
 
-  <a class="contact-main-btn reveal d2 js-open-wechat-modal" href="#" data-track="cta_contact_wechat_primary" aria-label="微信优先联系我">
+  <a class="contact-main-btn reveal d2 js-open-wechat-modal" href="#" data-track="cta_contact_primary" aria-label="微信或飞书联系我">
     <span class="cc-icon" aria-hidden="true">
       <svg viewBox="0 0 24 24" fill="none">
         <rect x="3.25" y="5.25" width="17.5" height="13.5" rx="2.75" stroke="currentColor" stroke-width="1.5"/>
         <path d="M5 7l7 5 7-5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
       </svg>
     </span>
-    <span data-i18n="zh:微信优先联系;en:WeChat First">微信优先联系</span>
+    <span data-i18n="zh:微信/飞书联系;en:WeChat / Feishu">微信/飞书联系</span>
   </a>
 
   <div class="contact-links reveal d3">
 
-    <button class="contact-card" id="wechatBtn" onclick="copyWechat()" aria-label="复制微信号 MRP18565682722">
+    <button class="contact-card" id="wechatBtn" type="button" onclick="copyWechat()" aria-label="复制微信号 MRP18565682722">
       <span class="cc-icon" aria-hidden="true">
         <svg viewBox="0 0 24 24" fill="currentColor">
           <path d="M8.52 5.25c-3.3 0-5.77 2.1-5.77 4.92 0 1.62.82 3.01 2.22 3.94l-.65 2.42a.5.5 0 0 0 .67.6l2.9-1.22c.22.03.42.04.63.04 3.29 0 5.76-2.1 5.76-4.92S11.8 5.25 8.52 5.25Zm-2.33 4.3a.88.88 0 1 1 0-1.76.88.88 0 0 1 0 1.76Zm2.33 0a.88.88 0 1 1 0-1.76.88.88 0 0 1 0 1.76Zm2.33 0a.88.88 0 1 1 0-1.76.88.88 0 0 1 0 1.76Z"/>
@@ -1358,11 +1371,15 @@ nav{
 
 <div class="wechat-modal" id="wechatModal" aria-hidden="true">
   <div class="wechat-modal-card" role="dialog" aria-modal="true" aria-labelledby="wechatModalTitle">
-    <div class="wechat-modal-title" id="wechatModalTitle" data-i18n="zh:微信优先联系;en:WeChat First Contact">微信优先联系</div>
-    <p class="wechat-modal-sub" data-i18n="zh:二维码位将后续补充；当前可先点击下方微信卡片复制微信号。;en:QR code will be added later. For now, use the WeChat card below to copy the ID.">二维码位将后续补充；当前可先点击下方微信卡片复制微信号。</p>
+    <div class="wechat-modal-title" id="wechatModalTitle" data-i18n="zh:微信 / 飞书联系;en:WeChat / Feishu Contact">微信 / 飞书联系</div>
+    <p class="wechat-modal-sub" id="wechatModalSub" data-i18n="zh:选择一个渠道扫码联系我，也可以在下方卡片点击复制微信号。;en:Choose a channel to scan and contact me, or copy my WeChat ID below.">选择一个渠道扫码联系我，也可以在下方卡片点击复制微信号。</p>
+    <div class="wechat-modal-tabs" role="tablist" aria-label="Contact channel selector">
+      <button class="wechat-modal-tab active" type="button" data-channel="wechat" data-i18n="zh:微信;en:WeChat">微信</button>
+      <button class="wechat-modal-tab" type="button" data-channel="feishu" data-i18n="zh:飞书;en:Feishu">飞书</button>
+    </div>
     <div class="wechat-qr-slot">
-      <img id="wechatQrImg" src="" alt="WeChat QR Code" hidden>
-      <div class="wechat-qr-note" data-i18n="zh:二维码待补充;en:QR code placeholder">二维码待补充</div>
+      <img id="wechatQrImg" src="assets/wechat-qr.jpg" alt="WeChat QR Code">
+      <div class="wechat-qr-note" id="wechatQrNote" data-i18n="zh:微信扫码添加我;en:Scan with WeChat to add me">微信扫码添加我</div>
     </div>
     <div class="wechat-modal-actions">
       <button class="wechat-modal-close" type="button" id="wechatModalClose" data-i18n="zh:关闭;en:Close">关闭</button>
@@ -1380,6 +1397,8 @@ function applyLang(){
   document.querySelectorAll('.zh').forEach(el=>el.style.display=lang==='zh'?'':'none');
   document.querySelectorAll('.en').forEach(el=>el.style.display=lang==='en'?'':'none');
   document.getElementById('langToggle').textContent=lang==='zh'?'EN':'中';
+  var activeTab=document.querySelector('.wechat-modal-tab.active');
+  if(activeTab&&typeof contactChannels!=='undefined'){setContactChannel(activeTab.getAttribute('data-channel'))}
   localStorage.setItem('lang',lang);
 }
 document.getElementById('langToggle').addEventListener('click',()=>{lang=lang==='zh'?'en':'zh';applyLang()});
@@ -1434,10 +1453,40 @@ document.querySelectorAll('[data-track]').forEach(function(el){
   });
 });
 
-// WeChat modal placeholder
+// Contact modal
+var contactChannels={
+  wechat:{
+    img:'assets/wechat-qr.jpg',
+    alt:'WeChat QR Code',
+    note:{zh:'微信扫码添加我，点击二维码可复制微信号',en:'Scan with WeChat, or click QR to copy my WeChat ID'},
+    copyable:true
+  },
+  feishu:{
+    img:'assets/feishu-qr.png',
+    alt:'Feishu QR Code',
+    note:{zh:'飞书扫码添加我',en:'Scan with Feishu to add me'},
+    copyable:false
+  }
+};
+function setContactChannel(channel){
+  var data=contactChannels[channel]||contactChannels.wechat;
+  var img=document.getElementById('wechatQrImg');
+  var note=document.getElementById('wechatQrNote');
+  if(!img||!note)return;
+  img.src=data.img;
+  img.alt=data.alt;
+  img.dataset.channel=channel;
+  img.classList.toggle('is-copyable',!!data.copyable);
+  img.title=data.copyable?(lang==='zh'?'点击复制微信号':'Click to copy WeChat ID'):'';
+  note.textContent=data.note[lang]||data.note.zh;
+  document.querySelectorAll('.wechat-modal-tab').forEach(function(tab){
+    tab.classList.toggle('active',tab.getAttribute('data-channel')===channel);
+  });
+}
 function openWechatModal(){
   var modal=document.getElementById('wechatModal');
   if(!modal)return;
+  setContactChannel('wechat');
   modal.classList.add('open');
   modal.setAttribute('aria-hidden','false');
 }
@@ -1453,6 +1502,11 @@ document.querySelectorAll('.js-open-wechat-modal').forEach(function(el){
     openWechatModal();
   });
 });
+document.querySelectorAll('.wechat-modal-tab').forEach(function(tab){
+  tab.addEventListener('click',function(){
+    setContactChannel(tab.getAttribute('data-channel'));
+  });
+});
 document.getElementById('wechatModalClose').addEventListener('click',closeWechatModal);
 document.getElementById('wechatModal').addEventListener('click',function(e){
   if(e.target.id==='wechatModal'){closeWechatModal();}
@@ -1460,18 +1514,62 @@ document.getElementById('wechatModal').addEventListener('click',function(e){
 document.addEventListener('keydown',function(e){
   if(e.key==='Escape'){closeWechatModal();}
 });
+var wechatBtn=document.getElementById('wechatBtn');
+if(wechatBtn){
+  wechatBtn.addEventListener('click',function(e){
+    e.preventDefault();
+    copyWechat();
+  });
+}
+var wechatQrImg=document.getElementById('wechatQrImg');
+if(wechatQrImg){
+  wechatQrImg.addEventListener('click',function(){
+    if(wechatQrImg.dataset.channel==='wechat'){
+      copyWechat();
+    }
+  });
+}
 
 // WeChat copy
 function copyWechat(){
+  var wechatId='MRP18565682722';
   trackEvent('contact_wechat_copy');
-  navigator.clipboard.writeText('MRP18565682722').then(()=>{
-    const t=document.getElementById('copyToast');
+  function showCopyToast(){
+    var t=document.getElementById('copyToast');
+    if(!t)return;
     t.style.display='block';
     applyI18n(t);
-    setTimeout(()=>{t.style.display='none'},2000);
-  }).catch(()=>{
-    prompt('复制微信号：','MRP18565682722');
-  });
+    setTimeout(function(){t.style.display='none'},2000);
+  }
+  function fallbackCopy(){
+    var input=document.createElement('input');
+    input.type='text';
+    input.value=wechatId;
+    input.setAttribute('readonly','readonly');
+    input.style.position='fixed';
+    input.style.opacity='0';
+    document.body.appendChild(input);
+    input.focus();
+    input.select();
+    input.setSelectionRange(0,wechatId.length);
+    try{
+      var copied=document.execCommand('copy');
+      document.body.removeChild(input);
+      if(copied){
+        showCopyToast();
+      }else{
+        prompt('复制微信号：',wechatId);
+      }
+    }catch(err){
+      document.body.removeChild(input);
+      prompt('复制微信号：',wechatId);
+    }
+  }
+  if(navigator.clipboard&&window.isSecureContext){
+    navigator.clipboard.writeText(wechatId).then(showCopyToast).catch(fallbackCopy);
+    return;
+  }
+  fallbackCopy();
 }
 </script>
 
