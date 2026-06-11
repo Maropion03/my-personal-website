@@ -1,0 +1,41 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" shape-rendering="crispEdges">
+  <!-- Pixel jellyfish · Maropion brand mark · #F4B942 -->
+  <g fill="#F4B942">
+    <!-- Dome (top arc, rounded) -->
+    <rect x="6" y="1" width="4" height="1"/>
+    <rect x="4" y="2" width="8" height="1"/>
+    <rect x="3" y="3" width="10" height="1"/>
+    <rect x="2" y="4" width="12" height="2"/>
+
+    <!-- Eye row: eyes as dark gaps at x=6 and x=9 -->
+    <rect x="2"  y="6" width="4" height="1"/>
+    <rect x="7"  y="6" width="2" height="1"/>
+    <rect x="10" y="6" width="4" height="1"/>
+
+    <!-- Dome bottom rim (solid line under eyes) -->
+    <rect x="2" y="7" width="12" height="1"/>
+
+    <!-- 6 tentacle strands, varying length, center longest -->
+    <!-- Strand 1 (outer left, shortest) x=3 -->
+    <rect x="3" y="8"  width="1" height="3"/>
+
+    <!-- Strand 2 x=5, length 5, slight bend at bottom -->
+    <rect x="5" y="8"  width="1" height="4"/>
+    <rect x="4" y="12" width="1" height="1"/>
+
+    <!-- Strand 3 (inner left) x=7, length 7, longest center-left -->
+    <rect x="7" y="8"  width="1" height="6"/>
+    <rect x="7" y="14" width="1" height="1"/>
+
+    <!-- Strand 4 (inner right) x=9, length 6, slight bend -->
+    <rect x="9" y="8"  width="1" height="5"/>
+    <rect x="10" y="13" width="1" height="1"/>
+
+    <!-- Strand 5 x=11, length 5 -->
+    <rect x="11" y="8"  width="1" height="4"/>
+    <rect x="12" y="12" width="1" height="1"/>
+
+    <!-- Strand 6 (outer right, shortest) x=13 -->
+    <rect x="13" y="8" width="1" height="3"/>
+  </g>
+</svg>
