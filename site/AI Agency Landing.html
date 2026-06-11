@@ -1,0 +1,492 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Studio — AI-powered web design</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Barlow:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --background: 213 45% 67%;
+  --foreground: 0 0% 100%;
+  --glass-bg: rgba(255,255,255,.12);
+  --glass-border: rgba(255,255,255,.25);
+  --glass-shadow: 0 4px 30px rgba(0,0,0,.08);
+  --glass-blur: 16px;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{background:#000;font-family:'Barlow',sans-serif;color:#fff;-webkit-font-smoothing:antialiased}
+
+/* Liquid Glass */
+.liquid-glass {
+  background: rgba(255,255,255,.01);
+  background-blend-mode: luminosity;
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+  border: none;
+  box-shadow: inset 0 1px 1px rgba(255,255,255,.1);
+  position: relative;
+  overflow: hidden;
+}
+.liquid-glass::before {
+  content:'';position:absolute;inset:0;border-radius:inherit;padding:1.4px;
+  background: linear-gradient(180deg,
+    rgba(255,255,255,.45) 0%,rgba(255,255,255,.15) 20%,
+    rgba(255,255,255,0) 40%,rgba(255,255,255,0) 60%,
+    rgba(255,255,255,.15) 80%,rgba(255,255,255,.45) 100%);
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  pointer-events: none;
+}
+.liquid-glass-strong {
+  background: rgba(255,255,255,.01);
+  background-blend-mode: luminosity;
+  backdrop-filter: blur(50px);
+  -webkit-backdrop-filter: blur(50px);
+  border: none;
+  box-shadow: 4px 4px 4px rgba(0,0,0,.05), inset 0 1px 1px rgba(255,255,255,.15);
+  position: relative;
+  overflow: hidden;
+}
+.liquid-glass-strong::before {
+  content:'';position:absolute;inset:0;border-radius:inherit;padding:1.4px;
+  background: linear-gradient(180deg,
+    rgba(255,255,255,.5) 0%,rgba(255,255,255,.2) 20%,
+    rgba(255,255,255,0) 40%,rgba(255,255,255,0) 60%,
+    rgba(255,255,255,.2) 80%,rgba(255,255,255,.5) 100%);
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  pointer-events: none;
+}
+</style>
+<script src="https://cdn.tailwindcss.com"></script>
+<script>
+tailwind.config = {
+  theme: { extend: {
+    fontFamily: {
+      heading: ["'Instrument Serif'","serif"],
+      body: ["'Barlow'","sans-serif"]
+    }
+  }}
+}
+</script>
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/hls.js@1.6.15/dist/hls.min.js"></script>
+<script src="https://unpkg.com/framer-motion@11.18.0/dist/framer-motion.js"></script>
+<script src="https://unpkg.com/lucide-react@0.462.0/dist/umd/lucide-react.js"></script>
+</head>
+<body>
+<div id="root"></div>
+<script type="text/babel">
+
+const { useState, useEffect, useRef } = React;
+const FM = window.Motion || {};
+const { motion, useInView } = FM;
+const LR = window.LucideReact || {};
+const { ArrowUpRight, Play, Zap, Palette, BarChart3, Shield } = LR;
+
+// ── Utilities ─────────────────────────────────────────
+
+function HLSVideo({ src, className, style }) {
+  const ref = useRef(null);
+  useEffect(() => {
+    const v = ref.current;
+    if (!v || !src) return;
+    if (window.Hls?.isSupported()) {
+      const hls = new window.Hls({ lowLatencyMode: true });
+      hls.loadSource(src);
+      hls.attachMedia(v);
+      v.play().catch(()=>{});
+      return () => hls.destroy();
+    } else if (v.canPlayType('application/vnd.apple.mpegurl')) {
+      v.src = src;
+      v.play().catch(()=>{});
+    }
+  }, [src]);
+  return <video ref={ref} autoPlay loop muted playsInline className={className} style={style} />;
+}
+
+function BlurText({ text, className, delay = 200 }) {
+  const ref = useRef(null);
+  const inView = useInView ? useInView(ref, { once: true, margin: '-5% 0px' }) : true;
+  const words = text.split(' ');
+  if (!motion) return <span className={className}>{text}</span>;
+  return (
+    <span ref={ref} className={className} style={{ display:'block' }}>
+      {words.map((word, i) => (
+        <motion.span
+          key={i}
+          style={{ display:'inline-block', marginRight:'0.26em' }}
+          initial={{ filter:'blur(10px)', opacity:0, y:50 }}
+          animate={inView ? { filter:'blur(0px)', opacity:1, y:0 } : {}}
+          transition={{ duration:0.7, delay: i*(delay/1000), ease:[0.25,0.1,0.25,1] }}
+        >
+          {word}
+        </motion.span>
+      ))}
+    </span>
+  );
+}
+
+function Badge({ children }) {
+  return (
+    <div className="liquid-glass rounded-full px-3.5 py-1 inline-flex text-xs font-medium text-white font-body">
+      {children}
+    </div>
+  );
+}
+
+function SectionHeading({ badge, heading }) {
+  return (
+    <div className="flex flex-col items-center gap-5 mb-20 text-center">
+      <Badge>{badge}</Badge>
+      <BlurText
+        text={heading}
+        className="text-4xl md:text-5xl lg:text-6xl font-heading italic text-white tracking-tight leading-[0.9] max-w-2xl"
+      />
+    </div>
+  );
+}
+
+function VideoSection({ src, children, grayscale = false, minH = 600 }) {
+  return (
+    <div className="relative overflow-hidden" style={{ minHeight: minH }}>
+      <HLSVideo
+        src={src}
+        className="absolute inset-0 w-full h-full object-cover z-0"
+        style={grayscale ? { filter:'saturate(0)' } : {}}
+      />
+      <div className="absolute top-0 inset-x-0 z-0 pointer-events-none" style={{ height:200, background:'linear-gradient(to bottom,black,transparent)' }} />
+      <div className="absolute bottom-0 inset-x-0 z-0 pointer-events-none" style={{ height:200, background:'linear-gradient(to top,black,transparent)' }} />
+      <div className="relative z-10 flex flex-col items-center justify-center px-6 py-24">
+        {children}
+      </div>
+    </div>
+  );
+}
+
+// ── Navbar ────────────────────────────────────────────
+
+function Navbar() {
+  const links = ['Home','Services','Work','Process'];
+  return (
+    <nav className="fixed top-4 left-0 right-0 z-50 px-8 lg:px-16 py-3 flex items-center justify-between">
+      {/* Logo */}
+      <div className="liquid-glass rounded-full w-12 h-12 flex items-center justify-center">
+        <span className="font-heading italic text-white text-xl">S</span>
+      </div>
+      {/* Center links */}
+      <div className="liquid-glass rounded-full px-1.5 py-1 hidden md:flex items-center gap-0.5">
+        {links.map(l => (
+          <a key={l} href="#" className="px-3 py-2 text-sm font-medium text-white/90 font-body hover:text-white transition-colors rounded-full">{l}</a>
+        ))}
+        <a href="#" className="bg-white text-black rounded-full px-3.5 py-1.5 text-sm font-medium font-body flex items-center gap-1 hover:bg-white/90 transition-colors">
+          Get Started {ArrowUpRight && <ArrowUpRight size={14} />}
+        </a>
+      </div>
+      <div className="w-12 h-12" />
+    </nav>
+  );
+}
+
+// ── Hero ──────────────────────────────────────────────
+
+function Hero() {
+  const M = motion || 'div';
+  return (
+    <div className="relative overflow-hidden" style={{ height:1000 }}>
+      <video
+        autoPlay loop muted playsInline
+        className="absolute left-0 w-full h-auto object-contain z-0"
+        style={{ top:'20%' }}
+        src="https://d8j0ntlcm91z4.cloudfront.net/user_38xzZboKViGWJOttwIXH07lWA1P/hf_20260307_083826_e938b29f-a43a-41ec-a153-3d4730578ab8.mp4"
+      />
+      <div className="absolute inset-0 bg-black/5 z-0" />
+      <div className="absolute bottom-0 inset-x-0 z-0 pointer-events-none" style={{ height:300, background:'linear-gradient(to bottom,transparent,black)' }} />
+
+      <div className="relative z-10 flex flex-col items-center text-center px-6" style={{ paddingTop:150 }}>
+        {/* Badge */}
+        <div className="liquid-glass rounded-full px-1 py-1 flex items-center gap-2 mb-10">
+          <span className="bg-white text-black rounded-full px-3 py-1 text-xs font-semibold font-body">New</span>
+          <span className="text-white/80 text-sm font-body pr-3">Introducing AI-powered web design.</span>
+        </div>
+
+        {/* Heading */}
+        <BlurText
+          text="The Website Your Brand Deserves"
+          className="text-6xl md:text-7xl lg:text-[5.5rem] font-heading italic text-white leading-[0.82] max-w-2xl mb-10"
+          delay={100}
+        />
+
+        {/* Subtext */}
+        {motion ? (
+          <motion.p
+            className="text-sm md:text-base text-white/80 font-body font-light leading-snug max-w-sm mb-10"
+            initial={{ filter:'blur(10px)', opacity:0, y:20 }}
+            animate={{ filter:'blur(0px)', opacity:1, y:0 }}
+            transition={{ duration:0.6, delay:0.8 }}
+          >
+            Stunning design. Blazing performance. Built by AI, refined by experts. This is web design, wildly reimagined.
+          </motion.p>
+        ) : (
+          <p className="text-sm md:text-base text-white/80 font-body font-light leading-snug max-w-sm mb-10">
+            Stunning design. Blazing performance. Built by AI, refined by experts. This is web design, wildly reimagined.
+          </p>
+        )}
+
+        {/* CTAs */}
+        {motion ? (
+          <motion.div
+            className="flex items-center gap-5"
+            initial={{ filter:'blur(10px)', opacity:0, y:20 }}
+            animate={{ filter:'blur(0px)', opacity:1, y:0 }}
+            transition={{ duration:0.6, delay:1.1 }}
+          >
+            <button className="liquid-glass-strong rounded-full px-5 py-2.5 text-white text-sm font-body font-medium flex items-center gap-2">
+              Get Started {ArrowUpRight && <ArrowUpRight size={16} />}
+            </button>
+            <button className="text-white/80 text-sm font-body font-light flex items-center gap-2 hover:text-white transition-colors">
+              {Play && <Play size={16} fill="currentColor" />} Watch the Film
+            </button>
+          </motion.div>
+        ) : (
+          <div className="flex items-center gap-5">
+            <button className="liquid-glass-strong rounded-full px-5 py-2.5 text-white text-sm font-body font-medium">Get Started</button>
+          </div>
+        )}
+
+        {/* Partners */}
+        <div className="mt-24 flex flex-col items-center gap-6">
+          <div className="liquid-glass rounded-full px-4 py-2 text-white/50 text-xs font-body">Trusted by the teams behind</div>
+          <div className="flex items-center gap-12 md:gap-16 flex-wrap justify-center">
+            {['Stripe','Vercel','Linear','Notion','Figma'].map(n => (
+              <span key={n} className="text-2xl md:text-3xl font-heading italic text-white/90">{n}</span>
+            ))}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ── Start Section ─────────────────────────────────────
+
+function StartSection() {
+  return (
+    <VideoSection src="https://stream.mux.com/9JXDljEVWYwWu01PUkAemafDugK89o01BR6zqJ3aS9u00A.m3u8" minH={600}>
+      <div className="flex flex-col items-center gap-6 max-w-xl text-center">
+        <Badge>How It Works</Badge>
+        <BlurText
+          text="You dream it. We ship it."
+          className="text-4xl md:text-5xl lg:text-6xl font-heading italic text-white tracking-tight leading-[0.9]"
+        />
+        <p className="text-white/60 font-body font-light text-sm md:text-base max-w-sm">
+          Share your vision. Our AI handles the rest—wireframes, design, code, launch. All in days, not quarters.
+        </p>
+        <button className="liquid-glass-strong rounded-full px-6 py-3 text-white font-body font-medium flex items-center gap-2">
+          Get Started {ArrowUpRight && <ArrowUpRight size={16} />}
+        </button>
+      </div>
+    </VideoSection>
+  );
+}
+
+// ── Features Chess ────────────────────────────────────
+
+function FeaturesChess() {
+  const rows = [
+    {
+      title: 'Designed to convert. Built to perform.',
+      body: "Every pixel is intentional. Our AI studies what works across thousands of top sites—then builds yours to outperform them all.",
+      cta: 'Learn more',
+      gif: 'https://motionsites.ai/assets/hero-finlytic-preview-CV9g0FHP.gif',
+      reverse: false,
+    },
+    {
+      title: 'It gets smarter. Automatically.',
+      body: "Your site evolves on its own. AI monitors every click, scroll, and conversion—then optimizes in real time. No manual updates. Ever.",
+      cta: 'See how it works',
+      gif: 'https://motionsites.ai/assets/hero-wealth-preview-B70idl_u.gif',
+      reverse: true,
+    },
+  ];
+
+  return (
+    <section className="px-6 lg:px-24 py-28">
+      <SectionHeading badge="Capabilities" heading="Pro features. Zero complexity." />
+      <div className="flex flex-col gap-24 max-w-5xl mx-auto">
+        {rows.map((row, i) => (
+          <div key={i} className={`flex flex-col ${row.reverse ? 'md:flex-row-reverse' : 'md:flex-row'} items-center gap-14`}>
+            <div className="flex-1 flex flex-col gap-6">
+              <h3 className="text-3xl md:text-4xl font-heading italic text-white leading-tight">{row.title}</h3>
+              <p className="text-white/60 font-body font-light text-sm md:text-base leading-relaxed">{row.body}</p>
+              <button className="liquid-glass-strong rounded-full px-5 py-2.5 text-white font-body text-sm font-medium self-start flex items-center gap-2">
+                {row.cta} {ArrowUpRight && <ArrowUpRight size={14} />}
+              </button>
+            </div>
+            <div className="flex-1 w-full">
+              <div className="liquid-glass rounded-2xl overflow-hidden aspect-video">
+                <img
+                  src={row.gif}
+                  alt={row.title}
+                  className="w-full h-full object-cover"
+                  onError={e => { e.target.style.display='none'; e.target.parentNode.style.background='rgba(255,255,255,0.04)'; }}
+                />
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
+    </section>
+  );
+}
+
+// ── Features Grid ─────────────────────────────────────
+
+function FeaturesGrid() {
+  const cards = [
+    { Icon: Zap,       title:'Days, Not Months',    body:"Concept to launch at a pace that redefines fast. Because waiting isn't a strategy." },
+    { Icon: Palette,   title:'Obsessively Crafted', body:"Every detail considered. Every element refined. Design so precise, it feels inevitable." },
+    { Icon: BarChart3, title:'Built to Convert',    body:"Layouts informed by data. Decisions backed by performance. Results you can measure." },
+    { Icon: Shield,    title:'Secure by Default',   body:"Enterprise-grade protection comes standard. SSL, DDoS mitigation, compliance. All included." },
+  ];
+
+  return (
+    <section className="px-6 lg:px-24 py-8 pb-28">
+      <SectionHeading badge="Why Us" heading="The difference is everything." />
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 max-w-5xl mx-auto">
+        {cards.map(({ Icon, title, body }) => (
+          <div key={title} className="liquid-glass rounded-2xl p-6 flex flex-col gap-5">
+            <div className="liquid-glass-strong rounded-full w-10 h-10 flex items-center justify-center flex-shrink-0">
+              {Icon && <Icon size={18} className="text-white" />}
+            </div>
+            <h4 className="text-white font-body font-medium text-base">{title}</h4>
+            <p className="text-white/60 font-body font-light text-sm leading-relaxed">{body}</p>
+          </div>
+        ))}
+      </div>
+    </section>
+  );
+}
+
+// ── Stats ─────────────────────────────────────────────
+
+function Stats() {
+  const stats = [
+    { val:'200+',   label:'Sites launched' },
+    { val:'98%',    label:'Client satisfaction' },
+    { val:'3.2x',   label:'More conversions' },
+    { val:'5 days', label:'Average delivery' },
+  ];
+  return (
+    <VideoSection
+      src="https://stream.mux.com/NcU3HlHeF7CUL86azTTzpy3Tlb00d6iF3BmCdFslMJYM.m3u8"
+      grayscale
+      minH={500}
+    >
+      <div className="liquid-glass rounded-3xl p-12 md:p-16 max-w-4xl w-full">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-10">
+          {stats.map(({ val, label }) => (
+            <div key={val} className="flex flex-col items-center gap-2 text-center">
+              <span className="text-4xl md:text-5xl lg:text-6xl font-heading italic text-white">{val}</span>
+              <span className="text-white/60 font-body font-light text-sm">{label}</span>
+            </div>
+          ))}
+        </div>
+      </div>
+    </VideoSection>
+  );
+}
+
+// ── Testimonials ──────────────────────────────────────
+
+function Testimonials() {
+  const items = [
+    { q:"A complete rebuild in five days. The result outperformed everything we'd spent months building before.", name:'Sarah Chen', role:'CEO, Luminary' },
+    { q:"Conversions up 4x. That's not a typo. The design just works differently when it's built on real data.", name:'Marcus Webb', role:'Head of Growth, Arcline' },
+    { q:"They didn't just design our site. They defined our brand. World-class doesn't begin to cover it.", name:'Elena Voss', role:'Brand Director, Helix' },
+  ];
+  return (
+    <section className="px-6 lg:px-24 py-28">
+      <SectionHeading badge="What They Say" heading="Don't take our word for it." />
+      <div className="grid md:grid-cols-3 gap-6 max-w-5xl mx-auto">
+        {items.map(({ q, name, role }) => (
+          <div key={name} className="liquid-glass rounded-2xl p-8 flex flex-col gap-6">
+            <p className="text-white/80 font-body font-light text-sm italic leading-relaxed flex-1">"{q}"</p>
+            <div>
+              <div className="text-white font-body font-medium text-sm">{name}</div>
+              <div className="text-white/50 font-body font-light text-xs">{role}</div>
+            </div>
+          </div>
+        ))}
+      </div>
+    </section>
+  );
+}
+
+// ── CTA + Footer ──────────────────────────────────────
+
+function CtaFooter() {
+  return (
+    <VideoSection src="https://stream.mux.com/8wrHPCX2dC3msyYU9ObwqNdm00u3ViXvOSHUMRYSEe5Q.m3u8" minH={700}>
+      <div className="flex flex-col items-center gap-7 max-w-3xl text-center">
+        <BlurText
+          text="Your next website starts here."
+          className="text-5xl md:text-6xl lg:text-7xl font-heading italic text-white leading-[0.85]"
+        />
+        <p className="text-white/60 font-body font-light text-sm md:text-base max-w-md">
+          Book a free strategy call. See what AI-powered design can do. No commitment, no pressure. Just possibilities.
+        </p>
+        <div className="flex items-center gap-4 flex-wrap justify-center">
+          <button className="liquid-glass-strong rounded-full px-6 py-3 text-white font-body font-medium flex items-center gap-2">
+            Book a Call {ArrowUpRight && <ArrowUpRight size={16} />}
+          </button>
+          <button className="bg-white text-black rounded-full px-6 py-3 font-body font-medium hover:bg-white/90 transition-colors">
+            View Pricing
+          </button>
+        </div>
+      </div>
+
+      {/* Footer bar */}
+      <div className="mt-32 pt-8 border-t border-white/10 w-full max-w-5xl flex items-center justify-between flex-wrap gap-4">
+        <span className="text-white/40 text-xs font-body">© 2026 Studio. All rights reserved.</span>
+        <div className="flex items-center gap-6">
+          {['Privacy','Terms','Contact'].map(l => (
+            <a key={l} href="#" className="text-white/40 text-xs font-body hover:text-white/70 transition-colors">{l}</a>
+          ))}
+        </div>
+      </div>
+    </VideoSection>
+  );
+}
+
+// ── App ───────────────────────────────────────────────
+
+function App() {
+  return (
+    <div className="bg-black min-h-screen">
+      <Navbar />
+      <Hero />
+      <div className="bg-black">
+        <StartSection />
+        <FeaturesChess />
+        <FeaturesGrid />
+        <Stats />
+        <Testimonials />
+        <CtaFooter />
+      </div>
+    </div>
+  );
+}
+
+ReactDOM.createRoot(document.getElementById('root')).render(<App />);
+</script>
+</body>
+</html>

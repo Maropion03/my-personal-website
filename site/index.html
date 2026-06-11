@@ -1,0 +1,985 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>水母银河 · AI PM & Builder</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500&family=Noto+Serif+SC:wght@400;700&family=Noto+Sans+SC:wght@300;400&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#08081e;--bg2:#0e0e28;--bg3:#13132f;
+  --border:rgba(140,120,255,.14);--border2:rgba(0,207,192,.12);
+  --p:#a191ff;--c:#00d4c4;--g:#f5c860;
+  --text:#ddddf5;--muted:#7070a0;
+  --card:rgba(255,255,255,.035);
+  --font-serif-cn:'Noto Serif SC',serif;
+  --font-serif-en:'Cormorant Garamond',serif;
+  --font-sans:'DM Sans','Noto Sans SC',sans-serif;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--text);font-family:var(--font-sans);overflow-x:hidden;font-size:15px;line-height:1.65}
+::selection{background:rgba(161,145,255,.3)}
+a{color:inherit;text-decoration:none}
+img{display:block;max-width:100%}
+
+/* Scrollbar */
+::-webkit-scrollbar{width:4px}
+::-webkit-scrollbar-track{background:var(--bg)}
+::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px}
+
+/* Canvas */
+#bg{position:fixed;inset:0;z-index:0;pointer-events:none}
+#hero-fade{position:absolute;bottom:0;left:0;right:0;height:220px;background:linear-gradient(to bottom,transparent,var(--bg));z-index:2;pointer-events:none}
+
+/* Nav */
+nav{position:fixed;top:0;left:0;right:0;z-index:100;padding:0 48px;height:60px;display:flex;align-items:center;justify-content:space-between;backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border-bottom:1px solid var(--border);background:rgba(8,8,30,.7);transition:background .3s}
+.nav-logo{font-family:var(--font-serif-cn);font-size:17px;letter-spacing:.12em;color:var(--p);cursor:pointer}
+.nav-links{display:flex;gap:36px;font-size:13px;color:var(--muted);letter-spacing:.06em}
+.nav-links a{transition:color .2s;position:relative}
+.nav-links a:hover,.nav-links a.active{color:var(--text)}
+.nav-links a::after{content:'';position:absolute;bottom:-3px;left:0;right:100%;height:1px;background:var(--p);transition:right .25s}
+.nav-links a:hover::after{right:0}
+.nav-right{display:flex;align-items:center;gap:16px}
+.lang-btn{font-size:12px;letter-spacing:.1em;color:var(--muted);cursor:pointer;padding:4px 10px;border:1px solid var(--border);border-radius:20px;transition:all .2s}
+.lang-btn:hover{color:var(--p);border-color:var(--p)}
+.cta-nav{font-size:12px;padding:6px 16px;border-radius:20px;background:var(--p);color:#fff;font-weight:500;transition:opacity .2s}
+.cta-nav:hover{opacity:.85}
+
+/* Sections */
+section{position:relative;z-index:1}
+.container{max-width:1100px;margin:0 auto;padding:0 48px}
+
+/* Hero */
+#hero{min-height:100vh;display:grid;grid-template-columns:1fr 1fr;align-items:center;padding:100px 0 60px;position:relative;overflow:hidden}
+@media(max-width:860px){#hero{grid-template-columns:1fr;padding:120px 24px 80px}}
+.hero-inner{padding-left:10%;padding-right:4%}
+@media(max-width:860px){.hero-inner{padding:0;text-align:center}}
+.hero-planet-col{position:relative;height:100%;min-height:500px}
+.hero-label{font-size:11px;letter-spacing:.25em;color:var(--c);text-transform:uppercase;margin-bottom:22px;opacity:.85;display:flex;align-items:center;gap:10px}
+.hero-label::before{content:'';width:28px;height:1px;background:var(--c)}
+@media(max-width:860px){.hero-label{justify-content:center}}
+.hero-name{font-family:var(--font-serif-cn);font-size:clamp(44px,6vw,82px);font-weight:700;line-height:1.05;letter-spacing:.04em;margin-bottom:6px;background:linear-gradient(140deg,#e8e4ff 0%,var(--p) 40%,var(--c) 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.hero-name-en{font-family:var(--font-serif-en);font-size:clamp(15px,2vw,22px);font-style:italic;color:var(--muted);margin-bottom:26px;letter-spacing:.1em}
+.hero-tagline{font-family:var(--font-serif-cn);font-size:clamp(14px,1.6vw,18px);color:rgba(220,220,240,.8);margin-bottom:40px;line-height:2;font-weight:400;border-left:2px solid rgba(161,145,255,.4);padding-left:16px}
+@media(max-width:860px){.hero-tagline{border-left:none;padding-left:0}}
+.hero-tagline em{color:var(--g);font-style:normal}
+.hero-ctas{display:flex;gap:12px;flex-wrap:wrap}
+@media(max-width:860px){.hero-ctas{justify-content:center}}
+.btn{display:inline-flex;align-items:center;gap:7px;padding:11px 22px;border-radius:28px;font-size:13px;font-weight:500;letter-spacing:.04em;cursor:pointer;transition:all .25s;border:none;outline:none}
+.btn-primary{background:linear-gradient(135deg,var(--p),#7b6fd4);color:#fff}
+.btn-primary:hover{transform:translateY(-2px);box-shadow:0 8px 28px rgba(161,145,255,.35)}
+.btn-outline{background:var(--card);color:var(--text);border:1px solid var(--border)}
+.btn-outline:hover{border-color:var(--p);color:var(--p);transform:translateY(-2px)}
+.btn-cyan{background:rgba(0,212,196,.1);color:var(--c);border:1px solid rgba(0,212,196,.25)}
+.btn-cyan:hover{background:rgba(0,212,196,.18);transform:translateY(-2px)}
+.scroll-hint{position:absolute;bottom:32px;left:48px;display:flex;flex-direction:column;align-items:flex-start;gap:8px;color:var(--muted);font-size:10px;letter-spacing:.18em;text-transform:uppercase;opacity:.45;animation:fadeup 2.8s infinite}
+@media(max-width:860px){.scroll-hint{left:50%;transform:translateX(-50%);align-items:center}}
+@keyframes fadeup{0%,100%{opacity:.45;transform:translateY(0)}50%{opacity:.2;transform:translateY(5px)}}
+
+/* Section header */
+.section-header{text-align:center;margin-bottom:60px}
+.section-label{font-size:11px;letter-spacing:.25em;color:var(--c);text-transform:uppercase;margin-bottom:14px}
+.section-title{font-family:var(--font-serif-cn);font-size:clamp(28px,4vw,40px);font-weight:700;line-height:1.2}
+.section-sub{font-size:14px;color:var(--muted);margin-top:12px}
+
+/* Projects */
+#projects{padding:120px 0 80px}
+.projects-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:20px}
+@media(max-width:900px){.projects-grid{grid-template-columns:1fr}}
+.proj-card{background:var(--card);border:1px solid var(--border);border-radius:16px;overflow:hidden;transition:border-color .3s,transform .3s;cursor:pointer}
+.proj-card:hover{border-color:rgba(161,145,255,.35);transform:translateY(-4px)}
+.proj-card.open{border-color:var(--p)}
+.proj-top{padding:28px 24px 20px}
+.proj-tag{display:inline-block;font-size:10px;letter-spacing:.15em;text-transform:uppercase;padding:3px 10px;border-radius:20px;margin-bottom:16px;font-weight:500}
+.tag-p{background:rgba(161,145,255,.12);color:var(--p)}
+.tag-c{background:rgba(0,212,196,.1);color:var(--c)}
+.tag-g{background:rgba(245,200,96,.1);color:var(--g)}
+.proj-title{font-family:var(--font-serif-cn);font-size:18px;font-weight:700;margin-bottom:8px;line-height:1.3}
+.proj-desc{font-size:13px;color:var(--muted);line-height:1.6;margin-bottom:18px}
+.proj-metrics{display:flex;gap:12px;flex-wrap:wrap;margin-bottom:18px}
+.metric{text-align:center;padding:8px 14px;background:rgba(255,255,255,.03);border-radius:8px;border:1px solid var(--border);min-width:60px}
+.metric-val{font-size:17px;font-weight:600;color:var(--text);font-family:var(--font-serif-en);line-height:1}
+.metric-lab{font-size:10px;color:var(--muted);margin-top:4px;letter-spacing:.06em}
+.tech-stack{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:18px}
+.tech{font-size:10px;letter-spacing:.05em;padding:3px 9px;background:rgba(255,255,255,.04);border:1px solid var(--border);border-radius:6px;color:var(--muted);font-family:monospace}
+.proj-links{display:flex;gap:10px;flex-wrap:wrap}
+.link-btn{font-size:12px;padding:6px 14px;border-radius:20px;transition:all .2s;display:inline-flex;align-items:center;gap:5px}
+.link-demo{background:rgba(161,145,255,.12);color:var(--p);border:1px solid rgba(161,145,255,.2)}
+.link-demo:hover{background:rgba(161,145,255,.22)}
+.link-gh{background:var(--card);color:var(--muted);border:1px solid var(--border)}
+.link-gh:hover{color:var(--text);border-color:rgba(255,255,255,.2)}
+.expand-btn{display:flex;align-items:center;justify-content:space-between;width:100%;padding:12px 24px;background:rgba(255,255,255,.02);border-top:1px solid var(--border);font-size:12px;color:var(--muted);cursor:pointer;transition:all .2s;border:none;outline:none}
+.expand-btn:hover{color:var(--p);background:rgba(161,145,255,.05)}
+.expand-icon{transition:transform .3s;font-size:14px}
+.proj-card.open .expand-icon{transform:rotate(180deg)}
+.proj-detail{max-height:0;overflow:hidden;transition:max-height .5s ease}
+.proj-card.open .proj-detail{max-height:1200px}
+.detail-inner{padding:24px;border-top:1px solid var(--border);display:flex;flex-direction:column;gap:20px}
+.case-block{display:flex;flex-direction:column;gap:6px}
+.case-block h4{font-size:11px;letter-spacing:.15em;text-transform:uppercase;font-weight:600}
+.case-block p{font-size:13px;color:var(--muted);line-height:1.7}
+.case-result{background:rgba(0,212,196,.05);border:1px solid rgba(0,212,196,.15);border-radius:10px;padding:14px 18px}
+.case-result h4{color:var(--c)}
+.arch-box{background:rgba(255,255,255,.02);border:1px solid var(--border);border-radius:8px;padding:14px;font-family:monospace;font-size:11px;color:var(--muted);line-height:1.8;overflow-x:auto;white-space:pre}
+
+/* Services */
+#services{padding:80px 0}
+.services-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:20px}
+@media(max-width:800px){.services-grid{grid-template-columns:1fr}}
+.svc-card{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:32px 26px;transition:border-color .3s,transform .3s}
+.svc-card:hover{border-color:rgba(0,212,196,.3);transform:translateY(-3px)}
+.svc-icon{font-size:28px;margin-bottom:16px;line-height:1}
+.svc-title{font-family:var(--font-serif-cn);font-size:17px;font-weight:700;margin-bottom:10px}
+.svc-desc{font-size:13px;color:var(--muted);line-height:1.7;margin-bottom:18px}
+.svc-items{display:flex;flex-direction:column;gap:5px}
+.svc-item{font-size:12px;color:var(--text);opacity:.75;padding-left:14px;position:relative}
+.svc-item::before{content:'→';position:absolute;left:0;color:var(--c);font-size:11px}
+.svc-cta{margin-top:22px;font-size:12px;padding:7px 18px;border-radius:20px;background:rgba(0,212,196,.1);color:var(--c);border:1px solid rgba(0,212,196,.25);display:inline-block;transition:all .2s;cursor:pointer}
+.svc-cta:hover{background:rgba(0,212,196,.2)}
+
+/* Career */
+#career{padding:80px 0}
+.career-wrap{display:grid;grid-template-columns:1fr 1fr;gap:60px;align-items:start}
+@media(max-width:760px){.career-wrap{grid-template-columns:1fr}}
+.career-label{font-size:11px;letter-spacing:.2em;color:var(--p);text-transform:uppercase;margin-bottom:24px;font-weight:600}
+.timeline{display:flex;flex-direction:column;gap:0}
+.tl-item{display:flex;gap:16px;padding-bottom:28px;position:relative}
+.tl-item::before{content:'';position:absolute;left:6px;top:16px;bottom:0;width:1px;background:var(--border)}
+.tl-item:last-child::before{display:none}
+.tl-dot{width:13px;height:13px;border-radius:50%;border:2px solid var(--p);background:var(--bg);flex-shrink:0;margin-top:4px;position:relative;z-index:1}
+.tl-dot.cyan{border-color:var(--c)}
+.tl-content{}
+.tl-co{font-size:13px;font-weight:500;color:var(--text);margin-bottom:2px}
+.tl-role{font-size:12px;color:var(--p);margin-bottom:2px}
+.tl-role.cyan{color:var(--c)}
+.tl-date{font-size:11px;color:var(--muted);letter-spacing:.05em}
+.edu-block{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:22px;margin-bottom:16px}
+.edu-school{font-size:14px;font-weight:600;margin-bottom:4px}
+.edu-degree{font-size:12px;color:var(--muted);margin-bottom:8px}
+.edu-detail{font-size:11px;color:var(--c);opacity:.8}
+.skills-cloud{display:flex;flex-wrap:wrap;gap:8px;margin-top:20px}
+.skill{font-size:12px;padding:5px 13px;border-radius:20px;background:rgba(255,255,255,.04);border:1px solid var(--border);color:var(--muted);transition:all .2s;cursor:default}
+.skill:hover{color:var(--p);border-color:rgba(161,145,255,.3)}
+.skill.hot{border-color:rgba(161,145,255,.25);color:var(--p)}
+
+/* Contact */
+#contact{padding:80px 0 120px}
+.contact-inner{max-width:680px;margin:0 auto;text-align:center}
+.contact-title{font-family:var(--font-serif-cn);font-size:clamp(28px,4vw,42px);font-weight:700;margin-bottom:16px;line-height:1.2}
+.contact-sub{font-size:14px;color:var(--muted);margin-bottom:48px;line-height:1.7}
+.contact-links{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+@media(max-width:600px){.contact-links{grid-template-columns:repeat(2,1fr)}}
+.contact-link{display:flex;flex-direction:column;align-items:center;gap:8px;padding:22px 16px;background:var(--card);border:1px solid var(--border);border-radius:14px;transition:all .25s;font-size:12px;color:var(--muted)}
+.contact-link:hover{border-color:rgba(161,145,255,.35);color:var(--p);transform:translateY(-3px)}
+.contact-link .ico{font-size:22px}
+.contact-link .lbl{font-weight:500;color:var(--text);font-size:13px}
+
+/* Reveal animations */
+.reveal{opacity:0;transform:translateY(28px);transition:opacity .7s cubic-bezier(.22,1,.36,1),transform .7s cubic-bezier(.22,1,.36,1)}
+.reveal.visible{opacity:1;transform:translateY(0)}
+.reveal-d1{transition-delay:.1s}
+.reveal-d2{transition-delay:.2s}
+.reveal-d3{transition-delay:.3s}
+
+/* Divider */
+.divider{width:100%;height:1px;background:linear-gradient(90deg,transparent,var(--border),transparent);margin:0}
+
+/* Footer */
+footer{text-align:center;padding:28px;font-size:11px;color:var(--muted);opacity:.6;border-top:1px solid var(--border);position:relative;z-index:1}
+
+/* Tweaks panel */
+#tweaks-panel{position:fixed;bottom:24px;right:24px;z-index:999;background:var(--bg3);border:1px solid var(--border);border-radius:16px;padding:20px;width:240px;display:none;box-shadow:0 20px 60px rgba(0,0,0,.5);font-size:13px}
+#tweaks-panel.show{display:block}
+#tweaks-panel h3{font-size:12px;letter-spacing:.15em;text-transform:uppercase;color:var(--muted);margin-bottom:16px;font-weight:600}
+.tweak-row{margin-bottom:14px}
+.tweak-row label{display:block;font-size:11px;color:var(--muted);margin-bottom:6px}
+.tweak-row input[type=range]{width:100%;accent-color:var(--p)}
+.tweak-row select{width:100%;background:var(--bg2);border:1px solid var(--border);color:var(--text);border-radius:6px;padding:5px 8px;font-size:12px;font-family:var(--font-sans)}
+.tweak-toggle{display:flex;gap:8px;flex-wrap:wrap}
+.tweak-opt{padding:4px 12px;border-radius:20px;font-size:11px;cursor:pointer;border:1px solid var(--border);color:var(--muted);transition:all .2s}
+.tweak-opt.active{border-color:var(--p);color:var(--p);background:rgba(161,145,255,.1)}
+
+/* Demo iframe modal */
+.demo-modal{position:fixed;inset:0;z-index:200;background:rgba(0,0,0,.85);display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity .3s;backdrop-filter:blur(10px)}
+.demo-modal.show{opacity:1;pointer-events:all}
+.demo-inner{width:90vw;max-width:1200px;height:80vh;background:var(--bg2);border-radius:16px;border:1px solid var(--border);overflow:hidden;display:flex;flex-direction:column}
+.demo-bar{display:flex;align-items:center;justify-content:space-between;padding:12px 20px;border-bottom:1px solid var(--border);font-size:13px}
+.demo-bar span{color:var(--muted)}
+.demo-close{cursor:pointer;color:var(--muted);font-size:20px;transition:color .2s;background:none;border:none;outline:none}
+.demo-close:hover{color:var(--text)}
+.demo-inner iframe{flex:1;border:none;width:100%;height:100%}
+</style>
+</head>
+<body>
+
+<canvas id="bg"></canvas>
+
+<!-- Nav -->
+<nav>
+  <div class="nav-logo" onclick="scrollTo({top:0,behavior:'smooth'})">水母银河</div>
+  <div class="nav-links">
+    <a href="#projects" data-i18n="zh:作品;en:Projects">作品</a>
+    <a href="#services" data-i18n="zh:服务;en:Services">服务</a>
+    <a href="#career" data-i18n="zh:经历;en:Career">经历</a>
+    <a href="#contact" data-i18n="zh:联系;en:Contact">联系</a>
+  </div>
+  <div class="nav-right">
+    <span class="lang-btn" id="langToggle">EN</span>
+    <a href="mailto:maropion@163.com" class="cta-nav" data-i18n="zh:聊一聊;en:Let's talk">聊一聊</a>
+  </div>
+</nav>
+
+<!-- Hero -->
+<section id="hero">
+  <div class="hero-inner">
+    <div class="hero-label" data-i18n="zh:AI 产品经理 · Builder · 独立开发者;en:AI Product Manager · Builder · Independent Developer">AI 产品经理 · Builder · 独立开发者</div>
+    <div class="hero-name">水母银河</div>
+    <div class="hero-name-en">Maropion · 毛睿平</div>
+    <div class="hero-tagline">
+      <span class="zh">水母不游向<em>风口</em>，<br>只把 AI 做成<em>结果</em></span>
+      <span class="en" style="display:none">Don't chase the trend —<br><em>ship AI into reality</em></span>
+    </div>
+    <div class="hero-ctas">
+      <a href="#contact" class="btn btn-primary">
+        <span data-i18n="zh:聊合作;en:Let's connect">聊合作</span>
+      </a>
+      <a href="#projects" class="btn btn-outline">
+        <span data-i18n="zh:看作品;en:View Work">看作品</span>
+      </a>
+      <a href="uploads/resume.pdf" download class="btn btn-cyan">
+        <span data-i18n="zh:下载简历;en:Download CV">下载简历</span>
+      </a>
+    </div>
+  </div>
+  <div class="hero-planet-col" aria-hidden="true"></div>
+  <div id="hero-fade"></div>
+  <div class="scroll-hint">
+    <span data-i18n="zh:向下探索;en:scroll">向下探索</span>
+    <span style="font-size:16px;margin-top:2px">↓</span>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- Projects -->
+<section id="projects">
+  <div class="container">
+    <div class="section-header reveal">
+      <div class="section-label" data-i18n="zh:作品展示;en:Projects">作品展示</div>
+      <h2 class="section-title" data-i18n="zh:从 PRD 到上线，都是我做的;en:From PRD to Production — All Mine">从 PRD 到上线，都是我做的</h2>
+      <p class="section-sub" data-i18n="zh:3 个独立项目，覆盖 AI Agent / 全栈 SaaS / LLM 评测;en:3 independent projects covering AI Agent · Full-stack SaaS · LLM Evaluation">3 个独立项目，覆盖 AI Agent / 全栈 SaaS / LLM 评测</p>
+    </div>
+    <div class="projects-grid">
+
+      <!-- Project 1 -->
+      <div class="proj-card reveal reveal-d1" id="card-0">
+        <div class="proj-top">
+          <div class="proj-tag tag-p" data-i18n="zh:多 Agent 架构;en:Multi-Agent">多 Agent 架构</div>
+          <div class="proj-title" data-i18n="zh:PRD 智能评审工作台;en:PRD Smart Review Agent">PRD 智能评审工作台</div>
+          <div class="proj-desc" data-i18n="zh:上传 PRD，6 个维度 AI 并行评审，3 分钟出结构化报告;en:Upload a PRD, 6-dimension AI parallel review, structured report in 3 minutes">上传 PRD，6 个维度 AI 并行评审，3 分钟出结构化报告</div>
+          <div class="proj-metrics">
+            <div class="metric"><div class="metric-val">97%</div><div class="metric-lab" data-i18n="zh:提效;en:faster">提效</div></div>
+            <div class="metric"><div class="metric-val">6</div><div class="metric-lab" data-i18n="zh:评审维度;en:dimensions">评审维度</div></div>
+            <div class="metric"><div class="metric-val">V35</div><div class="metric-lab" data-i18n="zh:迭代版本;en:iterations">迭代</div></div>
+          </div>
+          <div class="tech-stack">
+            <span class="tech">CrewAI</span><span class="tech">FastAPI</span><span class="tech">SSE</span><span class="tech">Docker</span><span class="tech">Railway</span><span class="tech">MiniMax</span>
+          </div>
+          <div class="proj-links">
+            <a href="#" class="link-btn link-demo" onclick="openDemo('https://awesome-requirement-review-agent-production.up.railway.app/single-page-shell.html',event)">▶ Live Demo</a>
+            <a href="https://github.com/Maropion03/awesome-requirement-review-agent" target="_blank" class="link-btn link-gh">⌥ GitHub</a>
+          </div>
+        </div>
+        <button class="expand-btn" onclick="toggleCard(0)">
+          <span data-i18n="zh:查看完整案例;en:View Case Study">查看完整案例</span>
+          <span class="expand-icon">▾</span>
+        </button>
+        <div class="proj-detail">
+          <div class="detail-inner">
+            <div class="case-block">
+              <h4 style="color:var(--g)" data-i18n="zh:😤 痛点;en:😤 Problem">😤 痛点</h4>
+              <p data-i18n="zh:产品评审会耗时 2+ 小时，研发/设计/测试三方视角分散，PRD 缺陷要到联调才暴露，修复成本极高。;en:PRD reviews took 2+ hours. Dev/Design/Test perspectives were scattered, defects only surfaced at integration — extremely costly to fix late.">产品评审会耗时 2+ 小时，研发/设计/测试三方视角分散，PRD 缺陷要到联调才暴露，修复成本极高。</p>
+            </div>
+            <div class="case-block">
+              <h4 style="color:var(--p)" data-i18n="zh:⚡ 怎么做;en:⚡ Solution">⚡ 怎么做</h4>
+              <p data-i18n="zh:基于 CrewAI 多 Agent 架构，设计 Orchestrator 协调研发/设计/测试 3 个专业 Agent 并行评审完整性、合理性、用户价值、可行性、风险、优先级一致性 6 个维度；FastAPI + SSE 实现实时流式进度推送；3 套预设权重适配不同项目类型；Docker 多阶段构建 + Railway 部署 + slowapi 限流。;en:Built on CrewAI multi-agent architecture: an Orchestrator coordinates Dev/Design/Test agents reviewing 6 dimensions in parallel. FastAPI + SSE streams real-time progress. 3 preset weight configs for different project types. Docker multi-stage build + Railway deployment + rate limiting.">基于 CrewAI 多 Agent 架构，设计 Orchestrator 协调研发/设计/测试 3 个专业 Agent 并行评审 6 个维度；FastAPI + SSE 实现实时流式进度推送；3 套预设权重；Docker + Railway 部署。</p>
+            </div>
+            <div class="case-block case-result">
+              <h4 data-i18n="zh:✅ 结果;en:✅ Results">✅ 结果</h4>
+              <p data-i18n="zh:单次评审时间：2 小时 → 3 分钟（↓97%）。支持 PDF/Markdown 双格式导出。已部署上线可直接使用，沉淀标准化使用文档并开源。;en:Review time: 2 hours → 3 minutes (↓97%). PDF & Markdown export. Deployed and live, open-sourced with standardized documentation.">单次评审：2 小时 → 3 分钟（↓97%）。PDF/Markdown 导出。已部署上线开源。</p>
+            </div>
+            <div class="arch-box">Orchestrator
+├── Dev Agent     → 可行性 + 技术风险
+├── Design Agent  → 合理性 + 用户价值
+└── Test Agent    → 完整性 + 优先级一致性
+        ↓ SSE stream
+Frontend (single-page HTML + Tailwind)</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Project 2 -->
+      <div class="proj-card reveal reveal-d2" id="card-1">
+        <div class="proj-top">
+          <div class="proj-tag tag-c" data-i18n="zh:全栈 SaaS;en:Full-stack SaaS">全栈 SaaS</div>
+          <div class="proj-title" data-i18n="zh:Spirit Construct · 灵构 AIPM Stack;en:Spirit Construct · AIPM Stack">Spirit Construct · 灵构 AIPM Stack</div>
+          <div class="proj-desc" data-i18n="zh:面向 AI PM 的一站式工具平台：ROI 计算器、参数调试场、PRD 生成器;en:All-in-one toolkit for AI PMs: ROI Calculator, Model Playground, PRD Generator">面向 AI PM 的一站式工具平台：ROI 计算器、参数调试场、PRD 生成器</div>
+          <div class="proj-metrics">
+            <div class="metric"><div class="metric-val">30h</div><div class="metric-lab" data-i18n="zh:独立交付;en:solo delivery">独立交付</div></div>
+            <div class="metric"><div class="metric-val">5+</div><div class="metric-lab" data-i18n="zh:功能模块;en:modules">功能模块</div></div>
+            <div class="metric"><div class="metric-val">0→1</div><div class="metric-lab" data-i18n="zh:全栈自研;en:full-stack">全栈</div></div>
+          </div>
+          <div class="tech-stack">
+            <span class="tech">Vanilla JS</span><span class="tech">Supabase</span><span class="tech">Cloudflare</span><span class="tech">SiliconFlow</span><span class="tech">SSE</span>
+          </div>
+          <div class="proj-links">
+            <a href="#" class="link-btn link-demo" onclick="openDemo('https://spirit-construct-maropion.top',event)">▶ Live Demo</a>
+            <a href="https://github.com/Maropion03/Spirit-Construct-AIPM-stack" target="_blank" class="link-btn link-gh">⌥ GitHub</a>
+          </div>
+        </div>
+        <button class="expand-btn" onclick="toggleCard(1)">
+          <span data-i18n="zh:查看完整案例;en:View Case Study">查看完整案例</span>
+          <span class="expand-icon">▾</span>
+        </button>
+        <div class="proj-detail">
+          <div class="detail-inner">
+            <div class="case-block">
+              <h4 style="color:var(--g)" data-i18n="zh:😤 痛点;en:😤 Problem">😤 痛点</h4>
+              <p data-i18n="zh:非技术背景 AI PM 在模型选型、成本感知上缺乏实操工具，只能靠读文章和"感觉"做决策，试错成本高。;en:Non-technical AI PMs lacked hands-on tools for model selection and cost estimation — forced to rely on articles and intuition, making decisions expensive to reverse.">非技术背景 AI PM 在模型选型和成本感知上缺乏实操工具，只能靠感觉，试错成本高。</p>
+            </div>
+            <div class="case-block">
+              <h4 style="color:var(--p)" data-i18n="zh:⚡ 怎么做;en:⚡ Solution">⚡ 怎么做</h4>
+              <p data-i18n="zh:采用 Vibe Coding 模式，在 30 小时内完成需求定义、竞品分析、UI/UX 设计到 MVP 上线全流程。Serverless 边缘路由压降早期成本；Fetch API + SSE 流式输出缓解等待焦虑。核心创新：Break-even 可视化 ROI 计算器 + 实时参数调试场。;en:Used Vibe Coding mode to go from requirements to MVP in 30 hours. Serverless edge routing to minimize early-stage costs. Fetch API + SSE for streaming output. Core innovation: Break-even ROI calculator + real-time model parameter playground.">Vibe Coding 模式，30 小时从需求到 MVP 上线。Serverless 边缘路由控成本；核心亮点：Break-even ROI 计算器 + 实时参数调试场。</p>
+            </div>
+            <div class="case-block case-result">
+              <h4 data-i18n="zh:✅ 结果;en:✅ Results">✅ 结果</h4>
+              <p data-i18n="zh:已部署至个人域名并 GitHub 开源。证明了 AI 辅助单人全栈交付的能力，具备跨越「产品-开发」协作边界的技术视野。;en:Deployed to personal domain, open-sourced on GitHub. Proved solo full-stack delivery capability with AI assistance, bridging the product-engineering gap.">已部署至个人域名并 GitHub 开源。证明 AI 辅助单人全栈交付能力。</p>
+            </div>
+            <div class="arch-box">Frontend: Vanilla JS + CSS Design System
+├── ROI Calculator   (Break-even visualization)
+├── Model Playground (Temperature / Top-P / Tokens)
+├── PRD Generator    (one-sentence → structured doc)
+└── Learning Roadmap (progress tracking)
+Auth: Supabase Google OAuth
+Deploy: Cloudflare Pages + Edge Workers</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Project 3 -->
+      <div class="proj-card reveal reveal-d3" id="card-2">
+        <div class="proj-top">
+          <div class="proj-tag tag-g" data-i18n="zh:LLM 评测;en:LLM Evaluation">LLM 评测</div>
+          <div class="proj-title">Eval Studio</div>
+          <div class="proj-desc" data-i18n="zh:Linear 风格 LLM 评测平台，会话隔离，多 Provider，可视化幻觉分析;en:Linear-style LLM evaluation platform — session-isolated, multi-provider, visual hallucination analysis">Linear 风格 LLM 评测平台，会话隔离，多 Provider，可视化幻觉分析</div>
+          <div class="proj-metrics">
+            <div class="metric"><div class="metric-val">4+</div><div class="metric-lab" data-i18n="zh:模型供应商;en:providers">供应商</div></div>
+            <div class="metric"><div class="metric-val">BYOK</div><div class="metric-lab" data-i18n="zh:隐私优先;en:privacy">隐私</div></div>
+            <div class="metric"><div class="metric-val">React</div><div class="metric-lab">TypeScript</div></div>
+          </div>
+          <div class="tech-stack">
+            <span class="tech">React 18</span><span class="tech">TypeScript</span><span class="tech">FastAPI</span><span class="tech">LiteLLM</span><span class="tech">SQLite</span><span class="tech">Recharts</span>
+          </div>
+          <div class="proj-links">
+            <a href="https://github.com/Maropion03/Eval-studio" target="_blank" class="link-btn link-gh">⌥ GitHub</a>
+          </div>
+        </div>
+        <button class="expand-btn" onclick="toggleCard(2)">
+          <span data-i18n="zh:查看完整案例;en:View Case Study">查看完整案例</span>
+          <span class="expand-icon">▾</span>
+        </button>
+        <div class="proj-detail">
+          <div class="detail-inner">
+            <div class="case-block">
+              <h4 style="color:var(--g)" data-i18n="zh:😤 痛点;en:😤 Problem">😤 痛点</h4>
+              <p data-i18n="zh:LLM 输出对比评估依赖电子表格和零散脚本，难以可视化幻觉、推理错误或回归问题。工程师缺乏一个专注、快速的实验工作台。;en:LLM output evaluation relied on spreadsheets and scattered scripts. Visualizing hallucinations, reasoning errors or regressions was painful. Engineers lacked a focused, fast experiment workspace.">LLM 输出对比评估依赖电子表格和零散脚本，难以可视化幻觉和推理错误，缺乏专注的实验工作台。</p>
+            </div>
+            <div class="case-block">
+              <h4 style="color:var(--p)" data-i18n="zh:⚡ 怎么做;en:⚡ Solution">⚡ 怎么做</h4>
+              <p data-i18n="zh:Linear 风格极简 UI，精心打造深色模式 + 环境光 + 玻璃拟态效果。BYOK 架构：API key 不离浏览器本地。会话隔离设计（刷新即重置）适合快速实验。LiteLLM 统一封装支持 DeepSeek/OpenAI/Moonshot/SiliconFlow 等任意 OpenAI 兼容接口。;en:Linear-inspired minimal UI with meticulously crafted dark mode + ambient lighting + glassmorphism. BYOK: API keys never leave local storage. Session isolation (refresh to reset) for rapid experimentation. LiteLLM wraps DeepSeek/OpenAI/Moonshot/SiliconFlow and any OpenAI-compatible endpoint.">Linear 风格 UI + 深色模式 + 玻璃拟态。BYOK 隐私架构。会话隔离（刷新即重置）。LiteLLM 统一封装多供应商 API。</p>
+            </div>
+            <div class="case-block case-result">
+              <h4 data-i18n="zh:✅ 结果;en:✅ Results">✅ 结果</h4>
+              <p data-i18n="zh:可视化 Faithfulness / Relevance / Coherence 三维指标，支持 diff 视图定位幻觉。MIT 开源。证明具备前后端全栈交付和工程化能力。;en:Visualizes Faithfulness / Relevance / Coherence metrics with a diff view to pinpoint hallucinations. MIT licensed. Demonstrates full-stack engineering capability.">可视化 3 维评测指标 + diff 视图定位幻觉。MIT 开源。证明全栈工程能力。</p>
+            </div>
+            <div class="arch-box">Frontend: React 18 + TypeScript + Vite
+├── TanStack Query (server state)
+├── Recharts (performance visualization)
+└── Phosphor Icons
+
+Backend: FastAPI + SQLite (SQLAlchemy)
+└── LiteLLM → DeepSeek / OpenAI / Moonshot
+              SiliconFlow / Ollama / vLLM</div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<div class="divider" style="margin:0 48px"></div>
+
+<!-- Services -->
+<section id="services">
+  <div class="container">
+    <div class="section-header reveal">
+      <div class="section-label" data-i18n="zh:服务能力;en:Services">服务能力</div>
+      <h2 class="section-title" data-i18n="zh:我能为你做什么;en:What I can build for you">我能为你做什么</h2>
+      <p class="section-sub" data-i18n="zh:产品思维 + 工程落地，从想法到可交付;en:Product thinking + engineering delivery, from idea to shipped">产品思维 + 工程落地，从想法到可交付</p>
+    </div>
+    <div class="services-grid">
+      <div class="svc-card reveal reveal-d1">
+        <div class="svc-icon">🤖</div>
+        <div class="svc-title" data-i18n="zh:AI Agent & Prototype 开发;en:AI Agent & Prototype Dev">AI Agent & Prototype 开发</div>
+        <div class="svc-desc" data-i18n="zh:从需求到可运行 demo，快速验证 AI 应用的可行性和用户价值;en:From requirements to a working demo — rapidly validate AI product feasibility and user value">从需求到可运行 demo，快速验证 AI 应用的可行性和用户价值</div>
+        <div class="svc-items">
+          <div class="svc-item" data-i18n="zh:多 Agent 工作流设计 & 开发;en:Multi-agent workflow design & dev">多 Agent 工作流设计 & 开发</div>
+          <div class="svc-item" data-i18n="zh:LLM 接入 & Prompt 优化;en:LLM integration & Prompt tuning">LLM 接入 & Prompt 优化</div>
+          <div class="svc-item" data-i18n="zh:全栈 MVP 快速交付;en:Full-stack MVP delivery">全栈 MVP 快速交付</div>
+          <div class="svc-item" data-i18n="zh:RAG 知识库系统搭建;en:RAG knowledge base systems">RAG 知识库系统搭建</div>
+        </div>
+        <a href="mailto:maropion@163.com?subject=AI Agent 开发咨询" class="svc-cta" data-i18n="zh:发起咨询;en:Get a quote">发起咨询</a>
+      </div>
+      <div class="svc-card reveal reveal-d2">
+        <div class="svc-icon">📊</div>
+        <div class="svc-title" data-i18n="zh:数据分析 & 洞察报告;en:Data Analysis & Insights">数据分析 & 洞察报告</div>
+        <div class="svc-desc" data-i18n="zh:机器学习辅助，将原始数据转化为可执行的业务洞察;en:ML-assisted, turning raw data into actionable business insights">机器学习辅助，将原始数据转化为可执行的业务洞察</div>
+        <div class="svc-items">
+          <div class="svc-item" data-i18n="zh:用户行为分析 & 画像;en:User behavior analysis & profiling">用户行为分析 & 画像</div>
+          <div class="svc-item" data-i18n="zh:文本挖掘 & 情感分析;en:Text mining & sentiment analysis">文本挖掘 & 情感分析</div>
+          <div class="svc-item" data-i18n="zh:竞品数据调研报告;en:Competitive intelligence reports">竞品数据调研报告</div>
+          <div class="svc-item" data-i18n="zh:可视化仪表盘搭建;en:Data visualization dashboards">可视化仪表盘搭建</div>
+        </div>
+        <a href="mailto:maropion@163.com?subject=数据分析咨询" class="svc-cta" data-i18n="zh:发起咨询;en:Get a quote">发起咨询</a>
+      </div>
+      <div class="svc-card reveal reveal-d3">
+        <div class="svc-icon">🗂</div>
+        <div class="svc-title" data-i18n="zh:AI 产品咨询 & PRD;en:AI Product Consulting & PRD">AI 产品咨询 & PRD</div>
+        <div class="svc-desc" data-i18n="zh:帮你把 AI 想法落地成清晰的产品规划，省去反复拉齐的沟通成本;en:Turn your AI ideas into clear product plans, eliminating misaligned communication loops">帮你把 AI 想法落地成清晰的产品规划，省去反复拉齐的沟通成本</div>
+        <div class="svc-items">
+          <div class="svc-item" data-i18n="zh:AI 产品路线图规划;en:AI product roadmap planning">AI 产品路线图规划</div>
+          <div class="svc-item" data-i18n="zh:高质量 PRD 撰写;en:High-quality PRD writing">高质量 PRD 撰写</div>
+          <div class="svc-item" data-i18n="zh:模型选型 & ROI 评估;en:Model selection & ROI analysis">模型选型 & ROI 评估</div>
+          <div class="svc-item" data-i18n="zh:产品 Demo 设计原型;en:Product demo prototyping">产品 Demo 设计原型</div>
+        </div>
+        <a href="mailto:maropion@163.com?subject=AI产品咨询" class="svc-cta" data-i18n="zh:发起咨询;en:Get a quote">发起咨询</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="divider" style="margin:0 48px"></div>
+
+<!-- Career -->
+<section id="career">
+  <div class="container">
+    <div class="section-header reveal">
+      <div class="section-label" data-i18n="zh:经历背景;en:Background">经历背景</div>
+      <h2 class="section-title" data-i18n="zh:产品 × 数据 × AI 三线并进;en:Product × Data × AI — Three tracks in parallel">产品 × 数据 × AI 三线并进</h2>
+    </div>
+    <div class="career-wrap">
+      <div class="reveal">
+        <div class="career-label" data-i18n="zh:工作经历;en:Experience">工作经历</div>
+        <div class="timeline">
+          <div class="tl-item">
+            <div class="tl-dot"></div>
+            <div class="tl-content">
+              <div class="tl-co">上海守扣科技</div>
+              <div class="tl-role">AI 产品经理</div>
+              <div class="tl-date">2026.04 — 至今</div>
+            </div>
+          </div>
+          <div class="tl-item">
+            <div class="tl-dot"></div>
+            <div class="tl-content">
+              <div class="tl-co">广州安点科技</div>
+              <div class="tl-role">AI 产品经理</div>
+              <div class="tl-date">2026.01 — 2026.03</div>
+            </div>
+          </div>
+          <div class="tl-item">
+            <div class="tl-dot cyan"></div>
+            <div class="tl-content">
+              <div class="tl-co">美团 · 点评事业部</div>
+              <div class="tl-role cyan">产品运营（AI / 风控）</div>
+              <div class="tl-date">2025.07 — 2025.09</div>
+            </div>
+          </div>
+          <div class="tl-item">
+            <div class="tl-dot cyan"></div>
+            <div class="tl-content">
+              <div class="tl-co">国泰海通证券 · 债务融资部</div>
+              <div class="tl-role cyan">行业研究</div>
+              <div class="tl-date">2025.09 — 2025.11</div>
+            </div>
+          </div>
+          <div class="tl-item">
+            <div class="tl-dot"></div>
+            <div class="tl-content">
+              <div class="tl-co">信永中和会计师事务所</div>
+              <div class="tl-role">审计实习生</div>
+              <div class="tl-date">2024.06 — 2024.09</div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="reveal reveal-d1">
+        <div class="career-label" data-i18n="zh:教育经历;en:Education">教育经历</div>
+        <div class="edu-block">
+          <div class="edu-school">香港城市大学</div>
+          <div class="edu-degree">MSc Artificial Intelligence in Business</div>
+          <div class="edu-detail">2026.09 — 2027.06 · 在读</div>
+        </div>
+        <div class="edu-block">
+          <div class="edu-school">广东财经大学</div>
+          <div class="edu-degree" data-i18n="zh:会计学 · 本科;en:Accounting · Bachelor">会计学 · 本科</div>
+          <div class="edu-detail">GPA 3.86/5 · <span data-i18n="zh:专业前 10%;en:Top 10% in major">专业前 10%</span></div>
+        </div>
+        <div style="margin-top:28px">
+          <div class="career-label" data-i18n="zh:核心技能;en:Core Skills">核心技能</div>
+          <div class="skills-cloud">
+            <span class="skill hot">Prompt Engineering</span>
+            <span class="skill hot">Multi-Agent</span>
+            <span class="skill hot">RAG</span>
+            <span class="skill hot">CrewAI</span>
+            <span class="skill">FastAPI</span>
+            <span class="skill">Python</span>
+            <span class="skill">React</span>
+            <span class="skill">SQL</span>
+            <span class="skill">Docker</span>
+            <span class="skill">PRD</span>
+            <span class="skill">Axure</span>
+            <span class="skill">IELTS 6.5</span>
+            <span class="skill">JLPT N2</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="divider" style="margin:0 48px"></div>
+
+<!-- Contact -->
+<section id="contact">
+  <div class="container">
+    <div class="contact-inner reveal">
+      <div class="contact-title" data-i18n="zh:来聊聊吧;en:Let's build something">来聊聊吧</div>
+      <p class="contact-sub" data-i18n="zh:无论是求职机会、接单合作还是纯粹的技术探讨，随时欢迎。<br>通常在 24 小时内回复。;en:Whether it's a job opportunity, freelance project, or just a technical chat — always open.<br>Usually responds within 24 hours.">无论是求职机会、接单合作还是纯粹的技术探讨，随时欢迎。<br>通常在 24 小时内回复。</p>
+      <div class="contact-links">
+        <a href="mailto:maropion@163.com" class="contact-link">
+          <span class="ico">✉</span>
+          <span class="lbl">Email</span>
+          <span>maropion@163.com</span>
+        </a>
+        <a href="https://github.com/Maropion03" target="_blank" class="contact-link">
+          <span class="ico">⌥</span>
+          <span class="lbl">GitHub</span>
+          <span>Maropion03</span>
+        </a>
+        <a href="https://awesome-requirement-review-agent-production.up.railway.app/single-page-shell.html" target="_blank" class="contact-link">
+          <span class="ico">▶</span>
+          <span class="lbl">Demo 1</span>
+          <span data-i18n="zh:PRD 评审工作台;en:PRD Review Agent">PRD 评审工作台</span>
+        </a>
+        <a href="https://spirit-construct-maropion.top" target="_blank" class="contact-link">
+          <span class="ico">✦</span>
+          <span class="lbl">Demo 2</span>
+          <span data-i18n="zh:灵构 AIPM Stack;en:Spirit Construct">灵构 AIPM Stack</span>
+        </a>
+        <a href="https://ecnucwapzdad.feishu.cn/wiki/C3gswU76FiOSwtkAU9PcCNifnsh" target="_blank" class="contact-link">
+          <span class="ico">📄</span>
+          <span class="lbl" data-i18n="zh:飞书文档;en:Feishu Doc">飞书文档</span>
+          <span data-i18n="zh:Agent 使用手册;en:Agent User Manual">Agent 使用手册</span>
+        </a>
+        <a href="uploads/resume.pdf" download class="contact-link">
+          <span class="ico">⬇</span>
+          <span class="lbl" data-i18n="zh:下载简历;en:Download CV">下载简历</span>
+          <span>PDF Resume</span>
+        </a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <span data-i18n="zh:水母银河 · 毛睿平 · 用 AI 把想法做成结果;en:Jellyfish Galaxy · Maropion · Shipping ideas with AI">水母银河 · 毛睿平 · 用 AI 把想法做成结果</span>
+</footer>
+
+<!-- Demo Modal -->
+<div class="demo-modal" id="demoModal">
+  <div class="demo-inner">
+    <div class="demo-bar">
+      <span id="demoTitle">Live Demo</span>
+      <button class="demo-close" onclick="closeDemo()">✕</button>
+    </div>
+    <iframe id="demoFrame" src="" sandbox="allow-scripts allow-same-origin allow-forms"></iframe>
+  </div>
+</div>
+
+<!-- Tweaks Panel -->
+<div id="tweaks-panel">
+  <h3>Tweaks</h3>
+  <div class="tweak-row">
+    <label data-i18n="zh:星云亮度;en:Nebula brightness">星云亮度</label>
+    <input type="range" min="0" max="2" step="0.1" value="1" id="tw-nebula" oninput="document.documentElement.style.setProperty('--nebula-alpha',this.value)">
+  </div>
+  <div class="tweak-row">
+    <label data-i18n="zh:色调;en:Accent color">色调</label>
+    <div class="tweak-toggle" id="tw-color">
+      <span class="tweak-opt active" onclick="setHue(255,'purple')">紫</span>
+      <span class="tweak-opt" onclick="setHue(180,'cyan')">青</span>
+      <span class="tweak-opt" onclick="setHue(30,'gold')">金</span>
+    </div>
+  </div>
+  <div class="tweak-row">
+    <label data-i18n="zh:字体风格;en:Font style">字体风格</label>
+    <select id="tw-font" onchange="setFont(this.value)">
+      <option value="serif" data-i18n="zh:宋体系（典雅）;en:Serif (elegant)">宋体系（典雅）</option>
+      <option value="sans" data-i18n="zh:黑体系（现代）;en:Sans (modern)">黑体系（现代）</option>
+    </select>
+  </div>
+</div>
+
+<script>
+// ── Language ──────────────────────────────────────────
+let lang = localStorage.getItem('lang') || 'zh';
+const t = (el) => {
+  const v = el.dataset.i18n;
+  if (!v) return;
+  const map = {};
+  v.split(';').forEach(p => { const [k,...r]=p.split(':'); map[k.trim()]=r.join(':'); });
+  if (map[lang]) el.textContent = map[lang];
+};
+function applyLang() {
+  document.documentElement.lang = lang;
+  document.querySelectorAll('[data-i18n]').forEach(t);
+  // show/hide .zh .en
+  document.querySelectorAll('.zh').forEach(el => el.style.display = lang==='zh'?'':'none');
+  document.querySelectorAll('.en').forEach(el => el.style.display = lang==='en'?'':'none');
+  document.getElementById('langToggle').textContent = lang==='zh'?'EN':'中';
+  localStorage.setItem('lang', lang);
+}
+document.getElementById('langToggle').addEventListener('click', () => {
+  lang = lang==='zh'?'en':'zh'; applyLang();
+});
+applyLang();
+
+// ── Canvas: Cosmic Scene ──────────────────────────────
+const canvas = document.getElementById('bg');
+const ctx = canvas.getContext('2d');
+let W, H;
+function resize() { W=canvas.width=window.innerWidth; H=canvas.height=window.innerHeight; }
+resize();
+window.addEventListener('resize', resize);
+
+// Stars
+const STARS = Array.from({length:260}, ()=>({
+  x:Math.random(), y:Math.random(),
+  r:Math.random()*1.6+.15,
+  ph:Math.random()*Math.PI*2,
+  sp:.3+Math.random()*1.4
+}));
+
+// Nebula blobs (fixed, pre-defined)
+const NEBULA = [
+  {x:.62,y:.32,rx:.38,ry:.28,c:[80,40,160]},
+  {x:.82,y:.62,rx:.28,ry:.34,c:[20,70,160]},
+  {x:.5, y:.7, rx:.32,ry:.22,c:[30,110,150]},
+  {x:.72,y:.18,rx:.22,ry:.18,c:[130,40,110]},
+  {x:.42,y:.45,rx:.20,ry:.16,c:[50,160,180]},
+];
+
+// Planet surface "landmass" definitions (normalized to radius)
+const LANDS = [
+  {cx:-.18,cy:-.12,rx:.32,ry:.18,a:-.3,c:'rgba(30,160,140,.22)'},
+  {cx:.28, cy:.14, rx:.22,ry:.28,a:.5, c:'rgba(20,90,130,.18)'},
+  {cx:-.08,cy:.34, rx:.38,ry:.16,a:1.1,c:'rgba(40,140,160,.16)'},
+  {cx:.16, cy:-.28,rx:.18,ry:.22,a:-.7,c:'rgba(15,70,110,.14)'},
+  {cx:-.32,cy:.22, rx:.20,ry:.14,a:.8, c:'rgba(60,180,150,.12)'},
+  {cx:.36, cy:-.12,rx:.16,ry:.20,a:.2, c:'rgba(25,110,140,.15)'},
+];
+
+// Orbiting moons
+const MOONS = [
+  {orbitA:2.2,orbitB:.55,tilt:.18,phase:0,     speed:.004,r:4, c:'rgba(200,190,255,.85)'},
+  {orbitA:1.6,orbitB:.42,tilt:-.12,phase:2.1,  speed:.007,r:3, c:'rgba(160,240,230,.8)'},
+  {orbitA:1.3,orbitB:.35,tilt:.26,phase:4.4,   speed:.011,r:2, c:'rgba(255,220,160,.75)'},
+];
+
+let scrollY = 0;
+window.addEventListener('scroll',()=>{ scrollY=window.scrollY; }, {passive:true});
+
+// ── Draw helpers ─────────────────────────────────────
+
+function drawNebula() {
+  NEBULA.forEach(b=>{
+    const g=ctx.createRadialGradient(b.x*W,b.y*H,0,b.x*W,b.y*H,b.rx*W);
+    g.addColorStop(0,`rgba(${b.c},0.13)`);
+    g.addColorStop(.5,`rgba(${b.c},0.06)`);
+    g.addColorStop(1,'transparent');
+    ctx.beginPath();
+    ctx.ellipse(b.x*W,b.y*H,b.rx*W,b.ry*H,0,0,Math.PI*2);
+    ctx.fillStyle=g; ctx.fill();
+  });
+}
+
+function drawStars(t) {
+  STARS.forEach(s=>{
+    const tw=.28+.72*(.5+.5*Math.sin(t*s.sp+s.ph));
+    ctx.globalAlpha=tw*.7;
+    ctx.fillStyle='#fff';
+    ctx.beginPath();
+    ctx.arc(s.x*W,s.y*H,s.r,0,Math.PI*2);
+    ctx.fill();
+  });
+  ctx.globalAlpha=1;
+}
+
+function drawRingHalf(px,py,pr,half) {
+  const rx=pr*1.78, ry=pr*.28;
+  ctx.save();
+  ctx.shadowBlur=18;
+  ctx.shadowColor='rgba(120,210,220,.3)';
+  // multiple ring bands
+  [[rx,ry,14,.18],[rx*.88,ry*.88,7,.12],[rx*1.08,ry*1.08,5,.08]].forEach(([a,b,lw,al])=>{
+    ctx.beginPath();
+    ctx.ellipse(px,py,a,b,0, half==='back'?Math.PI:0, half==='back'?0:Math.PI);
+    ctx.strokeStyle=`rgba(140,220,230,${al})`;
+    ctx.lineWidth=lw; ctx.stroke();
+  });
+  ctx.restore();
+}
+
+function drawPlanetSphere(px,py,pr,t) {
+  ctx.save();
+  ctx.beginPath(); ctx.arc(px,py,pr,0,Math.PI*2); ctx.clip();
+
+  // Base sphere gradient (light from upper-left)
+  const lx=px-pr*.38, ly=py-pr*.32;
+  const bg=ctx.createRadialGradient(lx,ly,0,px,py,pr*1.15);
+  bg.addColorStop(0,'#5ee8d6');
+  bg.addColorStop(.22,'#2d8ca0');
+  bg.addColorStop(.5,'#1b4a72');
+  bg.addColorStop(.78,'#0e2248');
+  bg.addColorStop(1,'#060818');
+  ctx.fillStyle=bg; ctx.fillRect(px-pr,py-pr,pr*2,pr*2);
+
+  // Surface bands (slow rotation effect)
+  const rot=t*.04;
+  LANDS.forEach(l=>{
+    const ox=Math.sin(rot+l.cx*3.5)*pr*.35;
+    ctx.beginPath();
+    ctx.ellipse(px+l.cx*pr+ox,py+l.cy*pr,l.rx*pr,l.ry*pr,l.a+rot*.08,0,Math.PI*2);
+    ctx.fillStyle=l.c; ctx.fill();
+  });
+
+  // Atmospheric haze layer
+  const haze=ctx.createRadialGradient(lx,ly,pr*.4,px,py,pr);
+  haze.addColorStop(0,'transparent');
+  haze.addColorStop(.7,'transparent');
+  haze.addColorStop(1,'rgba(10,15,50,.65)');
+  ctx.fillStyle=haze; ctx.fillRect(px-pr,py-pr,pr*2,pr*2);
+
+  // Specular highlight
+  const spec=ctx.createRadialGradient(lx+pr*.08,ly+pr*.06,0,lx+pr*.08,ly+pr*.06,pr*.48);
+  spec.addColorStop(0,'rgba(255,255,255,.13)');
+  spec.addColorStop(.5,'rgba(255,255,255,.04)');
+  spec.addColorStop(1,'transparent');
+  ctx.fillStyle=spec; ctx.fillRect(px-pr,py-pr,pr*2,pr*2);
+
+  ctx.restore();
+}
+
+function drawAtmosphere(px,py,pr) {
+  // Rim glow layers
+  for(let i=7;i>=1;i--) {
+    const rad=pr*(1+i*.045);
+    const al=.055/i;
+    const rg=ctx.createRadialGradient(px,py,pr*.9,px,py,rad);
+    rg.addColorStop(0,`rgba(80,220,210,${al*2})`);
+    rg.addColorStop(.6,`rgba(60,160,200,${al})`);
+    rg.addColorStop(1,'transparent');
+    ctx.beginPath(); ctx.arc(px,py,rad,0,Math.PI*2);
+    ctx.fillStyle=rg; ctx.fill();
+  }
+  // Strong backlit blue glow (opposite light source = bottom-right)
+  const blg=ctx.createRadialGradient(px+pr*.32,py+pr*.28,pr*.7,px+pr*.32,py+pr*.28,pr*1.45);
+  blg.addColorStop(0,'transparent');
+  blg.addColorStop(.35,`rgba(40,180,210,.07)`);
+  blg.addColorStop(1,'transparent');
+  ctx.beginPath(); ctx.arc(px,py,pr*1.5,0,Math.PI*2);
+  ctx.fillStyle=blg; ctx.fill();
+}
+
+function drawMoons(px,py,pr,t) {
+  MOONS.forEach(m=>{
+    const angle=m.phase+t*m.speed;
+    const mx=px+Math.cos(angle)*m.orbitA*pr;
+    const my=py+Math.sin(angle)*m.orbitB*pr*Math.cos(m.tilt);
+    const depth=Math.sin(angle); // -1=back, +1=front
+    if(depth>0) return; // draw back-side moons only before planet
+    ctx.save();
+    ctx.shadowBlur=14; ctx.shadowColor=m.c;
+    ctx.beginPath(); ctx.arc(mx,my,m.r,0,Math.PI*2);
+    ctx.fillStyle=m.c; ctx.fill();
+    ctx.restore();
+  });
+}
+
+function drawMoonsFront(px,py,pr,t) {
+  MOONS.forEach(m=>{
+    const angle=m.phase+t*m.speed;
+    const mx=px+Math.cos(angle)*m.orbitA*pr;
+    const my=py+Math.sin(angle)*m.orbitB*pr*Math.cos(m.tilt);
+    const depth=Math.sin(angle);
+    if(depth<=0) return;
+    ctx.save();
+    ctx.shadowBlur=18; ctx.shadowColor=m.c;
+    ctx.beginPath(); ctx.arc(mx,my,m.r,0,Math.PI*2);
+    ctx.fillStyle=m.c; ctx.fill();
+    ctx.restore();
+  });
+}
+
+function drawLensFlare(px,py,pr,t) {
+  // Light source position (upper-left of planet)
+  const fx=px-pr*.38, fy=py-pr*.32;
+  // Subtle flare dots along axis from light through center
+  const dx=px-fx, dy=py-fy, len=Math.sqrt(dx*dx+dy*dy);
+  const nx=dx/len, ny=dy/len;
+  const flares=[
+    {d:pr*.6,  r:pr*.07,al:.18,c:'rgba(200,240,255,'},
+    {d:pr*1.1, r:pr*.04,al:.12,c:'rgba(180,160,255,'},
+    {d:pr*1.8, r:pr*.06,al:.09,c:'rgba(160,220,240,'},
+    {d:pr*2.4, r:pr*.03,al:.07,c:'rgba(255,220,180,'},
+  ];
+  flares.forEach(f=>{
+    const bx=fx+nx*f.d, by=fy+ny*f.d;
+    const g=ctx.createRadialGradient(bx,by,0,bx,by,f.r);
+    g.addColorStop(0,f.c+(f.al)+')');
+    g.addColorStop(1,f.c+'0)');
+    ctx.beginPath(); ctx.arc(bx,by,f.r,0,Math.PI*2);
+    ctx.fillStyle=g; ctx.fill();
+  });
+}
+
+function animate() {
+  const t=Date.now()*.001;
+  const fade=Math.max(0,1-scrollY/(H*.85));
+
+  // Clear
+  ctx.fillStyle='rgba(8,8,30,1)';
+  ctx.fillRect(0,0,W,H);
+
+  if(fade<=0){requestAnimationFrame(animate);return;}
+
+  ctx.globalAlpha=fade;
+
+  const pr=Math.min(W*.26, H*.40);
+  const px=W*.7, py=H*.5-scrollY*.35;
+
+  // 1. Nebula
+  drawNebula();
+  // 2. Stars
+  drawStars(t);
+  // 3. Lens flare (behind planet)
+  drawLensFlare(px,py,pr,t);
+  // 4. Moons (back)
+  drawMoons(px,py,pr,t);
+  // 5. Ring back half
+  drawRingHalf(px,py,pr,'back');
+  // 6. Planet
+  drawPlanetSphere(px,py,pr,t);
+  // 7. Atmosphere
+  drawAtmosphere(px,py,pr);
+  // 8. Ring front half
+  drawRingHalf(px,py,pr,'front');
+  // 9. Moons (front)
+  drawMoonsFront(px,py,pr,t);
+
+  ctx.globalAlpha=1;
+  requestAnimationFrame(animate);
+}
+animate();
+
+// ── Scroll reveal ─────────────────────────────────────
+const io = new IntersectionObserver(entries=>{
+  entries.forEach(e=>{ if(e.isIntersecting) e.target.classList.add('visible'); });
+},{threshold:.1});
+document.querySelectorAll('.reveal').forEach(el=>io.observe(el));
+
+// ── Nav active state ──────────────────────────────────
+const navLinks = document.querySelectorAll('.nav-links a');
+const sections = ['hero','projects','services','career','contact'];
+window.addEventListener('scroll',()=>{
+  const y=window.scrollY+80;
+  sections.forEach(id=>{
+    const el=document.getElementById(id);
+    if(!el) return;
+    if(y>=el.offsetTop && y<el.offsetTop+el.offsetHeight){
+      navLinks.forEach(a=>a.classList.remove('active'));
+      const match=[...navLinks].find(a=>a.getAttribute('href')==='#'+id);
+      if(match) match.classList.add('active');
+    }
+  });
+});
+
+// ── Project expand ────────────────────────────────────
+function toggleCard(i) {
+  const card=document.getElementById('card-'+i);
+  const wasOpen=card.classList.contains('open');
+  document.querySelectorAll('.proj-card').forEach(c=>c.classList.remove('open'));
+  if(!wasOpen) card.classList.add('open');
+}
+
+// ── Demo modal ────────────────────────────────────────
+function openDemo(url, e) {
+  e && e.preventDefault();
+  document.getElementById('demoFrame').src=url;
+  document.getElementById('demoTitle').textContent='Live Demo — '+url.split('/')[2];
+  document.getElementById('demoModal').classList.add('show');
+}
+function closeDemo() {
+  document.getElementById('demoModal').classList.remove('show');
+  setTimeout(()=>{ document.getElementById('demoFrame').src=''; },300);
+}
+document.getElementById('demoModal').addEventListener('click',function(e){
+  if(e.target===this) closeDemo();
+});
+
+// ── Tweaks ────────────────────────────────────────────
+let planetSpeed = 1;
+function setPlanetSpeed(v) { planetSpeed = v; }
+
+function setHue(h, key) {
+  document.querySelectorAll('#tw-color .tweak-opt').forEach(o=>o.classList.remove('active'));
+  event.target.classList.add('active');
+  document.documentElement.style.setProperty('--p', `hsl(${h},70%,72%)`);
+}
+function setFont(v) {
+  const root=document.documentElement;
+  if(v==='sans'){
+    root.style.setProperty('--font-serif-cn',"'Noto Sans SC',sans-serif");
+    root.style.setProperty('--font-serif-en',"'DM Sans',sans-serif");
+  } else {
+    root.style.setProperty('--font-serif-cn',"'Noto Serif SC',serif");
+    root.style.setProperty('--font-serif-en',"'Cormorant Garamond',serif");
+  }
+}
+
+// ── Start animation ───────────────────────────────────
+animate();
+
+// ── Tweaks panel toggle ───────────────────────────────
+const tweaksPanel=document.getElementById('tweaks-panel');
+window.addEventListener('message',e=>{
+  if(e.data?.type==='__activate_edit_mode') tweaksPanel.classList.add('show');
+  if(e.data?.type==='__deactivate_edit_mode') tweaksPanel.classList.remove('show');
+});
+window.parent.postMessage({type:'__edit_mode_available'},'*');
+</script>
+</body>
+</html>

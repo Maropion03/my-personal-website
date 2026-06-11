@@ -1,0 +1,96 @@
+<h2>三种整体布局风格</h2>
+<p class="subtitle">同样的内容，三种不同的视觉节奏 — 选一个方向，我们再细化</p>
+
+<div class="cards">
+
+  <!-- Option A -->
+  <div class="card" data-choice="a" onclick="toggleSelect(this)">
+    <div class="card-image" style="background:#1a1028;padding:16px;font-size:11px;color:#ccc;line-height:1.6">
+      <div style="background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.15);border-radius:10px;padding:10px;margin-bottom:8px">
+        <div style="color:#FF8FAB;font-weight:700;font-size:12px;margin-bottom:6px">📁 作品集</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px">
+          <div style="background:rgba(255,143,171,.12);border-radius:6px;height:40px;display:flex;align-items:center;justify-content:center;font-size:10px">灵构</div>
+          <div style="background:rgba(108,184,232,.12);border-radius:6px;height:40px;display:flex;align-items:center;justify-content:center;font-size:10px">PRD评审</div>
+          <div style="background:rgba(255,202,95,.12);border-radius:6px;height:40px;display:flex;align-items:center;justify-content:center;font-size:10px">Eval Studio</div>
+          <div style="background:rgba(255,143,171,.12);border-radius:6px;height:40px;display:flex;align-items:center;justify-content:center;font-size:10px">学术研究</div>
+        </div>
+      </div>
+      <div style="background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.15);border-radius:10px;padding:10px">
+        <div style="color:#6CB8E8;font-weight:700;font-size:12px;margin-bottom:6px">🗂 经历</div>
+        <div style="display:flex;gap:8px">
+          <div style="width:2px;background:linear-gradient(#FF8FAB,#6CB8E8);border-radius:2px;flex-shrink:0"></div>
+          <div style="font-size:10px;color:#bbb">
+            <div style="margin-bottom:4px">美团 · 产品运营</div>
+            <div style="margin-bottom:4px">安点科技 · AI产品经理</div>
+            <div>守扣科技 · AI产品经理</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="card-body">
+      <h3>A · 卡片堆叠式（推荐）</h3>
+      <p>每个板块是一块液态玻璃大卡片，内部再分列。作品 2×2 网格，经历竖向时间线。和现有首页风格无缝衔接，视觉统一感最强。</p>
+    </div>
+  </div>
+
+  <!-- Option B -->
+  <div class="card" data-choice="b" onclick="toggleSelect(this)">
+    <div class="card-image" style="background:#1a1028;padding:16px;font-size:11px;color:#ccc;line-height:1.6">
+      <div style="margin-bottom:8px">
+        <div style="color:#FF8FAB;font-size:18px;font-weight:800;letter-spacing:-0.5px;margin-bottom:6px">作品集</div>
+        <div style="display:flex;gap:8px;align-items:center">
+          <div style="background:rgba(255,143,171,.15);border-radius:8px;width:80px;height:52px;flex-shrink:0"></div>
+          <div style="font-size:10px;color:#bbb">
+            <div style="font-weight:600;color:#fff;margin-bottom:3px">灵构 Spirit Construct</div>
+            <div>面向AI产品经理的SaaS工具，含ROI计算器…</div>
+            <div style="margin-top:4px;display:flex;gap:4px">
+              <span style="background:rgba(255,143,171,.2);padding:2px 8px;border-radius:10px;font-size:9px">SaaS</span>
+              <span style="background:rgba(108,184,232,.2);padding:2px 8px;border-radius:10px;font-size:9px">AI</span>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div style="border-top:1px solid rgba(255,255,255,.1);padding-top:8px">
+        <div style="color:#6CB8E8;font-size:18px;font-weight:800;letter-spacing:-0.5px;margin-bottom:6px">经历</div>
+        <div style="font-size:10px;color:#bbb">
+          <span style="color:#FFCA5F">2025–09</span> 美团 点评事业部 — 产品运营（AI/风控）
+        </div>
+      </div>
+    </div>
+    <div class="card-body">
+      <h3>B · 杂志编辑式</h3>
+      <p>大号章节标题 + 左图右文交替排列，每个作品像一篇文章独占一行。信息密度低，视觉冲击力强，适合深度展示每个项目。</p>
+    </div>
+  </div>
+
+  <!-- Option C -->
+  <div class="card" data-choice="c" onclick="toggleSelect(this)">
+    <div class="card-image" style="background:#1a1028;padding:16px;font-size:11px;color:#ccc;line-height:1.6">
+      <div style="display:grid;grid-template-columns:120px 1fr;gap:10px">
+        <div>
+          <div style="color:#FF8FAB;font-size:10px;font-weight:700;margin-bottom:6px">导航</div>
+          <div style="font-size:10px;color:#aaa;line-height:2">
+            <div style="color:#fff">▶ 作品集</div>
+            <div>服务</div>
+            <div>经历</div>
+            <div>关于</div>
+            <div>联系</div>
+          </div>
+        </div>
+        <div>
+          <div style="color:#fff;font-size:11px;font-weight:600;margin-bottom:6px">灵构 Spirit Construct</div>
+          <div style="background:rgba(255,255,255,.06);border-radius:6px;height:50px;margin-bottom:6px;display:flex;align-items:center;justify-content:center;font-size:10px;color:#888">截图预览</div>
+          <div style="display:flex;gap:4px">
+            <span style="background:rgba(255,143,171,.2);padding:2px 8px;border-radius:10px;font-size:9px">SaaS</span>
+            <span style="background:rgba(108,184,232,.2);padding:2px 8px;border-radius:10px;font-size:9px">Next.js</span>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="card-body">
+      <h3>C · 侧边栏导航式</h3>
+      <p>固定左侧二级导航，右侧展示内容，类似文档站或 Notion 风格。内容多时浏览效率高，但在移动端需要折叠处理，适合内容特别丰富的情况。</p>
+    </div>
+  </div>
+
+</div>

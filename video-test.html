@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html>
+<head><meta charset="UTF-8"><title>Video Test</title>
+<style>
+body{background:#111;display:flex;flex-direction:column;align-items:center;padding:20px;font-family:sans-serif;color:white}
+video{max-width:800px;width:100%}
+canvas{max-width:800px;width:100%;border:1px solid #444;margin-top:10px}
+button{margin:8px;padding:10px 20px;cursor:pointer}
+#info{margin:10px;font-size:14px;color:#aaa}
+</style>
+</head>
+<body>
+<h2>Video Frame Inspector</h2>
+<video id="v" controls crossorigin="anonymous"
+  src="https://d8j0ntlcm91z4.cloudfront.net/user_38xzZboKViGWJOttwIXH07lWA1P/hf_20260324_151826_c7218672-6e92-402c-9e45-f1e0f454bdc4.mp4">
+</video>
+<div id="info">加载中...</div>
+<button onclick="capture()">截取当前帧</button>
+<canvas id="c"></canvas>
+
+<script>
+const v = document.getElementById('v');
+const c = document.getElementById('c');
+const ctx = c.getContext('2d');
+const info = document.getElementById('info');
+
+v.addEventListener('loadedmetadata', () => {
+  info.textContent = `尺寸: ${v.videoWidth}×${v.videoHeight}  时长: ${v.duration.toFixed(1)}s`;
+});
+v.addEventListener('error', e => { info.textContent = '加载错误: ' + (v.error?.message || e); });
+v.addEventListener('progress', () => {
+  if(v.buffered.length) info.textContent = `已缓冲: ${v.buffered.end(0).toFixed(1)}s / ${v.duration?.toFixed(1)||'?'}s`;
+});
+
+function capture() {
+  c.width = v.videoWidth || 640;
+  c.height = v.videoHeight || 360;
+  ctx.drawImage(v, 0, 0);
+  info.textContent = `帧已截取 @ ${v.currentTime.toFixed(2)}s`;
+}
+</script>
+</body>
+</html>

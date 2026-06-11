@@ -1,0 +1,587 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>水母银河 · AI PM & Builder</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Barlow:wght@300;400;500;600&family=Noto+Serif+SC:wght@400;700&family=Noto+Sans+SC:wght@300;400&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg:#03020f;--bg2:#07061e;
+  --text:#eeeef8;--muted:rgba(255,255,255,.48);
+  --accent:#b87aff;--accent-bg:rgba(180,120,255,.10);--accent-border:rgba(180,120,255,.25);
+  --heading:'Instrument Serif','Noto Serif SC',serif;
+  --body:'Barlow','Noto Sans SC',sans-serif;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--text);font-family:var(--body);font-weight:300;line-height:1.65;-webkit-font-smoothing:antialiased;overflow-x:hidden}
+::selection{background:rgba(110,180,255,.22)}
+a{color:inherit;text-decoration:none}
+
+/* ── Liquid Glass ─────────────────────────────── */
+.glass{
+  background:rgba(255,255,255,.015);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);
+  box-shadow:inset 0 1px 1px rgba(255,255,255,.08);position:relative;overflow:hidden;
+}
+.glass::before{
+  content:'';position:absolute;inset:0;border-radius:inherit;padding:1.4px;
+  background:linear-gradient(180deg,rgba(255,255,255,.35) 0%,rgba(255,255,255,.1) 22%,transparent 42%,transparent 58%,rgba(255,255,255,.1) 78%,rgba(255,255,255,.35) 100%);
+  -webkit-mask:linear-gradient(#fff 0 0) content-box,linear-gradient(#fff 0 0);-webkit-mask-composite:xor;mask-composite:exclude;pointer-events:none;
+}
+.glass-strong{
+  background:rgba(255,255,255,.02);backdrop-filter:blur(40px);-webkit-backdrop-filter:blur(40px);
+  box-shadow:4px 4px 6px rgba(0,0,0,.06),inset 0 1px 1px rgba(255,255,255,.12);position:relative;overflow:hidden;
+}
+.glass-strong::before{
+  content:'';position:absolute;inset:0;border-radius:inherit;padding:1.4px;
+  background:linear-gradient(180deg,rgba(255,255,255,.45) 0%,rgba(255,255,255,.15) 22%,transparent 42%,transparent 58%,rgba(255,255,255,.15) 78%,rgba(255,255,255,.45) 100%);
+  -webkit-mask:linear-gradient(#fff 0 0) content-box,linear-gradient(#fff 0 0);-webkit-mask-composite:xor;mask-composite:exclude;pointer-events:none;
+}
+
+/* ── Nebula background ──────────────────────── */
+#nebula{
+  position:fixed;inset:0;z-index:0;pointer-events:none;
+  background:
+    radial-gradient(ellipse 85% 55% at 78% 12%, rgba(130,30,200,.22) 0%, transparent 55%),
+    radial-gradient(ellipse 65% 50% at 12% 60%, rgba(30,50,210,.16) 0%, transparent 55%),
+    radial-gradient(ellipse 55% 45% at 88% 82%, rgba(190,20,90,.13) 0%, transparent 55%),
+    radial-gradient(ellipse 70% 90% at 50% 50%, rgba(55,15,130,.10) 0%, transparent 70%);
+  animation:nebula-breathe 20s ease-in-out infinite alternate;
+}
+@keyframes nebula-breathe{0%{opacity:.75;transform:scale(1)}100%{opacity:1;transform:scale(1.06)}}
+
+/* ── Stars (CSS generated) ──────────────────── */
+#stars{position:fixed;inset:0;z-index:0;pointer-events:none;opacity:.65}
+
+/* ── Nav ──────────────────────────────────────── */
+nav{position:fixed;top:16px;left:0;right:0;z-index:100;padding:0 clamp(24px,4vw,64px);display:flex;align-items:center;justify-content:space-between}
+.nav-logo{font-family:var(--heading);font-style:italic;font-size:18px;letter-spacing:.04em;color:var(--text);opacity:.9;cursor:pointer}
+.nav-center{display:flex;align-items:center;gap:2px;padding:4px 5px;border-radius:9999px}
+.nav-center a{padding:6px 14px;font-size:13px;font-weight:400;color:rgba(255,255,255,.7);border-radius:9999px;transition:color .2s}
+.nav-center a:hover{color:#fff}
+.nav-right{display:flex;align-items:center;gap:12px}
+.pill{display:inline-flex;align-items:center;gap:6px;padding:7px 16px;border-radius:9999px;font-size:12px;font-weight:500;cursor:pointer;transition:all .25s}
+.pill-white{background:#fff;color:#000}
+.pill-white:hover{background:rgba(255,255,255,.88)}
+.pill-glass{color:var(--text)}
+.lang-btn{font-size:11px;letter-spacing:.12em;color:var(--muted);cursor:pointer;padding:5px 11px;border-radius:9999px;transition:color .2s}
+.lang-btn:hover{color:var(--text)}
+
+/* ── Hero ─────────────────────────────────────── */
+#hero{min-height:100vh;display:grid;grid-template-columns:1fr 1fr;align-items:center;padding:100px 0 60px;position:relative}
+@media(max-width:860px){#hero{grid-template-columns:1fr;padding:120px 24px 60px;text-align:center}}
+.hero-text{padding-left:clamp(32px,6vw,96px);padding-right:24px;position:relative;z-index:2}
+@media(max-width:860px){.hero-text{padding:0}}
+.hero-label{font-size:11px;font-weight:500;letter-spacing:.2em;text-transform:uppercase;margin-bottom:24px;display:inline-flex;align-items:center;gap:8px;padding:6px 14px;border-radius:9999px;color:var(--accent)}
+.hero-name{font-family:var(--heading);font-style:italic;font-size:clamp(52px,7vw,88px);line-height:.95;letter-spacing:-.02em;margin-bottom:6px;color:var(--text)}
+.hero-sub{font-family:var(--heading);font-style:italic;font-size:clamp(15px,2vw,22px);color:var(--muted);margin-bottom:28px;letter-spacing:.06em}
+.hero-tagline{font-size:clamp(15px,1.5vw,18px);color:rgba(255,255,255,.6);margin-bottom:40px;line-height:1.9;font-weight:300;max-width:380px}
+@media(max-width:860px){.hero-tagline{margin-inline:auto}}
+.hero-tagline em{color:var(--accent);font-style:normal;font-weight:400}
+.hero-ctas{display:flex;gap:12px;flex-wrap:wrap}
+@media(max-width:860px){.hero-ctas{justify-content:center}}
+
+/* ── Jellyfish Image ──────────────────────────── */
+.earth-col{display:flex;align-items:center;justify-content:center;position:relative;z-index:1}
+@media(max-width:860px){.earth-col{margin-top:40px}}
+.earth-wrap{position:relative;width:clamp(220px,26vw,400px)}
+.jelly-img{
+  width:100%;height:auto;display:block;
+  filter:drop-shadow(0 0 32px rgba(160,80,255,.7)) drop-shadow(0 0 80px rgba(100,30,220,.4)) drop-shadow(0 0 140px rgba(180,50,255,.2));
+  animation:jelly-float 7s ease-in-out infinite alternate;
+}
+@keyframes jelly-float{
+  0%{transform:translateY(-16px) rotate(-1.5deg) scale(1)}
+  100%{transform:translateY(16px) rotate(1.5deg) scale(1.02)}
+}
+.hero-fade{position:absolute;bottom:0;left:0;right:0;height:200px;background:linear-gradient(to bottom,transparent,var(--bg));z-index:3;pointer-events:none}
+
+/* ── Section styles ───────────────────────────── */
+section{position:relative;z-index:1}
+.container{max-width:1100px;margin:0 auto;padding:0 clamp(24px,4vw,64px)}
+.section-badge{display:inline-flex;align-items:center;padding:5px 14px;border-radius:9999px;font-size:11px;font-weight:500;letter-spacing:.15em;text-transform:uppercase;color:var(--accent);margin-bottom:16px}
+.section-title{font-family:var(--heading);font-style:italic;font-size:clamp(30px,4.5vw,48px);line-height:.95;letter-spacing:-.01em;margin-bottom:12px}
+.section-sub{font-size:14px;color:var(--muted);font-weight:300}
+.section-header{text-align:center;margin-bottom:64px}
+.divider{width:100%;height:1px;background:linear-gradient(90deg,transparent,rgba(255,255,255,.06),transparent);margin:0}
+
+/* ── Project cards ────────────────────────────── */
+#projects{padding:100px 0 80px}
+.projects-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+@media(max-width:900px){.projects-grid{grid-template-columns:1fr}}
+.proj-card{border-radius:20px;transition:transform .3s;cursor:pointer}
+.proj-card:hover{transform:translateY(-4px)}
+.proj-card.open{transform:none}
+.proj-top{padding:28px 24px 22px}
+.proj-tag{display:inline-flex;padding:4px 12px;border-radius:9999px;font-size:10px;letter-spacing:.12em;text-transform:uppercase;font-weight:500;color:var(--accent);margin-bottom:16px}
+.proj-title{font-family:var(--heading);font-style:italic;font-size:20px;margin-bottom:8px;line-height:1.2}
+.proj-desc{font-size:13px;color:var(--muted);line-height:1.65;margin-bottom:18px}
+.proj-metrics{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:18px}
+.metric{text-align:center;padding:8px 14px;border-radius:12px;min-width:56px}
+.metric-val{font-family:var(--heading);font-style:italic;font-size:20px;color:var(--text);line-height:1}
+.metric-lab{font-size:10px;color:var(--muted);margin-top:4px;letter-spacing:.04em}
+.tech-stack{display:flex;flex-wrap:wrap;gap:5px;margin-bottom:16px}
+.tech{font-size:10px;letter-spacing:.04em;padding:3px 9px;border-radius:8px;color:var(--muted);font-family:'Barlow',monospace;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.06)}
+.proj-links{display:flex;gap:8px;flex-wrap:wrap}
+.link-btn{font-size:12px;padding:6px 14px;border-radius:9999px;transition:all .2s;display:inline-flex;align-items:center;gap:5px}
+.link-demo{background:var(--accent-bg);color:var(--accent);border:1px solid var(--accent-border)}
+.link-demo:hover{background:rgba(110,180,255,.18)}
+.link-gh{background:rgba(255,255,255,.04);color:var(--muted);border:1px solid rgba(255,255,255,.08)}
+.link-gh:hover{color:var(--text)}
+.expand-btn{display:flex;align-items:center;justify-content:space-between;width:100%;padding:14px 24px;background:rgba(255,255,255,.015);border-top:1px solid rgba(255,255,255,.05);font-size:12px;color:var(--muted);cursor:pointer;transition:all .2s;border:none;outline:none;font-family:var(--body)}
+.expand-btn:hover{color:var(--accent)}
+.expand-icon{transition:transform .3s;font-size:14px}
+.proj-card.open .expand-icon{transform:rotate(180deg)}
+.proj-detail{max-height:0;overflow:hidden;transition:max-height .5s ease}
+.proj-card.open .proj-detail{max-height:1200px}
+.detail-inner{padding:24px;border-top:1px solid rgba(255,255,255,.04);display:flex;flex-direction:column;gap:18px}
+.case-label{font-size:11px;letter-spacing:.15em;text-transform:uppercase;font-weight:600;margin-bottom:4px}
+.case-text{font-size:13px;color:var(--muted);line-height:1.75}
+.case-result{border-radius:12px;padding:14px 18px;background:rgba(110,180,255,.04);border:1px solid rgba(110,180,255,.1)}
+.case-result .case-label{color:var(--accent)}
+.arch-box{background:rgba(255,255,255,.02);border:1px solid rgba(255,255,255,.05);border-radius:10px;padding:14px;font-family:'Barlow',monospace;font-size:11px;color:var(--muted);line-height:1.9;overflow-x:auto;white-space:pre}
+
+/* ── Services ─────────────────────────────────── */
+#services{padding:80px 0}
+.services-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+@media(max-width:800px){.services-grid{grid-template-columns:1fr}}
+.svc-card{border-radius:20px;padding:32px 26px;transition:transform .3s}
+.svc-card:hover{transform:translateY(-3px)}
+.svc-icon{width:42px;height:42px;border-radius:9999px;display:flex;align-items:center;justify-content:center;margin-bottom:18px;font-size:18px}
+.svc-title{font-family:var(--heading);font-style:italic;font-size:19px;margin-bottom:10px}
+.svc-desc{font-size:13px;color:var(--muted);line-height:1.75;margin-bottom:18px}
+.svc-items{display:flex;flex-direction:column;gap:6px}
+.svc-item{font-size:12px;color:rgba(255,255,255,.6);padding-left:14px;position:relative}
+.svc-item::before{content:'→';position:absolute;left:0;color:var(--accent);font-size:11px}
+.svc-cta{margin-top:22px;display:inline-flex;align-items:center;gap:5px;font-size:12px;padding:8px 18px;border-radius:9999px;color:var(--text);transition:all .2s;cursor:pointer;border:none;outline:none;font-family:var(--body)}
+.svc-cta:hover{color:var(--accent)}
+
+/* ── Career ───────────────────────────────────── */
+#career{padding:80px 0}
+.career-wrap{display:grid;grid-template-columns:1fr 1fr;gap:60px;align-items:start}
+@media(max-width:760px){.career-wrap{grid-template-columns:1fr}}
+.career-label{font-size:11px;letter-spacing:.18em;text-transform:uppercase;color:var(--accent);margin-bottom:22px;font-weight:500}
+.tl-item{display:flex;gap:14px;padding-bottom:26px;position:relative}
+.tl-item::before{content:'';position:absolute;left:5.5px;top:16px;bottom:0;width:1px;background:rgba(255,255,255,.06)}
+.tl-item:last-child::before{display:none}
+.tl-dot{width:12px;height:12px;border-radius:50%;border:2px solid rgba(255,255,255,.2);background:var(--bg);flex-shrink:0;margin-top:4px}
+.tl-co{font-size:13px;font-weight:500;color:var(--text);margin-bottom:2px}
+.tl-role{font-size:12px;color:var(--accent);margin-bottom:2px}
+.tl-date{font-size:11px;color:var(--muted)}
+.edu-block{border-radius:14px;padding:22px;margin-bottom:14px}
+.edu-school{font-family:var(--heading);font-style:italic;font-size:16px;margin-bottom:4px}
+.edu-degree{font-size:12px;color:var(--muted);margin-bottom:6px}
+.edu-detail{font-size:11px;color:var(--accent);opacity:.8}
+.skills-cloud{display:flex;flex-wrap:wrap;gap:7px;margin-top:20px}
+.skill{font-size:12px;padding:5px 13px;border-radius:9999px;color:var(--muted);transition:color .2s;cursor:default;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.06)}
+.skill:hover{color:var(--text)}
+.skill.hot{color:var(--accent);border-color:var(--accent-border)}
+
+/* ── Contact ──────────────────────────────────── */
+#contact{padding:80px 0 100px}
+.contact-inner{max-width:680px;margin:0 auto;text-align:center}
+.contact-title{font-family:var(--heading);font-style:italic;font-size:clamp(32px,5vw,52px);margin-bottom:14px;line-height:.95}
+.contact-sub{font-size:14px;color:var(--muted);margin-bottom:48px;line-height:1.75;font-weight:300}
+.contact-links{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+@media(max-width:600px){.contact-links{grid-template-columns:repeat(2,1fr)}}
+.contact-link{display:flex;flex-direction:column;align-items:center;gap:8px;padding:24px 16px;border-radius:16px;transition:all .25s;font-size:12px;color:var(--muted)}
+.contact-link:hover{transform:translateY(-3px);color:var(--text)}
+.contact-link .ico{font-size:22px;margin-bottom:2px}
+.contact-link .lbl{font-weight:500;color:var(--text);font-size:13px}
+
+/* ── Footer ───────────────────────────────────── */
+footer{text-align:center;padding:28px;font-size:11px;color:var(--muted);opacity:.4;border-top:1px solid rgba(255,255,255,.04);position:relative;z-index:1}
+
+/* ── Blur Text animation ──────────────────────── */
+.blur-text{visibility:hidden}
+.blur-text.ready{visibility:visible}
+.blur-word{display:inline-block;filter:blur(8px);opacity:0;transform:translateY(24px);transition:filter .55s ease,opacity .55s ease,transform .55s ease}
+.blur-word.visible{filter:blur(0);opacity:1;transform:translateY(0)}
+
+/* ── Reveal ───────────────────────────────────── */
+.reveal{opacity:0;transform:translateY(24px);transition:opacity .65s cubic-bezier(.22,1,.36,1),transform .65s cubic-bezier(.22,1,.36,1)}
+.reveal.visible{opacity:1;transform:translateY(0)}
+.reveal-d1{transition-delay:.08s}.reveal-d2{transition-delay:.16s}.reveal-d3{transition-delay:.24s}
+
+/* ── Demo modal ───────────────────────────────── */
+.demo-modal{position:fixed;inset:0;z-index:200;background:rgba(0,0,0,.88);display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity .3s;backdrop-filter:blur(12px)}
+.demo-modal.show{opacity:1;pointer-events:all}
+.demo-box{width:90vw;max-width:1200px;height:80vh;border-radius:20px;overflow:hidden;display:flex;flex-direction:column}
+.demo-bar{display:flex;align-items:center;justify-content:space-between;padding:12px 20px;border-bottom:1px solid rgba(255,255,255,.06);font-size:13px;color:var(--muted)}
+.demo-close{cursor:pointer;color:var(--muted);font-size:18px;background:none;border:none;outline:none;transition:color .2s;font-family:var(--body)}
+.demo-close:hover{color:var(--text)}
+.demo-box iframe{flex:1;border:none;width:100%;height:100%}
+
+/* ── Tweaks ───────────────────────────────────── */
+#tweaks{position:fixed;bottom:24px;right:24px;z-index:999;border-radius:18px;padding:20px;width:220px;display:none;box-shadow:0 24px 64px rgba(0,0,0,.5);font-size:13px}
+#tweaks.show{display:block}
+#tweaks h3{font-size:11px;letter-spacing:.15em;text-transform:uppercase;color:var(--muted);margin-bottom:16px;font-weight:500}
+.tw-row{margin-bottom:14px}
+.tw-row label{display:block;font-size:11px;color:var(--muted);margin-bottom:6px}
+.tw-row select{width:100%;background:var(--bg2);border:1px solid rgba(255,255,255,.08);color:var(--text);border-radius:8px;padding:5px 8px;font-size:12px;font-family:var(--body)}
+.tw-row input[type=range]{width:100%;accent-color:var(--accent)}
+</style>
+</head>
+<body>
+<div id="nebula"></div>
+<div id="stars"></div>
+
+<!-- Nav -->
+<nav>
+  <span class="nav-logo" onclick="scrollTo({top:0,behavior:'smooth'})">水母银河</span>
+  <div class="nav-center glass">
+    <a href="#projects" data-i18n="zh:作品;en:Projects">作品</a>
+    <a href="#services" data-i18n="zh:服务;en:Services">服务</a>
+    <a href="#career" data-i18n="zh:经历;en:Career">经历</a>
+    <a href="#contact" data-i18n="zh:联系;en:Contact">联系</a>
+  </div>
+  <div class="nav-right">
+    <span class="lang-btn glass" id="langToggle">EN</span>
+    <a href="mailto:maropion@163.com" class="pill pill-white" data-i18n="zh:聊一聊;en:Let's talk">聊一聊</a>
+  </div>
+</nav>
+
+<!-- Hero -->
+<section id="hero">
+  <div class="hero-text">
+    <div class="hero-label glass" data-i18n="zh:AI 产品经理 · Builder · 独立开发者;en:AI Product Manager · Builder · Maker">AI 产品经理 · Builder · 独立开发者</div>
+    <h1 class="hero-name blur-text">水母银河</h1>
+    <div class="hero-sub">Maropion · 毛睿平</div>
+    <div class="hero-tagline">
+      <span class="zh">水母不游向<em>风口</em>，<br>只把 AI 做成<em>结果</em></span>
+      <span class="en" style="display:none">Don't chase the trend —<br><em>ship AI into reality</em></span>
+    </div>
+    <div class="hero-ctas">
+      <a href="#contact" class="pill glass-strong" data-i18n="zh:聊合作;en:Let's connect">聊合作</a>
+      <a href="#projects" class="pill glass" data-i18n="zh:看作品;en:View Work">看作品</a>
+      <a href="uploads/resume.pdf" download class="pill glass" style="color:var(--accent)" data-i18n="zh:下载简历;en:Download CV">下载简历</a>
+    </div>
+  </div>
+  <div class="earth-col">
+    <div class="earth-wrap">
+      <img class="jelly-img" src="jelly.png" alt="水母银河">
+    </div>
+  </div>
+  <div class="hero-fade"></div>
+</section>
+
+<div class="divider"></div>
+
+<!-- Projects -->
+<section id="projects">
+  <div class="container">
+    <div class="section-header reveal">
+      <div class="section-badge glass" data-i18n="zh:作品展示;en:Projects">作品展示</div>
+      <h2 class="section-title blur-text" data-i18n="zh:从 PRD 到上线，都是我做的;en:From PRD to Production — All Mine">从 PRD 到上线，都是我做的</h2>
+      <p class="section-sub" data-i18n="zh:3 个独立项目，覆盖 AI Agent / 全栈 SaaS / LLM 评测;en:3 independent projects — AI Agent · Full-stack SaaS · LLM Evaluation">3 个独立项目，覆盖 AI Agent / 全栈 SaaS / LLM 评测</p>
+    </div>
+    <div class="projects-grid">
+      <!-- Card 0 -->
+      <div class="proj-card glass reveal reveal-d1" id="card-0">
+        <div class="proj-top">
+          <div class="proj-tag glass" data-i18n="zh:多 Agent 架构;en:Multi-Agent">多 Agent 架构</div>
+          <div class="proj-title" data-i18n="zh:PRD 智能评审工作台;en:PRD Smart Review Agent">PRD 智能评审工作台</div>
+          <div class="proj-desc" data-i18n="zh:上传 PRD，6 维度 AI 并行评审，3 分钟出结构化报告;en:Upload a PRD, 6-dimension AI parallel review, structured report in 3 min">上传 PRD，6 维度 AI 并行评审，3 分钟出结构化报告</div>
+          <div class="proj-metrics">
+            <div class="metric glass"><div class="metric-val">97%</div><div class="metric-lab" data-i18n="zh:提效;en:faster">提效</div></div>
+            <div class="metric glass"><div class="metric-val">6</div><div class="metric-lab" data-i18n="zh:评审维度;en:dimensions">维度</div></div>
+            <div class="metric glass"><div class="metric-val">V35</div><div class="metric-lab" data-i18n="zh:迭代;en:iterations">迭代</div></div>
+          </div>
+          <div class="tech-stack"><span class="tech">CrewAI</span><span class="tech">FastAPI</span><span class="tech">SSE</span><span class="tech">Docker</span><span class="tech">Railway</span></div>
+          <div class="proj-links">
+            <a href="#" class="link-btn link-demo" onclick="openDemo('https://awesome-requirement-review-agent-production.up.railway.app/single-page-shell.html',event)">▶ Live Demo</a>
+            <a href="https://github.com/Maropion03/awesome-requirement-review-agent" target="_blank" class="link-btn link-gh">GitHub</a>
+          </div>
+        </div>
+        <button class="expand-btn" onclick="toggleCard(0)"><span data-i18n="zh:查看案例;en:Case Study">查看案例</span><span class="expand-icon">▾</span></button>
+        <div class="proj-detail"><div class="detail-inner">
+          <div><div class="case-label" style="color:var(--accent)">😤 <span data-i18n="zh:痛点;en:Problem">痛点</span></div><p class="case-text" data-i18n="zh:产品评审耗时 2+ 小时，研发/设计/测试三方视角分散，PRD 缺陷到联调才暴露。;en:PRD reviews took 2+ hours. Dev/Design/Test perspectives scattered, defects surfaced only at integration.">产品评审耗时 2+ 小时，研发/设计/测试三方视角分散，PRD 缺陷到联调才暴露。</p></div>
+          <div><div class="case-label" style="color:rgba(255,255,255,.5)">⚡ <span data-i18n="zh:怎么做;en:Solution">怎么做</span></div><p class="case-text" data-i18n="zh:CrewAI 多 Agent：Orchestrator 协调研发/设计/测试 3 Agent 并行 6 维度评审。FastAPI + SSE 实时流式推送，3 套预设权重，Docker + Railway 部署。;en:CrewAI multi-agent: Orchestrator coordinates 3 agents reviewing 6 dimensions in parallel. FastAPI + SSE streaming, 3 weight presets, Docker + Railway deployment.">CrewAI 多 Agent：Orchestrator 协调 3 Agent 并行 6 维度评审。FastAPI + SSE，3 套预设权重，Docker + Railway。</p></div>
+          <div class="case-result"><div class="case-label">✅ <span data-i18n="zh:结果;en:Results">结果</span></div><p class="case-text" data-i18n="zh:评审时间 2h → 3min（↓97%）。PDF/Markdown 导出。已部署上线开源。;en:Review time 2h → 3min (↓97%). PDF/Markdown export. Deployed and open-sourced.">评审 2h → 3min（↓97%）。PDF/Markdown 导出。已部署开源。</p></div>
+          <div class="arch-box">Orchestrator
+├── Dev Agent     → 可行性 + 技术风险
+├── Design Agent  → 合理性 + 用户价值
+└── Test Agent    → 完整性 + 优先级
+        ↓ SSE stream → Frontend</div>
+        </div></div>
+      </div>
+      <!-- Card 1 -->
+      <div class="proj-card glass reveal reveal-d2" id="card-1">
+        <div class="proj-top">
+          <div class="proj-tag glass" data-i18n="zh:全栈 SaaS;en:Full-stack SaaS">全栈 SaaS</div>
+          <div class="proj-title" data-i18n="zh:Spirit Construct · 灵构;en:Spirit Construct · AIPM Stack">Spirit Construct · 灵构</div>
+          <div class="proj-desc" data-i18n="zh:面向 AI PM 的工具平台：ROI 计算器、参数调试场、PRD 生成器;en:AI PM toolkit: ROI Calculator, Model Playground, PRD Generator">面向 AI PM 的工具平台：ROI 计算器、参数调试场、PRD 生成器</div>
+          <div class="proj-metrics">
+            <div class="metric glass"><div class="metric-val">30h</div><div class="metric-lab" data-i18n="zh:独立交付;en:solo ship">交付</div></div>
+            <div class="metric glass"><div class="metric-val">5+</div><div class="metric-lab" data-i18n="zh:模块;en:modules">模块</div></div>
+            <div class="metric glass"><div class="metric-val">0→1</div><div class="metric-lab" data-i18n="zh:全栈;en:full-stack">全栈</div></div>
+          </div>
+          <div class="tech-stack"><span class="tech">Vanilla JS</span><span class="tech">Supabase</span><span class="tech">Cloudflare</span><span class="tech">SiliconFlow</span></div>
+          <div class="proj-links">
+            <a href="#" class="link-btn link-demo" onclick="openDemo('https://spirit-construct-maropion.top',event)">▶ Live Demo</a>
+            <a href="https://github.com/Maropion03/Spirit-Construct-AIPM-stack" target="_blank" class="link-btn link-gh">GitHub</a>
+          </div>
+        </div>
+        <button class="expand-btn" onclick="toggleCard(1)"><span data-i18n="zh:查看案例;en:Case Study">查看案例</span><span class="expand-icon">▾</span></button>
+        <div class="proj-detail"><div class="detail-inner">
+          <div><div class="case-label" style="color:var(--accent)">😤 <span data-i18n="zh:痛点;en:Problem">痛点</span></div><p class="case-text" data-i18n="zh:非技术 AI PM 缺乏模型选型和成本感知的实操工具，只能靠感觉。;en:Non-tech AI PMs lacked hands-on tools for model selection and cost estimation.">非技术 AI PM 缺乏模型选型和成本感知的实操工具。</p></div>
+          <div><div class="case-label" style="color:rgba(255,255,255,.5)">⚡ <span data-i18n="zh:怎么做;en:Solution">怎么做</span></div><p class="case-text" data-i18n="zh:Vibe Coding 30 小时 MVP 交付。Serverless 边缘路由控成本。核心：Break-even ROI 计算器 + 实时参数调试场。;en:Vibe Coding, 30h MVP delivery. Serverless edge routing. Core: Break-even ROI calculator + real-time model playground.">Vibe Coding 30h MVP。Serverless 边缘路由。核心：ROI 计算器 + 参数调试场。</p></div>
+          <div class="case-result"><div class="case-label">✅ <span data-i18n="zh:结果;en:Results">结果</span></div><p class="case-text" data-i18n="zh:已部署个人域名并 GitHub 开源。证明 AI 辅助单人全栈交付能力。;en:Deployed to personal domain, open-sourced on GitHub. Proved solo full-stack delivery.">已部署个人域名并开源。证明单人全栈交付。</p></div>
+        </div></div>
+      </div>
+      <!-- Card 2 -->
+      <div class="proj-card glass reveal reveal-d3" id="card-2">
+        <div class="proj-top">
+          <div class="proj-tag glass" data-i18n="zh:LLM 评测;en:LLM Evaluation">LLM 评测</div>
+          <div class="proj-title">Eval Studio</div>
+          <div class="proj-desc" data-i18n="zh:Linear 风格 LLM 评测平台，会话隔离，多 Provider，可视化幻觉分析;en:Linear-style LLM eval platform — session-isolated, multi-provider, hallucination analysis">Linear 风格 LLM 评测平台，会话隔离，多 Provider，可视化幻觉分析</div>
+          <div class="proj-metrics">
+            <div class="metric glass"><div class="metric-val">4+</div><div class="metric-lab" data-i18n="zh:供应商;en:providers">供应商</div></div>
+            <div class="metric glass"><div class="metric-val">BYOK</div><div class="metric-lab" data-i18n="zh:隐私;en:privacy">隐私</div></div>
+            <div class="metric glass"><div class="metric-val">TS</div><div class="metric-lab">React 18</div></div>
+          </div>
+          <div class="tech-stack"><span class="tech">React 18</span><span class="tech">TypeScript</span><span class="tech">FastAPI</span><span class="tech">LiteLLM</span><span class="tech">Recharts</span></div>
+          <div class="proj-links">
+            <a href="https://github.com/Maropion03/Eval-studio" target="_blank" class="link-btn link-gh">GitHub</a>
+          </div>
+        </div>
+        <button class="expand-btn" onclick="toggleCard(2)"><span data-i18n="zh:查看案例;en:Case Study">查看案例</span><span class="expand-icon">▾</span></button>
+        <div class="proj-detail"><div class="detail-inner">
+          <div><div class="case-label" style="color:var(--accent)">😤 <span data-i18n="zh:痛点;en:Problem">痛点</span></div><p class="case-text" data-i18n="zh:LLM 输出评估依赖电子表格，难以可视化幻觉和推理错误。;en:LLM evaluation relied on spreadsheets, hard to visualize hallucinations.">LLM 输出评估依赖电子表格，难以可视化幻觉和推理错误。</p></div>
+          <div><div class="case-label" style="color:rgba(255,255,255,.5)">⚡ <span data-i18n="zh:怎么做;en:Solution">怎么做</span></div><p class="case-text" data-i18n="zh:Linear 风格 UI + 深色模式 + 玻璃拟态。BYOK 隐私架构。LiteLLM 统一封装多供应商。;en:Linear-style UI + dark mode + glassmorphism. BYOK privacy. LiteLLM unifying multiple providers.">Linear 风格 UI + 深色模式 + 玻璃拟态。BYOK 隐私架构。LiteLLM 统一封装。</p></div>
+          <div class="case-result"><div class="case-label">✅ <span data-i18n="zh:结果;en:Results">结果</span></div><p class="case-text" data-i18n="zh:可视化 3 维评测指标 + diff 视图定位幻觉。MIT 开源。;en:Visual 3-axis metrics + diff view for hallucination detection. MIT licensed.">可视化 3 维指标 + diff 视图。MIT 开源。</p></div>
+        </div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="divider" style="margin:0 clamp(24px,4vw,64px)"></div>
+
+<!-- Services -->
+<section id="services">
+  <div class="container">
+    <div class="section-header reveal">
+      <div class="section-badge glass" data-i18n="zh:服务能力;en:Services">服务能力</div>
+      <h2 class="section-title blur-text" data-i18n="zh:我能为你做什么;en:What I can build for you">我能为你做什么</h2>
+      <p class="section-sub" data-i18n="zh:产品思维 + 工程落地，从想法到可交付;en:Product thinking + engineering delivery">产品思维 + 工程落地，从想法到可交付</p>
+    </div>
+    <div class="services-grid">
+      <div class="svc-card glass reveal reveal-d1">
+        <div class="svc-icon glass-strong">🤖</div>
+        <div class="svc-title" data-i18n="zh:AI Agent & Prototype;en:AI Agent & Prototype">AI Agent & Prototype</div>
+        <div class="svc-desc" data-i18n="zh:从需求到可运行 demo，快速验证 AI 应用可行性;en:From requirements to working demo — validate AI product ideas fast">从需求到可运行 demo，快速验证 AI 应用可行性</div>
+        <div class="svc-items">
+          <div class="svc-item" data-i18n="zh:多 Agent 工作流设计;en:Multi-agent workflow design">多 Agent 工作流设计</div>
+          <div class="svc-item" data-i18n="zh:LLM 接入 & Prompt 优化;en:LLM integration & Prompt tuning">LLM 接入 & Prompt 优化</div>
+          <div class="svc-item" data-i18n="zh:全栈 MVP 快速交付;en:Full-stack MVP delivery">全栈 MVP 快速交付</div>
+          <div class="svc-item" data-i18n="zh:RAG 知识库搭建;en:RAG knowledge base">RAG 知识库搭建</div>
+        </div>
+        <a href="mailto:maropion@163.com?subject=AI%20Agent%20咨询" class="svc-cta glass-strong" data-i18n="zh:发起咨询 →;en:Get a quote →">发起咨询 →</a>
+      </div>
+      <div class="svc-card glass reveal reveal-d2">
+        <div class="svc-icon glass-strong">📊</div>
+        <div class="svc-title" data-i18n="zh:数据分析 & 洞察;en:Data Analysis & Insights">数据分析 & 洞察</div>
+        <div class="svc-desc" data-i18n="zh:机器学习辅助，将原始数据转化为可执行的业务洞察;en:ML-assisted, turning raw data into actionable insights">机器学习辅助，将原始数据转化为可执行的业务洞察</div>
+        <div class="svc-items">
+          <div class="svc-item" data-i18n="zh:用户行为分析;en:User behavior analysis">用户行为分析</div>
+          <div class="svc-item" data-i18n="zh:文本挖掘 & 情感分析;en:Text mining & sentiment">文本挖掘 & 情感分析</div>
+          <div class="svc-item" data-i18n="zh:竞品数据调研;en:Competitive intelligence">竞品数据调研</div>
+          <div class="svc-item" data-i18n="zh:BI 仪表盘搭建;en:BI dashboards">BI 仪表盘搭建</div>
+        </div>
+        <a href="mailto:maropion@163.com?subject=数据分析咨询" class="svc-cta glass-strong" data-i18n="zh:发起咨询 →;en:Get a quote →">发起咨询 →</a>
+      </div>
+      <div class="svc-card glass reveal reveal-d3">
+        <div class="svc-icon glass-strong">🗂</div>
+        <div class="svc-title" data-i18n="zh:AI 产品咨询 & PRD;en:AI Product Consulting">AI 产品咨询 & PRD</div>
+        <div class="svc-desc" data-i18n="zh:把 AI 想法落地成清晰的产品规划，省去反复拉齐成本;en:Turn AI ideas into clear product plans, eliminating alignment loops">把 AI 想法落地成清晰的产品规划</div>
+        <div class="svc-items">
+          <div class="svc-item" data-i18n="zh:AI 产品路线图;en:AI product roadmap">AI 产品路线图</div>
+          <div class="svc-item" data-i18n="zh:高质量 PRD 撰写;en:High-quality PRD writing">高质量 PRD 撰写</div>
+          <div class="svc-item" data-i18n="zh:模型选型 & ROI;en:Model selection & ROI">模型选型 & ROI</div>
+          <div class="svc-item" data-i18n="zh:产品 Demo 原型;en:Product demo prototyping">产品 Demo 原型</div>
+        </div>
+        <a href="mailto:maropion@163.com?subject=AI产品咨询" class="svc-cta glass-strong" data-i18n="zh:发起咨询 →;en:Get a quote →">发起咨询 →</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="divider" style="margin:0 clamp(24px,4vw,64px)"></div>
+
+<!-- Career -->
+<section id="career">
+  <div class="container">
+    <div class="section-header reveal">
+      <div class="section-badge glass" data-i18n="zh:经历背景;en:Background">经历背景</div>
+      <h2 class="section-title blur-text" data-i18n="zh:产品 × 数据 × AI;en:Product × Data × AI">产品 × 数据 × AI</h2>
+    </div>
+    <div class="career-wrap">
+      <div class="reveal">
+        <div class="career-label" data-i18n="zh:工作经历;en:Experience">工作经历</div>
+        <div>
+          <div class="tl-item"><div class="tl-dot"></div><div><div class="tl-co">上海守扣科技</div><div class="tl-role">AI 产品经理</div><div class="tl-date">2026.04 — 至今</div></div></div>
+          <div class="tl-item"><div class="tl-dot"></div><div><div class="tl-co">广州安点科技</div><div class="tl-role">AI 产品经理</div><div class="tl-date">2026.01 — 2026.03</div></div></div>
+          <div class="tl-item"><div class="tl-dot"></div><div><div class="tl-co">美团 · 点评事业部</div><div class="tl-role">产品运营（AI / 风控）</div><div class="tl-date">2025.07 — 2025.09</div></div></div>
+          <div class="tl-item"><div class="tl-dot"></div><div><div class="tl-co">国泰海通证券</div><div class="tl-role">行业研究</div><div class="tl-date">2025.09 — 2025.11</div></div></div>
+          <div class="tl-item"><div class="tl-dot"></div><div><div class="tl-co">信永中和会计师事务所</div><div class="tl-role">审计实习生</div><div class="tl-date">2024.06 — 2024.09</div></div></div>
+        </div>
+      </div>
+      <div class="reveal reveal-d1">
+        <div class="career-label" data-i18n="zh:教育经历;en:Education">教育经历</div>
+        <div class="edu-block glass">
+          <div class="edu-school">香港城市大学</div>
+          <div class="edu-degree">MSc Artificial Intelligence in Business</div>
+          <div class="edu-detail">2026.09 — 2027.06</div>
+        </div>
+        <div class="edu-block glass">
+          <div class="edu-school">广东财经大学</div>
+          <div class="edu-degree" data-i18n="zh:会计学 · 本科;en:Accounting · Bachelor">会计学 · 本科</div>
+          <div class="edu-detail">GPA 3.86/5 · Top 10%</div>
+        </div>
+        <div style="margin-top:28px">
+          <div class="career-label" data-i18n="zh:核心技能;en:Skills">核心技能</div>
+          <div class="skills-cloud">
+            <span class="skill hot">Prompt Engineering</span>
+            <span class="skill hot">Multi-Agent</span>
+            <span class="skill hot">RAG</span>
+            <span class="skill hot">CrewAI</span>
+            <span class="skill">FastAPI</span>
+            <span class="skill">Python</span>
+            <span class="skill">React</span>
+            <span class="skill">SQL</span>
+            <span class="skill">Docker</span>
+            <span class="skill">PRD</span>
+            <span class="skill">Axure</span>
+            <span class="skill">IELTS 6.5</span>
+            <span class="skill">JLPT N2</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="divider" style="margin:0 clamp(24px,4vw,64px)"></div>
+
+<!-- Contact -->
+<section id="contact">
+  <div class="container">
+    <div class="contact-inner reveal">
+      <div class="contact-title blur-text" data-i18n="zh:来聊聊吧;en:Let's build something">来聊聊吧</div>
+      <p class="contact-sub" data-i18n="zh:无论是求职机会、接单合作还是技术探讨，随时欢迎。;en:Whether it's a job, freelance project, or tech chat — always open.">无论是求职机会、接单合作还是技术探讨，随时欢迎。</p>
+      <div class="contact-links">
+        <a href="mailto:maropion@163.com" class="contact-link glass"><span class="ico">✉</span><span class="lbl">Email</span><span>maropion@163.com</span></a>
+        <a href="https://github.com/Maropion03" target="_blank" class="contact-link glass"><span class="ico">⌥</span><span class="lbl">GitHub</span><span>Maropion03</span></a>
+        <a href="https://awesome-requirement-review-agent-production.up.railway.app/single-page-shell.html" target="_blank" class="contact-link glass"><span class="ico">▶</span><span class="lbl">Demo</span><span data-i18n="zh:PRD 评审;en:PRD Review">PRD 评审</span></a>
+        <a href="https://spirit-construct-maropion.top" target="_blank" class="contact-link glass"><span class="ico">✦</span><span class="lbl">Demo</span><span data-i18n="zh:灵构;en:Spirit Construct">灵构</span></a>
+        <a href="https://ecnucwapzdad.feishu.cn/wiki/C3gswU76FiOSwtkAU9PcCNifnsh" target="_blank" class="contact-link glass"><span class="ico">📄</span><span class="lbl" data-i18n="zh:飞书文档;en:Feishu">飞书文档</span></a>
+        <a href="uploads/resume.pdf" download class="contact-link glass"><span class="ico">⬇</span><span class="lbl" data-i18n="zh:简历;en:CV">简历</span><span>PDF</span></a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer><span data-i18n="zh:水母银河 · 毛睿平 · 用 AI 把想法做成结果;en:Jellyfish Galaxy · Maropion · Shipping ideas with AI">水母银河 · 毛睿平 · 用 AI 把想法做成结果</span></footer>
+
+<!-- Demo Modal -->
+<div class="demo-modal" id="demoModal">
+  <div class="demo-box glass">
+    <div class="demo-bar"><span id="demoTitle">Live Demo</span><button class="demo-close" onclick="closeDemo()">✕</button></div>
+    <iframe id="demoFrame" src="" sandbox="allow-scripts allow-same-origin allow-forms"></iframe>
+  </div>
+</div>
+
+<!-- Tweaks -->
+<div id="tweaks" class="glass">
+  <h3>Tweaks</h3>
+  <div class="tw-row"><label data-i18n="zh:主色;en:Accent">主色</label>
+    <select onchange="setAccent(this.value)">
+      <option value="#6eb4ff">Blue</option>
+      <option value="#a191ff">Violet</option>
+      <option value="#6ee8c0">Mint</option>
+      <option value="#f0c870">Gold</option>
+    </select></div>
+</div>
+
+<script>
+// ── Language ──────────────────────────────────────────
+let lang = localStorage.getItem('lang')||'zh';
+function t(el){const v=el.dataset.i18n;if(!v)return;const m={};v.split(';').forEach(p=>{const[k,...r]=p.split(':');m[k.trim()]=r.join(':')});if(m[lang])el.textContent=m[lang]}
+function applyLang(){
+  document.documentElement.lang=lang;
+  document.querySelectorAll('[data-i18n]').forEach(t);
+  document.querySelectorAll('.zh').forEach(el=>el.style.display=lang==='zh'?'':'none');
+  document.querySelectorAll('.en').forEach(el=>el.style.display=lang==='en'?'':'none');
+  document.getElementById('langToggle').textContent=lang==='zh'?'EN':'中';
+  localStorage.setItem('lang',lang);
+}
+document.getElementById('langToggle').addEventListener('click',()=>{lang=lang==='zh'?'en':'zh';applyLang()});
+applyLang();
+
+// ── Stars ─────────────────────────────────────────────
+(function(){
+  const c=document.createElement('canvas'),x=c.getContext('2d');
+  c.width=2000;c.height=1200;
+  for(let i=0;i<300;i++){
+    const a=.15+Math.random()*.55;
+    x.fillStyle=`rgba(255,255,255,${a})`;
+    x.beginPath();x.arc(Math.random()*2000,Math.random()*1200,Math.random()*1.2+.2,0,Math.PI*2);x.fill();
+  }
+  document.getElementById('stars').style.background=`url(${c.toDataURL()}) repeat`;
+})();
+
+// ── BlurText ──────────────────────────────────────────
+document.querySelectorAll('.blur-text').forEach(el=>{
+  const text=el.textContent.trim();if(!text)return;
+  const words=text.split(/(\s+)/);
+  el.textContent='';el.classList.add('ready');
+  let idx=0;
+  words.forEach(w=>{
+    if(/^\s+$/.test(w)){el.appendChild(document.createTextNode(w));return}
+    const s=document.createElement('span');s.className='blur-word';s.textContent=w;
+    s.style.transitionDelay=`${idx*.07}s`;el.appendChild(s);idx++;
+  });
+});
+const blurObs=new IntersectionObserver(es=>{es.forEach(e=>{if(e.isIntersecting){e.target.querySelectorAll('.blur-word').forEach(w=>w.classList.add('visible'));blurObs.unobserve(e.target)}})},{threshold:.15});
+document.querySelectorAll('.blur-text').forEach(el=>blurObs.observe(el));
+
+// ── Reveal ────────────────────────────────────────────
+const revObs=new IntersectionObserver(es=>{es.forEach(e=>{if(e.isIntersecting)e.target.classList.add('visible')})},{threshold:.1});
+document.querySelectorAll('.reveal').forEach(el=>revObs.observe(el));
+
+// ── Nav active ────────────────────────────────────────
+const navLinks=document.querySelectorAll('.nav-center a');
+window.addEventListener('scroll',()=>{
+  const y=window.scrollY+90;
+  ['hero','projects','services','career','contact'].forEach(id=>{
+    const el=document.getElementById(id);if(!el)return;
+    if(y>=el.offsetTop&&y<el.offsetTop+el.offsetHeight){
+      navLinks.forEach(a=>a.style.color='');
+      const m=[...navLinks].find(a=>a.getAttribute('href')==='#'+id);
+      if(m)m.style.color='#fff';
+    }
+  });
+},{passive:true});
+
+// ── Card expand ───────────────────────────────────────
+function toggleCard(i){const c=document.getElementById('card-'+i);const o=c.classList.contains('open');document.querySelectorAll('.proj-card').forEach(x=>x.classList.remove('open'));if(!o)c.classList.add('open')}
+
+// ── Demo modal ────────────────────────────────────────
+function openDemo(url,e){e&&e.preventDefault();document.getElementById('demoFrame').src=url;document.getElementById('demoTitle').textContent='Live Demo';document.getElementById('demoModal').classList.add('show')}
+function closeDemo(){document.getElementById('demoModal').classList.remove('show');setTimeout(()=>document.getElementById('demoFrame').src='',300)}
+document.getElementById('demoModal').addEventListener('click',function(e){if(e.target===this)closeDemo()});
+
+// ── Tweaks ────────────────────────────────────────────
+function setAccent(c){document.documentElement.style.setProperty('--accent',c);document.documentElement.style.setProperty('--accent-bg',c+'18');document.documentElement.style.setProperty('--accent-border',c+'38')}
+
+// ── Tweaks toggle ─────────────────────────────────────
+const tp=document.getElementById('tweaks');
+window.addEventListener('message',e=>{if(e.data?.type==='__activate_edit_mode')tp.classList.add('show');if(e.data?.type==='__deactivate_edit_mode')tp.classList.remove('show')});
+window.parent.postMessage({type:'__edit_mode_available'},'*');
+</script>
+</body>
+</html>

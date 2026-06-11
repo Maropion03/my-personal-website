@@ -1,0 +1,1577 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>水母银河 · AI PM & Builder</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Barlow:wght@300;400;500;600&family=Noto+Serif+SC:wght@400;700&family=Noto+Sans+SC:wght@300;400&display=swap" rel="stylesheet">
+<link href="https://iconsax.gitlab.io/i/icons.css" rel="stylesheet">
+<style>
+:root{
+  --bg:#FFFCF8;--bg2:#FFF7F0;
+  --text:#F4EEF9;--muted:rgba(244,238,249,.55);--subtle:rgba(255,255,255,.06);
+  --pink:#FF8FAB;--pink-l:#FFE3EC;--pink-d:rgba(255,143,171,.12);--pink-b:rgba(255,143,171,.28);
+  --blue:#6CB8E8;--blue-l:#D5EDFB;--blue-d:rgba(108,184,232,.12);--blue-b:rgba(108,184,232,.3);
+  --yellow:#FFCA5F;--yellow-l:#FFF3CC;--yellow-d:rgba(255,202,95,.14);--yellow-b:rgba(255,202,95,.36);
+  --purple:#c084fc;
+  --border:rgba(255,255,255,.14);
+  --serif:'Instrument Serif','Noto Serif SC',serif;
+  --sans:'Barlow','Noto Sans SC',sans-serif;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{background:#060008;color:var(--text);font-family:var(--sans);font-weight:300;line-height:1.65;-webkit-font-smoothing:antialiased;overflow-x:hidden}
+a{color:inherit;text-decoration:none}
+::selection{background:var(--pink-d)}
+
+/* ── Background ─────────────────────────────── */
+#bg-scene{
+  position:fixed;inset:0;z-index:0;pointer-events:none;
+  background:#0d0818;
+}
+#bg-scene::before{
+  content:'';position:absolute;inset:0;
+  background:
+    radial-gradient(ellipse 72% 58% at 22% 32%, rgba(255,100,155,.20) 0%, transparent 65%),
+    radial-gradient(ellipse 58% 48% at 78% 68%, rgba(100,165,240,.13) 0%, transparent 62%),
+    radial-gradient(ellipse 52% 64% at 52% 98%, rgba(170,90,255,.11) 0%, transparent 58%),
+    radial-gradient(ellipse 40% 32% at 60% 15%, rgba(255,160,200,.10) 0%, transparent 55%);
+  animation:bgpulse 9s ease-in-out infinite alternate;
+}
+@keyframes bgpulse{
+  0%{opacity:.75}
+  100%{opacity:1}
+}
+
+/* ── Liquid glass mixin ───────────────────── */
+/* shared liquid-glass variables used across components */
+
+/* ── Nav ─────────────────────────────────── */
+nav{
+  position:fixed;top:0;left:0;right:0;z-index:100;
+  display:flex;align-items:center;justify-content:space-between;
+  padding:0 clamp(24px,5vw,80px);height:64px;
+  background:rgba(255,255,255,.08);
+  backdrop-filter:blur(28px) saturate(180%);-webkit-backdrop-filter:blur(28px) saturate(180%);
+  border-bottom:1px solid rgba(255,255,255,.28);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.45),0 2px 24px rgba(255,150,190,.10);
+}
+.nav-logo{display:none}
+.nav-links{
+  display:flex;gap:26px;
+  margin-left:auto;margin-right:auto;
+}
+.nav-links a{padding:6px 16px;font-size:16px;font-weight:500;color:var(--muted);border-radius:9999px;transition:color .2s;letter-spacing:.03em}
+.nav-links a:hover{color:var(--text)}
+.nav-right{display:flex;align-items:center;gap:10px}
+.lang-btn{font-size:11px;letter-spacing:.14em;color:var(--muted);cursor:pointer;padding:5px 13px;border-radius:9999px;border:1px solid rgba(255,255,255,.35);transition:all .2s;font-weight:600;background:rgba(255,255,255,.10);backdrop-filter:blur(12px)}
+.lang-btn:hover{color:var(--text);border-color:rgba(255,255,255,.6);background:rgba(255,255,255,.18)}
+.nav-github{
+  width:40px;height:40px;border-radius:9999px;
+  display:inline-flex;align-items:center;justify-content:center;
+  border:1px solid rgba(255,255,255,.28);
+  background:rgba(255,255,255,.08);color:rgba(255,255,255,.82);
+  transition:all .22s;
+}
+.nav-github svg{width:18px;height:18px;display:block}
+.nav-github:hover{color:#fff;background:rgba(255,255,255,.14);border-color:rgba(255,255,255,.44);transform:translateY(-1px)}
+.nav-cta{
+  display:inline-flex;align-items:center;gap:6px;
+  padding:9px 22px;border-radius:9999px;
+  background:var(--pink);color:#fff;font-size:15px;font-weight:600;letter-spacing:.04em;
+  transition:all .25s;cursor:pointer;box-shadow:0 4px 16px rgba(255,143,171,.35);
+}
+.nav-cta:hover{background:#ff7099;transform:translateY(-1px);box-shadow:0 6px 20px rgba(255,143,171,.45)}
+@media(max-width:720px){.nav-links{display:none}}
+
+/* ── Hero ────────────────────────────────── */
+#hero{
+  min-height:100vh;
+  display:grid;grid-template-columns:1fr 1fr;
+  align-items:center;gap:40px;
+  padding:88px clamp(24px,4vw,64px) 64px clamp(80px,12vw,200px);
+  position:relative;z-index:1;
+}
+@media(max-width:880px){
+  #hero{grid-template-columns:1fr;padding:96px 24px 56px;text-align:center}
+  .hero-photo-col{order:-1}
+}
+
+/* Left */
+.hero-left{
+  max-width:620px;display:flex;flex-direction:column;gap:0;
+  padding:0;
+}
+@media(max-width:880px){.hero-left{max-width:100%;align-items:center}}
+
+.hero-badge{
+  display:inline-flex;align-items:center;gap:9px;
+  padding:9px 20px;border-radius:9999px;
+  background:var(--pink-d);border:1px solid var(--pink-b);
+  font-size:12px;font-weight:500;letter-spacing:.16em;text-transform:uppercase;
+  color:var(--pink);margin-bottom:30px;width:fit-content;
+}
+.badge-dot{width:7px;height:7px;border-radius:50%;background:var(--pink);animation:pdot 2s ease-in-out infinite}
+@keyframes pdot{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.4;transform:scale(.75)}}
+
+.hero-name{
+  font-family:var(--serif);font-style:italic;
+  font-size:clamp(62px,8vw,108px);
+  line-height:.9;letter-spacing:-.02em;color:var(--text);margin-bottom:10px;
+}
+.hero-sub{
+  font-family:var(--serif);font-style:italic;
+  font-size:clamp(17px,2.2vw,26px);
+  color:var(--muted);margin-bottom:32px;letter-spacing:.07em;
+}
+.hero-intent{
+  margin:-20px 0 26px;
+  font-size:13px;
+  color:rgba(255,255,255,.58);
+  letter-spacing:.03em;
+}
+
+/* Bio */
+.hero-bio{
+  margin-bottom:30px;
+  max-width:620px;
+  font-size:17px;color:rgba(255,255,255,.76);line-height:1.95;
+}
+.hero-bio p+p{margin-top:10px}
+.hero-bio strong{color:#fff;font-weight:500}
+
+/* Skill chips */
+.skill-chips{display:flex;flex-wrap:wrap;gap:9px;margin-bottom:36px}
+@media(max-width:880px){.skill-chips{justify-content:center}}
+.chip{
+  font-size:15px;padding:9px 20px;border-radius:9999px;font-weight:400;letter-spacing:.03em;
+  transition:transform .2s,box-shadow .2s;cursor:default;
+  backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.50);
+}
+.chip:hover{transform:translateY(-2px);box-shadow:inset 0 1px 0 rgba(255,255,255,.60),0 6px 18px rgba(255,140,180,.15)}
+.chip-pink{background:rgba(255,143,171,.14);border:1px solid rgba(255,143,171,.35);color:var(--pink)}
+.chip-blue{background:rgba(108,184,232,.14);border:1px solid rgba(108,184,232,.38);color:var(--blue)}
+.chip-yellow{background:rgba(255,202,95,.16);border:1px solid rgba(255,202,95,.40);color:var(--yellow)}
+
+/* CTAs */
+.hero-ctas{display:flex;gap:10px;flex-wrap:wrap}
+@media(max-width:880px){.hero-ctas{justify-content:center}}
+.cta-pink{
+  display:inline-flex;align-items:center;gap:6px;
+  padding:13px 32px;border-radius:9999px;
+  background:var(--pink);color:#fff;font-size:15px;font-weight:600;letter-spacing:.04em;
+  transition:all .25s;cursor:pointer;box-shadow:0 4px 18px rgba(255,143,171,.3);
+}
+.cta-pink:hover{background:#ff7099;transform:translateY(-2px);box-shadow:0 8px 24px rgba(255,143,171,.4)}
+.cta-outline{
+  display:inline-flex;align-items:center;gap:6px;
+  padding:13px 32px;border-radius:9999px;
+  border:1px solid rgba(255,255,255,.38);color:var(--text);
+  font-size:15px;font-weight:400;letter-spacing:.02em;
+  background:rgba(255,255,255,.12);
+  backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.55);
+  transition:all .25s;cursor:pointer;
+}
+.cta-outline:hover{border-color:rgba(255,255,255,.55);background:rgba(255,255,255,.22);transform:translateY(-1px)}
+.cta-blue{
+  display:inline-flex;align-items:center;gap:6px;
+  padding:13px 32px;border-radius:9999px;
+  border:1px solid var(--blue-b);color:var(--blue);
+  background:var(--blue-d);
+  font-size:15px;font-weight:400;letter-spacing:.02em;
+  transition:all .25s;cursor:pointer;
+}
+.cta-blue:hover{background:rgba(108,184,232,.2);transform:translateY(-1px)}
+
+/* Right — Photo */
+.hero-photo-col{display:flex;align-items:center;justify-content:center;position:relative}
+.photo-wrap{position:relative;width:clamp(230px,25vw,380px)}
+
+.photo-card{
+  border-radius:28px;overflow:hidden;position:relative;
+  border:1px solid rgba(255,255,255,.38);
+  box-shadow:
+    inset 0 1.5px 0 rgba(255,255,255,.60),
+    inset 0 -1px 0 rgba(255,180,210,.18),
+    0 24px 60px rgba(255,130,175,.18),
+    0 0 0 8px rgba(255,200,225,.12);
+  animation:float 6.5s ease-in-out infinite alternate;
+}
+@keyframes float{0%{transform:translateY(-10px) rotate(-.5deg)}100%{transform:translateY(10px) rotate(.5deg)}}
+.photo-card img{width:100%;height:auto;display:block;object-fit:cover}
+
+/* Decorative rings behind photo */
+.photo-ring{
+  position:absolute;border-radius:50%;pointer-events:none;z-index:-1;
+}
+.ring1{
+  width:120%;height:120%;top:50%;left:50%;transform:translate(-50%,-50%);
+  background:radial-gradient(circle,rgba(255,143,171,.12) 0%,rgba(108,184,232,.08) 50%,transparent 75%);
+  animation:pglow 4.5s ease-in-out infinite alternate;
+}
+.ring2{
+  width:92%;height:auto;aspect-ratio:1;
+  top:50%;left:50%;transform:translate(-50%,-50%);
+  border:2px solid rgba(255,143,171,.18);
+  animation:ring2 6s ease-in-out infinite alternate;
+}
+@keyframes pglow{from{opacity:.6;transform:translate(-50%,-50%) scale(.94)}to{opacity:1;transform:translate(-50%,-50%) scale(1.06)}}
+@keyframes ring2{from{transform:translate(-50%,-50%) scale(.9);opacity:.4}to{transform:translate(-50%,-50%) scale(1.1);opacity:.7}}
+
+/* Floating badge */
+.photo-badge{
+  position:absolute;bottom:-18px;right:-12px;
+  display:flex;flex-direction:column;align-items:flex-start;
+  padding:13px 17px;border-radius:18px;
+  background:rgba(109,184,232,.24);
+  backdrop-filter:blur(24px) saturate(180%);-webkit-backdrop-filter:blur(24px) saturate(180%);
+  border:1px solid rgba(115,194,255,.46);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.45),0 10px 32px rgba(53,114,205,.22);
+  z-index:2;
+}
+.badge-val{font-family:var(--serif);font-style:italic;font-size:24px;color:#fef6ff;line-height:1;margin-bottom:3px;text-shadow:0 1px 10px rgba(0,0,0,.22)}
+.badge-lab{font-size:10px;letter-spacing:.06em;color:rgba(246,250,255,.88);font-weight:500}
+
+/* Second floating tag (top-left) */
+.photo-tag2{
+  position:absolute;top:-16px;left:-14px;
+  display:flex;align-items:center;gap:8px;
+  padding:10px 14px;border-radius:14px;
+  background:rgba(255,255,255,.12);
+  backdrop-filter:blur(24px) saturate(180%);-webkit-backdrop-filter:blur(24px) saturate(180%);
+  border:1px solid rgba(255,255,255,.40);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.60),0 6px 20px rgba(255,130,175,.12);
+  z-index:2;font-size:12px;color:var(--text);
+}
+.tag2-dot{width:8px;height:8px;border-radius:50%;background:var(--blue);flex-shrink:0}
+
+/* ── Stats strip ─────────────────────────── */
+.stats-strip{
+  position:relative;z-index:1;
+  display:grid;grid-template-columns:repeat(4,1fr);
+  background:rgba(255,255,255,.08);
+  border-top:1px solid rgba(255,255,255,.28);
+  border-bottom:1px solid rgba(255,255,255,.18);
+  backdrop-filter:blur(28px) saturate(180%);-webkit-backdrop-filter:blur(28px) saturate(180%);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.45),0 -4px 24px rgba(255,150,190,.08);
+}
+@media(max-width:600px){.stats-strip{grid-template-columns:repeat(2,1fr)}}
+.stat{
+  padding:26px clamp(16px,3vw,44px);
+  border-right:1px solid rgba(255,255,255,.18);
+  transition:background .2s;
+}
+.stat:last-child{border-right:none}
+.stat:hover{background:rgba(255,255,255,.12)}
+.stat-n{
+  font-family:var(--serif);font-style:italic;
+  font-size:32px;line-height:1;margin-bottom:5px;
+}
+.stat-n.pink{color:var(--pink)}
+.stat-n.blue{color:var(--blue)}
+.stat-n.yellow{color:var(--yellow)}
+.stat-n.green{color:#6bbe9e}
+.stat-l{font-size:11px;letter-spacing:.05em;color:var(--muted);font-weight:400}
+
+/* ── Divider ─────────────────────────────── */
+.divider{width:100%;height:1px;background:linear-gradient(90deg,transparent,var(--border),transparent)}
+
+/* ── Scroll hint ─────────────────────────── */
+.scroll-hint{
+  position:absolute;bottom:28px;left:50%;transform:translateX(-50%);
+  display:flex;flex-direction:column;align-items:center;gap:6px;
+  font-size:9px;letter-spacing:.2em;text-transform:uppercase;color:var(--muted);
+  pointer-events:none;animation:shint 2.5s ease-in-out infinite;
+}
+@keyframes shint{0%,100%{opacity:.35;transform:translateX(-50%) translateY(0)}50%{opacity:.65;transform:translateX(-50%) translateY(5px)}}
+
+/* ── Reveal ──────────────────────────────── */
+.reveal{opacity:1;transform:none;transition:opacity .7s cubic-bezier(.22,1,.36,1),transform .7s cubic-bezier(.22,1,.36,1)}
+.reveal.vis{opacity:1;transform:none}
+.d1{transition-delay:.07s}.d2{transition-delay:.14s}.d3{transition-delay:.21s}.d4{transition-delay:.28s}.d5{transition-delay:.35s}
+
+/* ── Shared section wrapper ──────────────── */
+.section-wrap{
+  max-width:1100px;margin:0 auto;
+  padding:100px clamp(24px,5vw,80px);
+  position:relative;z-index:1;
+}
+.sec-eyebrow{
+  font-size:11px;letter-spacing:3px;text-transform:uppercase;
+  margin-bottom:8px;font-weight:500;
+  color:rgba(255,255,255,.5);
+}
+.sec-title{
+  font-family:var(--serif);font-style:italic;
+  font-size:clamp(36px,5vw,56px);line-height:1;
+  color:#fff;margin-bottom:60px;
+}
+
+/* ── Timeline shared (used in Projects + Career) ── */
+.tl-track{display:flex;flex-direction:column;gap:0;position:relative}
+.tl-track::before{
+  content:'';position:absolute;left:50%;top:0;bottom:0;
+  width:2px;transform:translateX(-50%);
+  background:linear-gradient(180deg,var(--pink),var(--blue) 40%,var(--yellow) 70%,var(--purple));
+}
+/* Each timeline row */
+.tl-row{
+  display:grid;grid-template-columns:1fr 48px 1fr;
+  align-items:start;gap:0;margin-bottom:56px;
+}
+.tl-row:last-child{margin-bottom:0}
+/* Center node */
+.tl-node{
+  display:flex;align-items:center;justify-content:center;
+  position:relative;z-index:2;
+  padding-top:18px;
+  grid-column:2;
+}
+.tl-dot{
+  width:12px;height:12px;border-radius:50%;
+  border:2px solid rgba(255,255,255,.3);
+  flex-shrink:0;
+}
+/* Left cell */
+.tl-left{padding-right:24px;text-align:right}
+/* Right cell */
+.tl-right{padding-left:24px;text-align:left}
+
+/* ── Glass card (shared by Projects + Career) ── */
+.glass-card{
+  background:rgba(255,255,255,.07);
+  backdrop-filter:blur(24px) saturate(160%);-webkit-backdrop-filter:blur(24px) saturate(160%);
+  border:1px solid rgba(255,255,255,.16);border-radius:18px;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.22),0 8px 32px rgba(0,0,0,.18);
+  overflow:hidden;
+}
+/* Screenshot container inside project card */
+.proj-img{
+  width:100%;aspect-ratio:16/9;overflow:hidden;
+  background:rgba(255,255,255,.04);
+  display:flex;align-items:center;justify-content:center;
+}
+.proj-img img{width:100%;height:100%;object-fit:cover;display:block;transition:transform .4s ease}
+.glass-card:hover .proj-img img{transform:scale(1.03)}
+.proj-body{padding:20px 22px 22px}
+.proj-time{
+  font-size:10px;letter-spacing:1.5px;text-transform:uppercase;
+  margin-bottom:6px;font-weight:500;
+}
+.proj-name{font-size:16px;font-weight:700;color:#fff;margin-bottom:6px;line-height:1.25}
+.proj-desc{font-size:13px;color:rgba(255,255,255,.55);line-height:1.6;margin-bottom:12px}
+.tag-row{display:flex;flex-wrap:wrap;gap:5px;margin-bottom:14px}
+.tag{
+  font-size:10px;padding:3px 10px;border-radius:999px;font-weight:500;
+  border:1px solid currentColor;opacity:.85;
+}
+.tag-pink{color:var(--pink);background:rgba(255,143,171,.1)}
+.tag-blue{color:var(--blue);background:rgba(108,184,232,.1)}
+.tag-yellow{color:var(--yellow);background:rgba(255,202,95,.1)}
+.tag-purple{color:var(--purple);background:rgba(192,132,252,.1)}
+.proj-links{display:flex;gap:14px}
+.proj-link{
+  font-size:12px;font-weight:500;letter-spacing:.04em;
+  display:inline-flex;align-items:center;gap:4px;
+  transition:opacity .2s;
+}
+.proj-link:hover{opacity:.7}
+/* Abstract card (for academic project) */
+.proj-abstract{
+  padding:22px;
+  font-size:12px;color:rgba(255,255,255,.6);line-height:1.75;
+}
+.proj-abstract .abstract-title{
+  font-size:13px;font-weight:700;color:#fff;margin-bottom:8px;line-height:1.3;
+}
+.proj-abstract .abstract-kw{
+  margin-top:10px;font-size:11px;color:var(--purple);letter-spacing:.04em;
+}
+
+/* ── Full-screen Project Slides ── */
+#projects{
+  position:relative;height:100vh;
+  overflow-y:scroll;scroll-snap-type:y mandatory;
+  scrollbar-width:none;z-index:1;
+}
+#projects::-webkit-scrollbar{display:none}
+.proj-slide{
+  height:100vh;scroll-snap-align:start;
+  display:grid;grid-template-columns:1fr 1fr;
+  position:relative;overflow:hidden;
+}
+.proj-slide::before{
+  content:'';position:absolute;inset:0;pointer-events:none;
+  background:#050508;
+}
+.proj-half-img{
+  position:relative;
+  display:flex;align-items:center;justify-content:center;
+  padding:36px;overflow:hidden;
+  background:transparent;
+}
+.proj-half-img::before{
+  content:'';position:absolute;inset:-8%;
+  background:radial-gradient(circle at 50% 58%, rgba(255,255,255,.03) 0%, transparent 38%);
+  filter:blur(26px);
+  opacity:1;
+  pointer-events:none;
+}
+/* Per-project radial background glow */
+.proj-slide:nth-child(1)::before{
+  background:#050508;
+}
+.proj-slide:nth-child(2)::before{
+  background:#050508;
+}
+.proj-slide:nth-child(3)::before{
+  background:#050508;
+}
+.proj-slide:nth-child(4)::before{
+  background:#050508;
+}
+.proj-half-img img{
+  width:auto;height:auto;max-width:94%;max-height:84%;
+  object-fit:contain;display:block;border-radius:12px;
+  transition:transform .5s ease,box-shadow .5s ease;
+}
+/* Per-project image glow */
+.proj-slide:nth-child(1) .proj-half-img img{box-shadow:0 0 48px rgba(255,100,155,.25),0 8px 32px rgba(0,0,0,.55)}
+.proj-slide:nth-child(2) .proj-half-img img{box-shadow:0 0 92px rgba(94,196,255,.28),0 0 34px rgba(62,116,255,.18),0 8px 32px rgba(0,0,0,.55)}
+.proj-slide:nth-child(3) .proj-half-img img{box-shadow:0 0 48px rgba(255,200,80,.20),0 8px 32px rgba(0,0,0,.55)}
+.proj-slide:hover .proj-half-img img{transform:scale(1.02)}
+.proj-slide-num{
+  position:absolute;bottom:28px;left:28px;
+  font-size:11px;letter-spacing:3px;
+  color:rgba(255,255,255,.3);text-transform:uppercase;
+  font-family:var(--sans);
+}
+.proj-half-info{
+  display:flex;flex-direction:column;justify-content:center;
+  padding:60px clamp(36px,5vw,76px);
+  background:transparent;
+  overflow-y:auto;
+  position:relative;z-index:1;
+}
+.proj-slide-header{margin-bottom:36px}
+.proj-slide-header .sec-eyebrow{margin-bottom:4px}
+.proj-slide-header .sec-title{margin-bottom:0;font-size:clamp(40px,5vw,62px)}
+#projects .proj-time{font-size:11px;letter-spacing:1.5px;text-transform:uppercase;margin-bottom:8px;font-weight:500}
+#projects .proj-name{
+  font-family:var(--serif);font-style:italic;
+  font-size:clamp(24px,2.8vw,34px);font-weight:700;color:#fff;
+  margin-bottom:18px;line-height:1.2;letter-spacing:-.01em
+}
+#projects .proj-desc{font-size:14px;color:rgba(255,255,255,.6);line-height:1.72;margin-bottom:20px;max-width:460px}
+#projects .tag-row{margin-bottom:22px}
+#projects .proj-links{gap:20px}
+#projects .proj-link{font-size:13px}
+.proj-half-abstract{
+  display:flex;flex-direction:column;justify-content:center;
+  padding:40px clamp(28px,4vw,60px);
+  background:transparent;
+  overflow-y:auto;
+}
+.proj-slide:nth-child(4) .proj-half-abstract{
+  background:#050508;
+  position:relative;
+}
+.proj-slide:nth-child(4) .proj-half-abstract::before{
+  content:'';
+  position:absolute;inset:0;
+  background:radial-gradient(circle at 42% 48%, rgba(255,255,255,.025) 0%, transparent 26%);
+  pointer-events:none;
+}
+.proj-slide:nth-child(4) .paper-chart{
+  position:relative;z-index:1;
+}
+/* ── Paper flowchart ── */
+.paper-chart{display:flex;flex-direction:column;align-items:center;gap:4px;width:100%;font-family:var(--sans)}
+.pc-section{display:flex;flex-direction:column;align-items:center;gap:5px;width:100%}
+.pc-label{
+  font-size:9px;letter-spacing:2px;text-transform:uppercase;
+  padding:3px 14px;border-radius:20px;
+}
+.pc-label.purple{color:var(--purple);border:1px solid rgba(192,132,252,.35);background:rgba(192,132,252,.08)}
+.pc-label.yellow{color:var(--yellow);border:1px solid rgba(255,202,95,.3);background:rgba(255,202,95,.06)}
+.pc-dual{display:flex;gap:8px;width:100%}
+.pc-col{flex:1;display:flex;flex-direction:column;align-items:center;gap:0}
+.pc-chan-box{
+  width:100%;border-radius:10px;padding:10px 8px;
+  display:flex;flex-direction:column;align-items:center;gap:3px;
+}
+.pc-chan-box.pink{border:1px solid rgba(255,143,171,.28);background:rgba(255,143,171,.04)}
+.pc-chan-box.blue{border:1px solid rgba(108,184,232,.28);background:rgba(108,184,232,.04)}
+.pc-chanhead{font-size:8px;letter-spacing:1px;text-transform:uppercase;color:rgba(255,255,255,.35);margin-bottom:2px}
+.pc-item{font-size:11px;color:rgba(255,255,255,.72);text-align:center;line-height:1.3}
+.pc-hi-pink{color:var(--pink)!important;font-weight:700}
+.pc-hi-blue{color:var(--blue)!important;font-weight:700}
+.pc-hi-yellow{color:var(--yellow)!important;font-weight:700}
+.pc-hi-purple{color:var(--purple)!important;font-weight:700}
+.pc-down{font-size:12px;color:rgba(255,255,255,.2);line-height:1.2}
+.pc-sep{width:1px;height:100%;background:rgba(255,255,255,.08)}
+.pc-merge{font-size:14px;color:rgba(255,255,255,.2);letter-spacing:20px;margin:2px 0}
+.pc-vline{width:1px;height:12px;background:rgba(192,132,252,.3);margin:0 auto}
+.pc-agent{
+  width:100%;border-radius:8px;
+  border:1px solid rgba(192,132,252,.22);
+  background:rgba(192,132,252,.06);
+  padding:8px 12px;display:flex;flex-wrap:wrap;align-items:center;gap:5px;
+}
+.pc-agent.judge{background:rgba(192,132,252,.11);border-color:rgba(192,132,252,.4)}
+.pc-role{font-size:12px;color:#fff;font-weight:600;flex:1;min-width:0}
+.pc-badge{
+  font-size:8px;padding:1px 5px;border-radius:4px;
+  background:rgba(192,132,252,.2);border:1px solid rgba(192,132,252,.4);color:var(--purple);
+}
+.pc-badge.rag{background:rgba(108,184,232,.15);border-color:rgba(108,184,232,.35);color:var(--blue)}
+.pc-llm{font-size:9px;color:rgba(255,255,255,.3);width:100%}
+.pc-out-wrap{display:flex;gap:8px;width:100%}
+.pc-out{
+  flex:1;border-radius:8px;padding:9px 8px;text-align:center;
+  border:1px solid rgba(255,202,95,.22);background:rgba(255,202,95,.04);
+}
+.pc-out-name{font-size:11px;color:rgba(255,255,255,.78)}
+.pc-out-sub{font-size:9px;color:var(--yellow);margin-top:3px}
+.proj-slide:nth-child(4) .pc-label.purple{
+  color:#d8adff;border-color:rgba(216,173,255,.6);background:rgba(216,173,255,.14);
+  box-shadow:0 0 18px rgba(176,112,255,.14);
+}
+.proj-slide:nth-child(4) .pc-label.yellow{
+  color:#ffd977;border-color:rgba(255,217,119,.55);background:rgba(255,217,119,.11);
+  box-shadow:0 0 18px rgba(255,202,95,.12);
+}
+.proj-slide:nth-child(4) .pc-chan-box.pink{
+  border-color:rgba(255,143,171,.48);background:rgba(255,143,171,.1);
+  box-shadow:0 0 22px rgba(255,143,171,.08);
+}
+.proj-slide:nth-child(4) .pc-chan-box.blue{
+  border-color:rgba(108,184,232,.5);background:rgba(108,184,232,.1);
+  box-shadow:0 0 22px rgba(108,184,232,.08);
+}
+.proj-slide:nth-child(4) .pc-chanhead{color:rgba(255,255,255,.74)}
+.proj-slide:nth-child(4) .pc-item{color:rgba(255,255,255,.94)}
+.proj-slide:nth-child(4) .pc-down,
+.proj-slide:nth-child(4) .pc-merge{color:rgba(255,255,255,.5)}
+.proj-slide:nth-child(4) .pc-sep,
+.proj-slide:nth-child(4) .pc-vline{background:rgba(255,255,255,.24)}
+.proj-slide:nth-child(4) .pc-agent{
+  border-color:rgba(255,255,255,.18);
+  background:rgba(255,255,255,.05);
+  box-shadow:0 0 24px rgba(255,255,255,.04);
+}
+.proj-slide:nth-child(4) .pc-agent.judge{
+  background:rgba(201,149,255,.14);
+  border-color:rgba(201,149,255,.42);
+  box-shadow:0 0 28px rgba(201,149,255,.09);
+}
+.proj-slide:nth-child(4) .pc-role{color:rgba(255,255,255,.95)}
+.proj-slide:nth-child(4) .pc-llm{color:rgba(255,255,255,.52)}
+.proj-slide:nth-child(4) .pc-badge{
+  background:rgba(201,149,255,.16);
+  border-color:rgba(201,149,255,.36);
+  color:#cf9fff;
+}
+.proj-slide:nth-child(4) .pc-badge.rag{
+  background:rgba(108,184,232,.16);
+  border-color:rgba(108,184,232,.36);
+  color:#84ccff;
+}
+.proj-slide:nth-child(4) .pc-out{
+  border-color:rgba(255,211,109,.34);
+  background:rgba(255,211,109,.1);
+  box-shadow:0 0 22px rgba(255,211,109,.08);
+}
+.proj-slide:nth-child(4) .pc-out-name{color:rgba(255,255,255,.92)}
+.proj-slide:nth-child(4) .pc-hi-pink{color:#ff9ec5!important}
+.proj-slide:nth-child(4) .pc-hi-blue{color:#8fd3ff!important}
+.proj-slide:nth-child(4) .pc-hi-yellow{color:#ffd977!important}
+.proj-slide:nth-child(4) .pc-hi-purple{color:#d8adff!important}
+.proj-nav{
+  position:fixed;right:28px;top:50%;transform:translateY(-50%);
+  display:flex;flex-direction:column;gap:12px;
+  z-index:200;opacity:0;transition:opacity .3s;pointer-events:none;
+}
+.proj-nav.visible{opacity:1;pointer-events:all}
+.proj-nav-dot{
+  width:8px;height:8px;border-radius:50%;
+  border:1.5px solid rgba(255,255,255,.35);background:transparent;
+  cursor:pointer;padding:0;transition:all .25s;display:block;
+}
+.proj-nav-dot.active{transform:scale(1.4)}
+@media(max-width:700px){
+  .proj-slide{grid-template-columns:1fr;grid-template-rows:50vh 50vh}
+  .proj-half-info{padding:24px 20px;border-left:none;border-top:1px solid rgba(255,255,255,.1)}
+  .proj-half-abstract{padding:24px 20px;border-right:none;border-bottom:1px solid rgba(192,132,252,.18)}
+  .proj-nav{display:none}
+}
+
+/* ── Services section ────────────────────── */
+#services .svc-grid{
+  display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:22px;
+  align-items:stretch;
+}
+@media(max-width:800px){#services .svc-grid{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:460px){#services .svc-grid{grid-template-columns:1fr}}
+.svc-card{
+  background:transparent;
+  backdrop-filter:none;-webkit-backdrop-filter:none;
+  border:none;border-radius:0;
+  padding:24px 18px;text-align:center;
+  box-shadow:none;
+  transition:transform .25s,box-shadow .25s;
+  min-height:360px;
+  display:grid;
+  grid-template-rows:56px 72px 1fr;
+  align-items:start;
+}
+.svc-card:hover{transform:translateY(-5px);box-shadow:none}
+.svc-icon{font-size:2rem;margin-bottom:18px;display:block}
+.svc-icon.iconsax{font-size:44px;line-height:1}
+.svc-card:nth-child(1) .svc-icon{color:#ff9aba}
+.svc-card:nth-child(2) .svc-icon{color:#f2a8b8}
+.svc-card:nth-child(3) .svc-icon{color:#8ecfff}
+.svc-card:nth-child(4) .svc-icon{color:#b5c7ff}
+.svc-name{font-size:18px;font-weight:700;color:#fff;margin-bottom:14px;line-height:1.35;display:flex;align-items:center;justify-content:center}
+.svc-desc{font-size:15px;color:rgba(255,255,255,.62);line-height:1.72}
+
+/* ── Career section ─────────────────────── */
+#career .tl-track::before{
+  background:linear-gradient(180deg,var(--pink),var(--blue) 30%,var(--yellow) 65%,var(--purple) 85%,rgba(255,255,255,.2));
+}
+#career .tl-row{
+  grid-template-columns:1fr 36px 1fr;
+  margin-bottom:44px;
+  align-items:start;
+}
+#career .tl-left{padding-right:14px}
+#career .tl-right{padding-left:14px}
+#career .tl-node{padding-top:18px}
+.career-card{
+  position:relative;
+  background:linear-gradient(160deg, rgba(255,255,255,.035) 0%, rgba(255,255,255,.015) 52%, rgba(255,255,255,.008) 100%);
+  backdrop-filter:blur(12px) saturate(130%);-webkit-backdrop-filter:blur(12px) saturate(130%);
+  border:1px solid rgba(255,255,255,.10);border-radius:16px;padding:22px 24px;
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.18),
+    0 8px 26px rgba(8,14,36,.22),
+    0 0 18px rgba(126,176,255,.08);
+  transition:transform .25s ease, box-shadow .25s ease, border-color .25s ease, background .25s ease;
+}
+.career-card:hover{
+  transform:translateY(-4px);
+  border-color:rgba(255,143,171,.34);
+  background:linear-gradient(160deg, rgba(255,255,255,.05) 0%, rgba(255,255,255,.02) 55%, rgba(255,255,255,.012) 100%);
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.24),
+    0 12px 30px rgba(8,14,36,.28),
+    0 0 24px rgba(255,143,171,.24),
+    0 0 42px rgba(255,143,171,.14);
+}
+.career-header{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:4px;gap:8px}
+.career-role{font-size:16px;font-weight:700;color:#fff;line-height:1.25}
+.career-time-badge{
+  font-size:10px;letter-spacing:1px;padding:4px 10px;border-radius:999px;
+  flex-shrink:0;font-weight:500;white-space:nowrap;margin-top:2px;
+}
+.career-co{font-size:14px;color:rgba(255,255,255,.5);margin-bottom:8px}
+.career-bullets{font-size:14px;color:rgba(255,255,255,.52);line-height:1.62;list-style:none;padding:0}
+.career-bullets li::before{content:'→ ';color:rgba(255,255,255,.25)}
+
+/* Career: left-side label column */
+.career-label{
+  text-align:right;
+  padding-right:24px;
+  align-self:start;
+  display:block;
+  padding-top:18px;
+}
+.career-label-role{font-size:16px;font-weight:700;color:#fff;margin-top:0;margin-bottom:6px;line-height:1.2}
+.career-label-co{font-size:14px;color:rgba(255,255,255,.52);line-height:1.3}
+.tl-row:nth-child(even) .tl-left{
+  grid-column:3;
+  padding-left:24px;padding-right:0;
+  text-align:left;
+}
+.tl-row:nth-child(even) .career-label{
+  transform:translateY(60px);
+}
+.tl-row:nth-child(even) .tl-right{
+  grid-column:1;
+  padding-right:24px;padding-left:0;
+  text-align:right;
+}
+.tl-row:nth-child(even) .tl-node{grid-column:2;justify-content:center}
+.tl-row:nth-child(1) .tl-dot{background:#ff8fab !important;border-color:#ff8fab !important}
+.tl-row:nth-child(2) .tl-dot{background:#6cb8e8 !important;border-color:#6cb8e8 !important}
+.tl-row:nth-child(3) .tl-dot{background:#8fd18a !important;border-color:#8fd18a !important}
+.tl-row:nth-child(4) .tl-dot{background:#ffca5f !important;border-color:#ffca5f !important}
+.tl-row:nth-child(5) .tl-dot{background:#c084fc !important;border-color:#c084fc !important}
+.tl-row:nth-child(even) .career-card{margin-left:auto}
+.tl-row:nth-child(even) .career-header{flex-direction:row-reverse}
+.tl-row:nth-child(even) .career-co,
+.tl-row:nth-child(even) .career-bullets{text-align:right}
+.tl-row:nth-child(even) .career-bullets li::before{content:''}
+.tl-row:nth-child(even) .career-bullets li::after{content:' ←';color:rgba(255,255,255,.25)}
+
+/* ── Contact section ────────────────────── */
+#contact{text-align:center}
+#contact .section-wrap{padding-bottom:80px}
+.contact-title{
+  font-family:var(--serif);font-style:italic;
+  font-size:clamp(36px,5vw,60px);color:#fff;margin-bottom:12px;line-height:1;
+}
+.contact-sub{font-size:15px;color:rgba(255,255,255,.45);margin-bottom:36px;line-height:1.6}
+.contact-main-btn{
+  display:inline-flex;align-items:center;gap:8px;
+  padding:14px 36px;border-radius:9999px;
+  background:var(--pink);color:#fff;font-size:15px;font-weight:600;letter-spacing:.04em;
+  transition:all .25s;box-shadow:0 4px 20px rgba(255,143,171,.35);margin-bottom:40px;
+}
+.contact-main-btn:hover{background:#ff7099;transform:translateY(-2px);box-shadow:0 8px 28px rgba(255,143,171,.45)}
+.contact-links{display:flex;justify-content:center;gap:12px;flex-wrap:wrap;margin-bottom:60px}
+.contact-card{
+  display:flex;align-items:center;gap:10px;
+  padding:15px 22px;border-radius:16px;
+  background:rgba(255,255,255,.07);
+  backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);
+  border:1px solid rgba(255,255,255,.15);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.20);
+  font-size:15px;color:rgba(255,255,255,.8);
+  transition:all .22s;cursor:pointer;
+}
+.contact-card:hover{
+  background:rgba(255,255,255,.14);
+  border-color:rgba(255,143,171,.45);
+  transform:translateY(-2px);
+  box-shadow:
+    0 0 0 1px rgba(255,143,171,.18),
+    0 10px 28px rgba(255,143,171,.26),
+    0 0 22px rgba(255,143,171,.22);
+}
+.contact-card .cc-icon{
+  width:26px;height:26px;flex-shrink:0;
+  display:inline-flex;align-items:center;justify-content:center;
+  color:#fff;
+}
+.contact-card .cc-icon svg{width:24px;height:24px;display:block}
+.contact-card .cc-label{font-size:12px;color:rgba(255,255,255,.35);display:block;line-height:1.2}
+.contact-card .cc-val{font-size:14px;color:#fff;font-weight:500}
+/* Copy feedback */
+.copy-toast{
+  display:none;position:fixed;bottom:28px;left:50%;transform:translateX(-50%);
+  background:rgba(192,132,252,.15);backdrop-filter:blur(12px);
+  border:1px solid rgba(192,132,252,.3);border-radius:10px;
+  padding:8px 20px;font-size:13px;color:#fff;z-index:400;
+  animation:fadeup .3s ease;
+}
+@keyframes fadeup{from{opacity:0;transform:translateX(-50%) translateY(8px)}to{opacity:1;transform:translateX(-50%) translateY(0)}}
+
+/* Contact QR modal */
+.wechat-modal{
+  position:fixed;inset:0;display:none;align-items:center;justify-content:center;
+  background:rgba(4,6,10,.62);z-index:280;
+}
+.wechat-modal.open{display:flex}
+.wechat-modal-card{
+  width:min(92vw,420px);padding:18px;border-radius:20px;
+  background:rgba(17,17,20,.9);
+  border:1px solid rgba(255,255,255,.18);
+  box-shadow:
+    0 20px 52px rgba(0,0,0,.45),
+    0 0 0 1px rgba(255,143,171,.16),
+    0 0 30px rgba(255,143,171,.2);
+  backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);
+}
+.wechat-modal-title{font-size:18px;font-weight:600;color:#fff;letter-spacing:.03em}
+.wechat-modal-sub{margin-top:6px;font-size:13px;line-height:1.7;color:rgba(255,255,255,.55)}
+.wechat-modal-tabs{
+  margin-top:14px;display:flex;gap:8px;
+}
+.wechat-modal-tab{
+  flex:1;border:1px solid rgba(255,255,255,.16);background:rgba(255,255,255,.05);color:rgba(255,255,255,.7);
+  border-radius:9999px;padding:10px 14px;font-size:13px;font-weight:600;cursor:pointer;transition:all .2s;
+}
+.wechat-modal-tab.active{
+  background:rgba(255,143,171,.16);border-color:rgba(255,143,171,.36);color:#fff;
+  box-shadow:0 0 0 1px rgba(255,143,171,.14) inset;
+}
+.wechat-qr-slot{
+  margin-top:14px;border-radius:14px;padding:14px;
+  background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.12);
+  min-height:188px;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:8px;
+}
+.wechat-qr-slot img{max-width:220px;width:100%;border-radius:16px;background:#fff}
+.wechat-qr-slot img.is-copyable{cursor:pointer;transition:transform .2s ease, box-shadow .2s ease}
+.wechat-qr-slot img.is-copyable:hover{transform:translateY(-2px);box-shadow:0 10px 28px rgba(255,143,171,.24)}
+.wechat-qr-note{font-size:12px;color:rgba(255,255,255,.48)}
+.wechat-modal-actions{margin-top:12px;display:flex;justify-content:flex-end}
+.wechat-modal-close{
+  border:1px solid rgba(255,255,255,.28);background:rgba(255,255,255,.07);color:#fff;
+  border-radius:9999px;padding:8px 18px;font-size:13px;cursor:pointer;transition:all .2s;
+}
+.wechat-modal-close:hover{background:rgba(255,255,255,.14);border-color:rgba(255,255,255,.4)}
+
+/* ── Footer ──────────────────────────────── */
+.site-footer{
+  text-align:center;padding:20px;
+  font-size:11px;color:rgba(255,255,255,.2);
+  letter-spacing:.05em;position:relative;z-index:1;
+}
+
+/* ── Timeline mobile stacking ────────────── */
+@media(max-width:700px){
+  .tl-track::before{left:20px}
+  .tl-row{grid-template-columns:32px 1fr;grid-template-rows:auto}
+  .tl-row:nth-child(even) .tl-left,
+  .tl-row:nth-child(even) .tl-right{
+    grid-column:auto;
+    padding-left:16px;padding-right:0;
+    text-align:left;
+  }
+  .tl-row:nth-child(even) .career-card{margin-left:0}
+  .tl-row:nth-child(even) .career-header{flex-direction:row}
+  .tl-row:nth-child(even) .career-co,
+  .tl-row:nth-child(even) .career-bullets{text-align:left}
+  .tl-row:nth-child(even) .career-bullets li::after{content:''}
+  .tl-row:nth-child(even) .career-bullets li::before{content:'→';color:rgba(255,255,255,.25)}
+  .tl-left{display:none}
+  .tl-right{padding-left:16px;text-align:left;grid-column:2}
+  .tl-node{grid-column:1;justify-content:flex-start}
+}
+</style>
+</head>
+<body>
+
+<!-- ── Background canvas ── -->
+<div id="bg-scene" aria-hidden="true"></div>
+
+<nav>
+  <div class="nav-links">
+    <a href="#projects" data-i18n="zh:作品;en:Projects">作品</a>
+    <a href="#services" data-i18n="zh:服务;en:Services">服务</a>
+    <a href="#career" data-i18n="zh:经历;en:Career">经历</a>
+    <a href="#contact" data-i18n="zh:联系;en:Contact">联系</a>
+  </div>
+  <div class="nav-right">
+    <span class="lang-btn" id="langToggle">EN</span>
+    <a class="nav-github" href="https://github.com/Maropion03" target="_blank" rel="noopener" aria-label="GitHub">
+      <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+        <path d="M12 .75a11.25 11.25 0 0 0-3.56 21.92c.56.1.77-.24.77-.55v-2.1c-3.11.68-3.77-1.32-3.77-1.32-.51-1.28-1.24-1.62-1.24-1.62-1.01-.68.08-.67.08-.67 1.12.08 1.7 1.14 1.7 1.14.99 1.7 2.6 1.2 3.24.92.1-.72.39-1.2.7-1.48-2.49-.28-5.12-1.25-5.12-5.54 0-1.22.44-2.22 1.15-3-.11-.28-.5-1.42.11-2.96 0 0 .94-.3 3.08 1.15a10.6 10.6 0 0 1 5.6 0c2.14-1.45 3.08-1.15 3.08-1.15.61 1.54.22 2.68.11 2.96.72.78 1.15 1.78 1.15 3 0 4.3-2.63 5.25-5.14 5.53.4.35.76 1.03.76 2.08v3.08c0 .31.2.66.78.55A11.25 11.25 0 0 0 12 .75Z"/>
+      </svg>
+    </a>
+    <a href="#" class="nav-cta js-open-wechat-modal" data-track="cta_nav_contact_primary" data-i18n="zh:微信/飞书联系;en:WeChat / Feishu">微信/飞书联系</a>
+  </div>
+</nav>
+
+<section id="hero">
+
+  <!-- ── Left ── -->
+  <div class="hero-left">
+
+    <div class="hero-badge reveal d1">
+      <span class="badge-dot"></span>
+      <span data-i18n="zh:AI 产品经理 · Builder · 独立开发者;en:AI Product Manager · Builder · Maker">AI 产品经理 · Builder · 独立开发者</span>
+    </div>
+
+    <h1 class="hero-name reveal d2">水母银河</h1>
+    <div class="hero-sub reveal d2">Maropion</div>
+    <p class="hero-intent reveal d2" data-i18n="zh:目前以求职机会为主，也欢迎 AI 产品与网页开发合作咨询;en:Open to job opportunities, and also available for AI product and web build collaborations">
+      目前以求职机会为主，也欢迎 AI 产品与网页开发合作咨询
+    </p>
+
+    <div class="hero-bio reveal d3">
+      <p class="zh"><strong>会计学出身的 AI 产品经理。</strong>曾在美团主导 AI Agent 开发与数据洞察，在初创公司独立交付 AI 产品从 0 到 1。</p>
+      <p class="zh">熟悉 RAG、Multi-Agent、Harness Engineering，能从写 PRD 到部署上线。港城大 <strong>MSc AI in Business</strong> 2026 秋入学。</p>
+      <p class="zh">核心指标：评审平均时长 <strong>5min</strong>；AI workflow 平均节省 <strong>70% 人工耗时</strong>。</p>
+      <p class="en" style="display:none"><strong>Accounting grad turned AI PM.</strong> Built AI Agents at Meituan, shipped 0→1 AI products at two startups. Proficient in RAG · Multi-Agent · Harness Engineering. Incoming MSc <strong>AI in Business</strong>, CityU HK, Fall 2026.</p>
+      <p class="en" style="display:none">Delivery metrics: <strong>5 min</strong> average review cycle; <strong>70%</strong> average manual-hours reduction in AI workflow.</p>
+    </div>
+
+    <div class="skill-chips reveal d4">
+      <span class="chip chip-pink">Harness Engineering</span>
+      <span class="chip chip-pink">Multi-Agent · CrewAI</span>
+      <span class="chip chip-pink">RAG · LiteLLM</span>
+      <span class="chip chip-blue">Python · FastAPI</span>
+      <span class="chip chip-blue">TypeScript · React 18</span>
+      <span class="chip chip-blue">Docker · Railway</span>
+      <span class="chip chip-blue">Swift · Metal</span>
+      <span class="chip chip-yellow">PRD 全流程</span>
+      <span class="chip chip-yellow">IELTS 6.5 · JLPT N2</span>
+    </div>
+
+    <div class="hero-ctas reveal d5">
+      <a href="#" class="cta-pink js-open-wechat-modal" data-track="cta_hero_contact_primary" data-i18n="zh:微信/飞书联系;en:WeChat / Feishu">微信/飞书联系</a>
+      <a href="#projects" class="cta-outline" data-i18n="zh:看作品;en:View Work">看作品</a>
+      <a href="assets/resume.pdf" download="毛睿平-简历.pdf" class="cta-blue" data-track="cta_hero_download_cv" data-i18n="zh:下载简历;en:Download CV">下载简历</a>
+    </div>
+
+  </div>
+
+  <!-- ── Right — Photo ── -->
+  <div class="hero-photo-col reveal d2">
+    <div class="photo-wrap">
+      <div class="photo-ring ring1"></div>
+      <div class="photo-ring ring2"></div>
+      <div class="photo-tag2">
+        <span class="tag2-dot"></span>
+        <span class="zh">香港城市大学 MSc AIB</span>
+        <span class="en" style="display:none">CityU HK · MSc AIB</span>
+      </div>
+      <div class="photo-card">
+        <img src="photo.jpg" alt="Maropion">
+      </div>
+      <div class="photo-badge">
+        <span class="badge-val">3+</span>
+        <span class="badge-lab" data-i18n="zh:年 AI 产品经验;en:Yrs AI Product Exp.">年 AI 产品经验</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="scroll-hint">
+    <svg width="14" height="22" viewBox="0 0 14 22" fill="none"><rect x="5.5" y="1" width="3" height="7" rx="1.5" fill="currentColor"/><rect x=".7" y=".7" width="12.6" height="20.6" rx="6.3" stroke="currentColor" stroke-width="1.2"/></svg>
+    <span>scroll</span>
+  </div>
+
+</section>
+
+<!-- Stats -->
+<div class="stats-strip">
+  <div class="stat reveal"><div class="stat-n pink">3</div><div class="stat-l" data-i18n="zh:独立开源项目;en:Open-source Projects">独立开源项目</div></div>
+  <div class="stat reveal d1"><div class="stat-n blue">97%</div><div class="stat-l" data-i18n="zh:AI 评审效率提升;en:Review Efficiency ↑">AI 评审效率提升</div></div>
+  <div class="stat reveal d2"><div class="stat-n yellow">30h</div><div class="stat-l" data-i18n="zh:最快 MVP 交付;en:Fastest MVP Ship">最快 MVP 交付</div></div>
+  <div class="stat reveal d3"><div class="stat-n green">V35</div><div class="stat-l" data-i18n="zh:Agent 产品迭代次数;en:Agent Iterations">Agent 产品迭代次数</div></div>
+</div>
+<div class="divider"></div>
+
+<!-- ══════════════ PROJECTS ══════════════ -->
+<section id="projects">
+
+  <!-- ① Spirit Construct -->
+  <div class="proj-slide">
+    <div class="proj-half-img">
+      <img src="references/spirit-construct-first.png" alt="Spirit Construct 界面截图" loading="lazy">
+      <div class="proj-half-overlay"></div>
+      <span class="proj-slide-num">01 / 04</span>
+    </div>
+    <div class="proj-half-info">
+      <div class="proj-slide-header">
+        <p class="sec-eyebrow" style="color:var(--pink)" data-i18n="zh:作品集;en:Projects">作品集</p>
+        <h2 class="sec-title" data-i18n="zh:我做过什么;en:Selected Work">我做过什么</h2>
+      </div>
+      <p class="proj-time" style="color:var(--pink)" data-i18n="zh:2026-01 · 至今;en:Jan 2026 · Present">2026-01 · 至今</p>
+      <h3 class="proj-name">Spirit Construct · 灵构</h3>
+      <p class="proj-desc" data-i18n="zh:面向AI产品经理的垂直SaaS工具，Vibe Coding模式30小时完成MVP，含大模型ROI计算器与可视化参数调试场；采用Serverless边缘路由大幅压降服务器成本。;en:Vertical SaaS for AI PMs — MVP shipped in 30h via Vibe Coding. Features LLM ROI calculator and visual parameter debugger with serverless edge routing.">面向AI产品经理的垂直SaaS工具，Vibe Coding模式30小时完成MVP，含大模型ROI计算器与可视化参数调试场；采用Serverless边缘路由大幅压降服务器成本。</p>
+      <div class="tag-row">
+        <span class="tag tag-pink">SaaS</span>
+        <span class="tag tag-blue">SSE流式输出</span>
+        <span class="tag tag-yellow">Serverless</span>
+        <span class="tag tag-pink">Fetch API</span>
+      </div>
+      <div class="proj-links">
+        <a class="proj-link" style="color:var(--pink)" href="https://spirit-construct-maropion.top/" target="_blank" rel="noopener" aria-label="Spirit Construct 线上演示">↗ <span data-i18n="zh:线上演示;en:Live Demo">线上演示</span></a>
+        <a class="proj-link" style="color:rgba(255,255,255,.45)" href="https://github.com/Maropion03/Spirit-Construct-AIPM-stack" target="_blank" rel="noopener" aria-label="Spirit Construct GitHub">⎇ GitHub</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- ② PRD评审工作台 -->
+  <div class="proj-slide">
+    <div class="proj-half-img">
+      <img src="references/awesome requirement review agent-first.png" alt="PRD智能评审工作台界面截图" loading="lazy">
+      <div class="proj-half-overlay"></div>
+      <span class="proj-slide-num">02 / 04</span>
+    </div>
+    <div class="proj-half-info">
+      <p class="proj-time" style="color:var(--blue)" data-i18n="zh:2026-01 – 2026-03;en:Jan – Mar 2026">2026-01 – 2026-03</p>
+      <h3 class="proj-name">PRD 智能评审工作台</h3>
+      <p class="proj-desc" data-i18n="zh:基于CrewAI多Agent架构设计6维度评审系统，FastAPI+SSE实现实时流式推送，单次评审从人工2h缩短至AI辅助3min，支持PDF/Markdown双格式导出，Docker部署上线。;en:6-dimension PRD review system built on CrewAI multi-agent. FastAPI+SSE streaming. Review time cut from 2h manual to 3min AI-assisted. PDF/MD export, Dockerized.">基于CrewAI多Agent架构设计6维度评审系统，FastAPI+SSE实现实时流式推送，单次评审从人工2h缩短至AI辅助3min，支持PDF/Markdown双格式导出，Docker部署上线。</p>
+      <div class="tag-row">
+        <span class="tag tag-blue">Multi-Agent</span>
+        <span class="tag tag-yellow">FastAPI + SSE</span>
+        <span class="tag tag-pink">Docker</span>
+        <span class="tag tag-blue">CrewAI</span>
+      </div>
+      <div class="proj-links">
+        <a class="proj-link" style="color:var(--blue)" href="https://awesome-requirement-review-agent-production.up.railway.app/single-page-shell.html" target="_blank" rel="noopener" aria-label="PRD评审工作台线上演示">↗ <span data-i18n="zh:线上演示;en:Live Demo">线上演示</span></a>
+        <a class="proj-link" style="color:rgba(255,255,255,.45)" href="https://github.com/Maropion03/awesome-requirement-review-agent" target="_blank" rel="noopener" aria-label="PRD评审工作台 GitHub">⎇ GitHub</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- ③ LLM Eval Studio -->
+  <div class="proj-slide">
+    <div class="proj-half-img">
+      <img src="references/LLM评测平台.png" alt="LLM Eval Studio 界面截图" loading="lazy">
+      <div class="proj-half-overlay"></div>
+      <span class="proj-slide-num">03 / 04</span>
+    </div>
+    <div class="proj-half-info">
+      <p class="proj-time" style="color:var(--yellow)" data-i18n="zh:2025-11 – 2026-03;en:Nov 2025 – Mar 2026">2025-11 – 2026-03</p>
+      <h3 class="proj-name">LLM Eval Studio</h3>
+      <p class="proj-desc" data-i18n="zh:Prompt调试台与LLM多维Judge评测平台，支持自定义评分标准（Faithfulness/Relevance/Coherence）与测试用例批量管理，内置系统Prompt与上下文注入。;en:Prompt debugger and multi-dimension LLM judge platform. Custom scoring criteria (Faithfulness/Relevance/Coherence), batch test-case management, system-prompt injection.">Prompt调试台与LLM多维Judge评测平台，支持自定义评分标准（Faithfulness/Relevance/Coherence）与测试用例批量管理，内置系统Prompt与上下文注入。</p>
+      <div class="tag-row">
+        <span class="tag tag-yellow">Prompt Eng</span>
+        <span class="tag tag-pink">LLM Eval</span>
+        <span class="tag tag-yellow">Judge系统</span>
+      </div>
+      <div class="proj-links">
+        <span class="proj-link" style="color:rgba(255,255,255,.3)" data-i18n="zh:内部工具;en:Internal Tool">内部工具</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ④ 财务舞弊研究 -->
+  <div class="proj-slide">
+    <div class="proj-half-abstract">
+      <div class="paper-chart">
+
+        <!-- 感知层 -->
+        <div class="pc-section">
+          <span class="pc-label purple">感知层 · Perception</span>
+          <div class="pc-dual">
+            <div class="pc-col">
+              <div class="pc-chan-box pink">
+                <span class="pc-chanhead">外部通道</span>
+                <span class="pc-item">财经新闻</span>
+                <span class="pc-down">↓</span>
+                <span class="pc-item pc-hi-pink">TextCNN</span>
+                <span class="pc-down">↓</span>
+                <span class="pc-item">风险线索集</span>
+              </div>
+            </div>
+            <div class="pc-sep"></div>
+            <div class="pc-col">
+              <div class="pc-chan-box blue">
+                <span class="pc-chanhead">内部通道</span>
+                <span class="pc-item">MD&amp;A 文本</span>
+                <span class="pc-down">↓</span>
+                <span class="pc-item pc-hi-blue">FinBERT</span>
+                <span class="pc-down">↓</span>
+                <span class="pc-item">ChromaDB</span>
+              </div>
+            </div>
+          </div>
+          <div class="pc-merge">↓ &ensp; ↓</div>
+        </div>
+
+        <!-- 认知层 -->
+        <div class="pc-section">
+          <span class="pc-label purple">认知层 · Cognition</span>
+          <div class="pc-agent">
+            <span class="pc-role">外部监控 Agent</span>
+            <span class="pc-llm">MiniMax M2.5 · T=0.3</span>
+          </div>
+          <div class="pc-vline"></div>
+          <div class="pc-agent">
+            <span class="pc-role">内部审计 Agent</span>
+            <span class="pc-badge rag">RAG</span>
+            <span class="pc-llm">DeepSeek V3.2 · T=0.2</span>
+          </div>
+          <div class="pc-vline"></div>
+          <div class="pc-agent judge">
+            <span class="pc-role">主审法官 Agent</span>
+            <span class="pc-badge">CoT</span>
+            <span class="pc-llm">Qwen3-Max · T=0.1</span>
+          </div>
+          <div class="pc-vline"></div>
+        </div>
+
+        <!-- 输出层 -->
+        <div class="pc-section">
+          <span class="pc-label yellow">输出层 · Output</span>
+          <div class="pc-out-wrap">
+            <div class="pc-out">
+              <div class="pc-out-name">舞弊风险概率</div>
+              <div class="pc-out-sub">F1: 0.316 ↑33% Recall</div>
+            </div>
+            <div class="pc-out">
+              <div class="pc-out-name">可解释审计底稿</div>
+              <div class="pc-out-sub">全链路证据溯源</div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+      <span style="display:block;margin-top:18px;font-size:10px;letter-spacing:3px;color:rgba(255,255,255,.2);text-transform:uppercase;text-align:center">04 / 04</span>
+    </div>
+    <div class="proj-half-info">
+      <p class="proj-time" style="color:var(--purple)" data-i18n="zh:2025-11 – 2026-03 · 学术;en:Nov 2025 – Mar 2026 · Academic">2025-11 – 2026-03 · 学术</p>
+      <h3 class="proj-name" data-i18n="zh:融合检索增强生成与多智能体协同的上市公司财务舞弊深度识别研究;en:Deep Fraud Detection Research for Listed Companies with RAG and Multi-Agent Collaboration">融合检索增强生成与多智能体协同的上市公司财务舞弊深度识别研究</h3>
+      <p class="proj-desc" data-i18n="zh:独立完成「感知-认知」双层架构设计与核心代码实现。TextCNN+FinBERT双通道提取短频风险与长文语义，RAG靶向召回百份年报，三节点Agent辩论框架核查幻觉。极度不平衡样本下F1显著领跑传统单模型基线。;en:Sole architect of dual-layer perception-cognition system. TextCNN+FinBERT dual-channel extraction, RAG over 100+ annual reports, 3-agent debate for hallucination checking. F1 significantly outperforms single-model baselines on imbalanced samples.">独立完成「感知-认知」双层架构设计与核心代码实现。TextCNN+FinBERT双通道提取短频风险与长文语义，RAG靶向召回百份年报，三节点Agent辩论框架核查幻觉。极度不平衡样本下F1显著领跑传统单模型基线。</p>
+      <div class="tag-row">
+        <span class="tag tag-purple">RAG</span>
+        <span class="tag tag-purple">FinBERT</span>
+        <span class="tag tag-purple">ChromaDB</span>
+        <span class="tag tag-purple">Multi-Agent</span>
+      </div>
+      <div class="proj-links">
+        <span class="proj-link" style="color:var(--purple)" data-i18n="zh:核心研究员;en:Core Researcher">核心研究员</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Navigation dots -->
+  <div class="proj-nav" id="projNav" aria-label="项目导航">
+    <button class="proj-nav-dot active" data-idx="0" aria-label="项目 1"></button>
+    <button class="proj-nav-dot" data-idx="1" aria-label="项目 2"></button>
+    <button class="proj-nav-dot" data-idx="2" aria-label="项目 3"></button>
+    <button class="proj-nav-dot" data-idx="3" aria-label="项目 4"></button>
+  </div>
+
+</section>
+
+<!-- ══════════════ SERVICES ══════════════ -->
+<section id="services">
+<div class="section-wrap">
+  <p class="sec-eyebrow reveal" style="color:var(--blue)" data-i18n="zh:服务;en:Services">服务</p>
+  <h2 class="sec-title reveal d1" data-i18n="zh:我能做什么;en:What I Offer">我能做什么</h2>
+
+  <div class="svc-grid">
+
+    <div class="svc-card reveal">
+      <i class="svc-icon iconsax" icon-name="task-list-square" aria-hidden="true"></i>
+      <h3 class="svc-name" data-i18n="zh:AI 产品规划;en:AI Product Planning">AI 产品规划</h3>
+      <p class="svc-desc" data-i18n="zh:需求挖掘、PRD撰写、MVP敏捷迭代与用户体验设计，覆盖产品全生命周期管理。;en:Requirements, PRD writing, MVP agile iteration and UX design — full product lifecycle coverage.">需求挖掘、PRD撰写、MVP敏捷迭代与用户体验设计，覆盖产品全生命周期管理。</p>
+    </div>
+
+    <div class="svc-card reveal d1">
+      <i class="svc-icon iconsax" icon-name="message-edit" aria-hidden="true"></i>
+      <h3 class="svc-name">Harness Engineering</h3>
+      <p class="svc-desc" data-i18n="zh:围绕评测Harness、Tool Harness与Agent Harness设计提示词契约，构建可回放、可观测、可回归的端到端AI工作流。;en:Design prompt contracts around evaluation, tool, and agent harnesses to build replayable, observable, and regression-safe AI workflows.">围绕评测Harness、Tool Harness与Agent Harness设计提示词契约，构建可回放、可观测、可回归的端到端AI工作流。</p>
+    </div>
+
+    <div class="svc-card reveal d2">
+      <i class="svc-icon iconsax" icon-name="presentation-chart" aria-hidden="true"></i>
+      <h3 class="svc-name" data-i18n="zh:数据分析;en:Data Analysis">数据分析</h3>
+      <p class="svc-desc" data-i18n="zh:Python / Pandas / Scikit-learn 数据清洗与ML建模，文本挖掘与用户洞察周报输出。;en:Python / Pandas / Scikit-learn data wrangling, ML modeling, text mining and user-insight reporting.">Python / Pandas / Scikit-learn 数据清洗与ML建模，文本挖掘与用户洞察周报输出。</p>
+    </div>
+
+    <div class="svc-card reveal d3">
+      <i class="svc-icon iconsax" icon-name="search-normal-1" aria-hidden="true"></i>
+      <h3 class="svc-name" data-i18n="zh:竞品分析;en:Competitive Research">竞品分析</h3>
+      <p class="svc-desc" data-i18n="zh:国内外20+竞品深度调研，覆盖定价策略与技术路线，输出产品定位与差异化建议。;en:Deep research on 20+ domestic and international competitors — pricing, tech roadmap, positioning and differentiation.">国内外20+竞品深度调研，覆盖定价策略与技术路线，输出产品定位与差异化建议。</p>
+    </div>
+
+  </div>
+</div>
+</section>
+
+<!-- ══════════════ CAREER ══════════════ -->
+<section id="career">
+<div class="section-wrap">
+  <p class="sec-eyebrow reveal" style="color:var(--yellow)" data-i18n="zh:经历;en:Experience">经历</p>
+  <h2 class="sec-title reveal d1" data-i18n="zh:我走过哪里;en:Where I've Been">我走过哪里</h2>
+
+  <div class="tl-track">
+
+    <!-- ① 上海守扣科技 -->
+    <div class="tl-row reveal">
+      <div class="tl-left career-label">
+        <p class="career-label-role" data-i18n="zh:AI 产品经理;en:AI Product Manager">AI 产品经理</p>
+        <p class="career-label-co">上海守扣科技有限公司</p>
+      </div>
+      <div class="tl-node"><div class="tl-dot" style="background:var(--pink);border-color:rgba(255,143,171,.4)"></div></div>
+      <div class="tl-right">
+        <div class="career-card">
+          <div class="career-header">
+            <span class="career-role" data-i18n="zh:落地页改版 · 多语言规划 · 竞品调研;en:Landing Page Revamp · Multilingual Planning · Competitive Research">落地页改版 · 多语言规划 · 竞品调研</span>
+            <span class="career-time-badge" style="background:rgba(255,143,171,.12);color:var(--pink)" data-i18n="zh:2026-04 至今;en:Apr 2026 · Present">2026-04 至今</span>
+          </div>
+          <p class="career-co">上海守扣科技有限公司</p>
+          <ul class="career-bullets">
+            <li data-i18n="zh:主导首页从零重构，建立统一视觉标题系统与组件规范;en:Led homepage full reconstruction — established unified visual title system and component spec">主导首页从零重构，建立统一视觉标题系统与组件规范</li>
+            <li data-i18n="zh:基于214国GDP/人口数据制定三阶段多语言路线图;en:Built 3-stage multilingual roadmap from 214-country GDP/population data">基于214国GDP/人口数据制定三阶段多语言路线图</li>
+            <li data-i18n="zh:深入理解OCR多引擎能力边界，推动产品与研发实现对齐;en:Deep-dived OCR multi-engine capabilities to align product features with R&D delivery">深入理解OCR多引擎能力边界，推动产品与研发实现对齐</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <!-- ② 广州安点科技 -->
+    <div class="tl-row reveal d1">
+      <div class="tl-left career-label">
+        <p class="career-label-role" data-i18n="zh:AI 产品经理;en:AI Product Manager">AI 产品经理</p>
+        <p class="career-label-co">广州安点科技有限公司</p>
+      </div>
+      <div class="tl-node"><div class="tl-dot" style="background:var(--blue);border-color:rgba(108,184,232,.4)"></div></div>
+      <div class="tl-right">
+        <div class="career-card">
+          <div class="career-header">
+            <span class="career-role" data-i18n="zh:PRD智能评审工作台 · 从0到1独立落地;en:PRD Review Platform · Built from 0 to 1">PRD智能评审工作台 · 从0到1独立落地</span>
+            <span class="career-time-badge" style="background:rgba(108,184,232,.12);color:var(--blue)" data-i18n="zh:2026-01 – 03;en:Jan – Mar 2026">2026-01 – 03</span>
+          </div>
+          <p class="career-co">广州安点科技有限公司</p>
+          <ul class="career-bullets">
+            <li data-i18n="zh:基于CrewAI多Agent架构设计6维度评审系统，三专业Agent并行评审;en:Designed 6-dimension review system on CrewAI multi-agent with 3 specialist agents running in parallel">基于CrewAI多Agent架构设计6维度评审系统，三专业Agent并行评审</li>
+            <li data-i18n="zh:后端FastAPI+SSE实时流式推送，多阶段Docker构建部署及slowapi限流防护;en:FastAPI+SSE real-time streaming backend, multi-stage Docker build with slowapi rate limiting">后端FastAPI+SSE实时流式推送，多阶段Docker构建部署及slowapi限流防护</li>
+            <li data-i18n="zh:单次评审耗时从人工2小时缩短至AI辅助3分钟（提效97%）;en:Reduced review time from 2h manual to 3min AI-assisted (97% efficiency gain)">单次评审耗时从人工2小时缩短至AI辅助3分钟（提效97%）</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <!-- ③ 国泰海通证券 -->
+    <div class="tl-row reveal d2">
+      <div class="tl-left career-label">
+        <p class="career-label-role" data-i18n="zh:行业研究;en:Industry Research">行业研究</p>
+        <p class="career-label-co">国泰海通证券-债务融资部</p>
+      </div>
+      <div class="tl-node"><div class="tl-dot" style="background:var(--yellow);border-color:rgba(255,202,95,.4)"></div></div>
+      <div class="tl-right">
+        <div class="career-card">
+          <div class="career-header">
+            <span class="career-role" data-i18n="zh:量化分析 · ML偿债模型 · 千亿级债券定价;en:Quantitative Analysis · ML Solvency Model · CNY 100B Bond Pricing">量化分析 · ML偿债模型 · 千亿级债券定价</span>
+            <span class="career-time-badge" style="background:rgba(255,202,95,.12);color:var(--yellow)" data-i18n="zh:2025-09 – 11;en:Sep – Nov 2025">2025-09 – 11</span>
+          </div>
+          <p class="career-co">国泰海通证券-债务融资部</p>
+          <ul class="career-bullets">
+            <li data-i18n="zh:独立完成三峡新能源千亿级发债前财务核查;en:Independently completed pre-issuance financial review for CNY 100B+ Three Gorges New Energy bond">独立完成三峡新能源千亿级发债前财务核查</li>
+            <li data-i18n="zh:基于回归分析等ML算法构建偿债能力评估模型，精准穿透4700亿应收账款;en:Built ML solvency model using regression analysis, penetrating CNY 470B in receivables">基于回归分析等ML算法构建偿债能力评估模型，精准穿透4700亿应收账款</li>
+            <li data-i18n="zh:为债券利率（1.70%）定价提供核心数据支撑;en:Provided core data support for bond interest rate pricing at 1.70%">为债券利率（1.70%）定价提供核心数据支撑</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <!-- ④ 美团 -->
+    <div class="tl-row reveal d3">
+      <div class="tl-left career-label">
+        <p class="career-label-role" data-i18n="zh:产品运营（AI/风控）;en:Product Operations (AI/Risk)">产品运营（AI/风控）</p>
+        <p class="career-label-co">美团-核心本地商业-点评事业部</p>
+      </div>
+      <div class="tl-node"><div class="tl-dot" style="background:var(--purple);border-color:rgba(192,132,252,.4)"></div></div>
+      <div class="tl-right">
+        <div class="career-card">
+          <div class="career-header">
+            <span class="career-role" data-i18n="zh:AI Agent开发 · 机器学习数据洞察 · 黑灰产防控;en:AI Agent Dev · ML Data Insights · Fraud Prevention">AI Agent开发 · 机器学习数据洞察 · 黑灰产防控</span>
+            <span class="career-time-badge" style="background:rgba(192,132,252,.12);color:var(--purple)" data-i18n="zh:2025-07 – 09;en:Jul – Sep 2025">2025-07 – 09</span>
+          </div>
+          <p class="career-co">美团-核心本地商业-点评事业部</p>
+          <ul class="career-bullets">
+            <li data-i18n="zh:基于Claude Sonnet开发「小红书评论筛选」AI Agent，迭代至V35并部署；CoT+Few-Shot策略将单帖处理时间从60s→30s（提效50%）;en:Built Xiaohongshu comment-filtering AI Agent on Claude Sonnet, iterated to V35; CoT+Few-Shot cut per-post time from 60s to 30s (50% gain)">基于Claude Sonnet开发「小红书评论筛选」AI Agent，迭代至V35并部署；CoT+Few-Shot策略将单帖处理时间从60s→30s（提效50%）</li>
+            <li data-i18n="zh:ML文本挖掘分析1800+帖子，精准匹配潜在用户300+名/周;en:ML text mining on 1800+ posts, matching 300+ potential users per week">ML文本挖掘分析1800+帖子，精准匹配潜在用户300+名/周</li>
+            <li data-i18n="zh:建立覆盖成都/重庆/长沙等城市300余个社群情报网络，月均识别150+条相关舆情;en:Built 300+ community intelligence networks across Chengdu/Chongqing/Changsha; identified 150+ risk signals/month">建立覆盖成都/重庆/长沙等城市300余个社群情报网络，月均识别150+条相关舆情</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <!-- ⑤ 信永中和 -->
+    <div class="tl-row reveal d4">
+      <div class="tl-left career-label">
+        <p class="career-label-role" data-i18n="zh:审计实习生;en:Audit Intern">审计实习生</p>
+        <p class="career-label-co">信永中和会计师事务所广州分所</p>
+      </div>
+      <div class="tl-node"><div class="tl-dot" style="background:rgba(255,255,255,.5);border-color:rgba(255,255,255,.2)"></div></div>
+      <div class="tl-right">
+        <div class="career-card">
+          <div class="career-header">
+            <span class="career-role" data-i18n="zh:机器辅助风险盘点 · BI看板;en:ML-Assisted Risk Inventory · BI Dashboards">机器辅助风险盘点 · BI看板</span>
+            <span class="career-time-badge" style="background:rgba(255,255,255,.08);color:rgba(255,255,255,.4)" data-i18n="zh:2024-06 – 09;en:Jun – Sep 2024">2024-06 – 09</span>
+          </div>
+          <p class="career-co">信永中和会计师事务所广州分所（特殊普通合伙）</p>
+          <ul class="career-bullets">
+            <li data-i18n="zh:应用数据聚类算法重构仓库存货盘点流程，精准识别42处高危异常数据;en:Applied clustering algorithms to reconstruct inventory process, identifying 42 high-risk anomalies">应用数据聚类算法重构仓库存货盘点流程，精准识别42处高危异常数据</li>
+            <li data-i18n="zh:引入BI工具实现15家子公司业务流可视化全景看板;en:Implemented BI dashboards for full business-flow visualization across 15 subsidiaries">引入BI工具实现15家子公司业务流可视化全景看板</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /.tl-track -->
+</div><!-- /.section-wrap -->
+</section>
+
+<!-- ══════════════ CONTACT ══════════════ -->
+<section id="contact">
+<div class="section-wrap">
+  <p class="sec-eyebrow reveal" style="color:var(--pink)" data-i18n="zh:联系;en:Contact">联系</p>
+
+  <h2 class="contact-title reveal d1" data-i18n="zh:有想法？一起聊聊;en:Got an idea? Let's talk.">有想法？一起聊聊</h2>
+  <p class="contact-sub reveal d2" data-i18n="zh:欢迎交流岗位机会、内推或项目合作，建议优先通过微信或 LinkedIn 联系;en:Open to job opportunities, referrals, and project collaborations. Best reached via WeChat or LinkedIn.">欢迎交流岗位机会、内推或项目合作，建议优先通过微信或 LinkedIn 联系</p>
+
+  <a class="contact-main-btn reveal d2 js-open-wechat-modal" href="#" data-track="cta_contact_primary" aria-label="微信或飞书联系我">
+    <span class="cc-icon" aria-hidden="true">
+      <svg viewBox="0 0 24 24" fill="none">
+        <rect x="3.25" y="5.25" width="17.5" height="13.5" rx="2.75" stroke="currentColor" stroke-width="1.5"/>
+        <path d="M5 7l7 5 7-5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    </span>
+    <span data-i18n="zh:微信/飞书联系;en:WeChat / Feishu">微信/飞书联系</span>
+  </a>
+
+  <div class="contact-links reveal d3">
+
+    <button class="contact-card" id="wechatBtn" type="button" onclick="copyWechat()" aria-label="复制微信号 MRP18565682722">
+      <span class="cc-icon" aria-hidden="true">
+        <svg viewBox="0 0 24 24" fill="currentColor">
+          <path d="M8.52 5.25c-3.3 0-5.77 2.1-5.77 4.92 0 1.62.82 3.01 2.22 3.94l-.65 2.42a.5.5 0 0 0 .67.6l2.9-1.22c.22.03.42.04.63.04 3.29 0 5.76-2.1 5.76-4.92S11.8 5.25 8.52 5.25Zm-2.33 4.3a.88.88 0 1 1 0-1.76.88.88 0 0 1 0 1.76Zm2.33 0a.88.88 0 1 1 0-1.76.88.88 0 0 1 0 1.76Zm2.33 0a.88.88 0 1 1 0-1.76.88.88 0 0 1 0 1.76Z"/>
+          <path d="M15.72 9.28c2.96 0 5.53 1.9 5.53 4.53 0 1.5-.83 2.82-2.16 3.68l.55 2.04a.47.47 0 0 1-.62.56l-2.5-1.05c-.26.03-.52.05-.8.05-2.57 0-4.83-1.42-5.35-3.43 2.86-.45 5.08-2.72 5.35-5.38Z"/>
+        </svg>
+      </span>
+      <div>
+        <span class="cc-label" data-i18n="zh:微信（点击复制）;en:WeChat (click to copy)">微信（点击复制）</span>
+        <span class="cc-val">MRP18565682722</span>
+      </div>
+    </button>
+
+    <a class="contact-card" href="https://www.linkedin.com/in/ruiping-mao-5521273a5/" target="_blank" rel="noopener" data-track="contact_linkedin_open" aria-label="LinkedIn 主页">
+      <span class="cc-icon" aria-hidden="true">
+        <svg viewBox="0 0 24 24" fill="currentColor">
+          <path d="M4.98 3.5A1.74 1.74 0 1 0 5 6.98 1.74 1.74 0 0 0 4.98 3.5ZM3.5 8.32h2.96V20.5H3.5V8.32Zm5.29 0h2.84v1.66h.04c.4-.75 1.36-1.95 3.35-1.95 3.58 0 4.24 2.36 4.24 5.43v7.04H16.3v-6.24c0-1.49-.03-3.4-2.07-3.4-2.08 0-2.39 1.62-2.39 3.3v6.34H8.8V8.32Z"/>
+        </svg>
+      </span>
+      <div>
+        <span class="cc-label">LinkedIn</span>
+        <span class="cc-val">Ruiping Mao</span>
+      </div>
+    </a>
+
+    <a class="contact-card" href="mailto:maropion@163.com" data-track="contact_email_open" aria-label="发送邮件至 maropion@163.com">
+      <span class="cc-icon" aria-hidden="true">
+        <svg viewBox="0 0 24 24" fill="none">
+          <rect x="3.25" y="5.25" width="17.5" height="13.5" rx="2.75" stroke="currentColor" stroke-width="1.5"/>
+          <path d="M5 7l7 5 7-5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </span>
+      <div>
+        <span class="cc-label" data-i18n="zh:邮箱;en:Email">邮箱</span>
+        <span class="cc-val">maropion@163.com</span>
+      </div>
+    </a>
+
+    <a class="contact-card" href="https://github.com/Maropion03" target="_blank" rel="noopener" data-track="contact_github_open" aria-label="GitHub 主页">
+      <span class="cc-icon" aria-hidden="true">
+        <svg viewBox="0 0 24 24" fill="currentColor">
+          <path d="M12 .75a11.25 11.25 0 0 0-3.56 21.92c.56.1.77-.24.77-.55v-2.1c-3.11.68-3.77-1.32-3.77-1.32-.51-1.28-1.24-1.62-1.24-1.62-1.01-.68.08-.67.08-.67 1.12.08 1.7 1.14 1.7 1.14.99 1.7 2.6 1.2 3.24.92.1-.72.39-1.2.7-1.48-2.49-.28-5.12-1.25-5.12-5.54 0-1.22.44-2.22 1.15-3-.11-.28-.5-1.42.11-2.96 0 0 .94-.3 3.08 1.15a10.6 10.6 0 0 1 5.6 0c2.14-1.45 3.08-1.15 3.08-1.15.61 1.54.22 2.68.11 2.96.72.78 1.15 1.78 1.15 3 0 4.3-2.63 5.25-5.14 5.53.4.35.76 1.03.76 2.08v3.08c0 .31.2.66.78.55A11.25 11.25 0 0 0 12 .75Z"/>
+        </svg>
+      </span>
+      <div>
+        <span class="cc-label">GitHub</span>
+        <span class="cc-val">Maropion03</span>
+      </div>
+    </a>
+
+  </div>
+</div>
+</section>
+
+<!-- ── Footer ── -->
+<footer class="site-footer">
+  © 2026 Maropion · Built with ☁️
+</footer>
+
+<!-- Copy toast -->
+<div class="copy-toast" id="copyToast" data-i18n="zh:微信号已复制 ✓;en:WeChat ID copied ✓">微信号已复制 ✓</div>
+
+<div class="wechat-modal" id="wechatModal" aria-hidden="true">
+  <div class="wechat-modal-card" role="dialog" aria-modal="true" aria-labelledby="wechatModalTitle">
+    <div class="wechat-modal-title" id="wechatModalTitle" data-i18n="zh:微信 / 飞书联系;en:WeChat / Feishu Contact">微信 / 飞书联系</div>
+    <p class="wechat-modal-sub" id="wechatModalSub" data-i18n="zh:选择一个渠道扫码联系我，也可以在下方卡片点击复制微信号。;en:Choose a channel to scan and contact me, or copy my WeChat ID below.">选择一个渠道扫码联系我，也可以在下方卡片点击复制微信号。</p>
+    <div class="wechat-modal-tabs" role="tablist" aria-label="Contact channel selector">
+      <button class="wechat-modal-tab active" type="button" data-channel="wechat" data-i18n="zh:微信;en:WeChat">微信</button>
+      <button class="wechat-modal-tab" type="button" data-channel="feishu" data-i18n="zh:飞书;en:Feishu">飞书</button>
+    </div>
+    <div class="wechat-qr-slot">
+      <img id="wechatQrImg" src="assets/wechat-qr.jpg" alt="WeChat QR Code">
+      <div class="wechat-qr-note" id="wechatQrNote" data-i18n="zh:微信扫码添加我;en:Scan with WeChat to add me">微信扫码添加我</div>
+    </div>
+    <div class="wechat-modal-actions">
+      <button class="wechat-modal-close" type="button" id="wechatModalClose" data-i18n="zh:关闭;en:Close">关闭</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// Lang
+let lang=localStorage.getItem('lang')||'zh';
+function applyI18n(el){const v=el.dataset.i18n;if(!v)return;const m={};v.split(';').forEach(p=>{const[k,...r]=p.split(':');m[k.trim()]=r.join(':')});if(m[lang])el.textContent=m[lang]}
+function applyLang(){
+  document.documentElement.lang=lang;
+  document.querySelectorAll('[data-i18n]').forEach(applyI18n);
+  document.querySelectorAll('.zh').forEach(el=>el.style.display=lang==='zh'?'':'none');
+  document.querySelectorAll('.en').forEach(el=>el.style.display=lang==='en'?'':'none');
+  document.getElementById('langToggle').textContent=lang==='zh'?'EN':'中';
+  var activeTab=document.querySelector('.wechat-modal-tab.active');
+  if(activeTab&&typeof contactChannels!=='undefined'){setContactChannel(activeTab.getAttribute('data-channel'))}
+  localStorage.setItem('lang',lang);
+}
+document.getElementById('langToggle').addEventListener('click',()=>{lang=lang==='zh'?'en':'zh';applyLang()});
+applyLang();
+
+// Reveal
+const ro=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting)e.target.classList.add('vis')}),{threshold:.1});
+document.querySelectorAll('.reveal').forEach(el=>ro.observe(el));
+
+// Project slide navigation dots
+(function(){
+  var sec=document.getElementById('projects');
+  if(!sec)return;
+  var slides=[].slice.call(sec.querySelectorAll('.proj-slide'));
+  var nav=document.getElementById('projNav');
+  var dots=nav?[].slice.call(nav.querySelectorAll('.proj-nav-dot')):[];
+  var colors=['var(--pink)','var(--blue)','var(--yellow)','var(--purple)'];
+  function setActive(idx){
+    dots.forEach(function(d,i){
+      var on=i===idx;
+      d.classList.toggle('active',on);
+      d.style.background=on?colors[idx]:'';
+      d.style.borderColor=on?colors[idx]:'';
+    });
+  }
+  new IntersectionObserver(function(es){
+    if(nav)nav.classList.toggle('visible',es[0].isIntersecting);
+  },{threshold:.1}).observe(sec);
+  var slideObs=new IntersectionObserver(function(es){
+    es.forEach(function(e){
+      if(e.isIntersecting){var idx=slides.indexOf(e.target);if(idx>=0)setActive(idx);}
+    });
+  },{root:sec,threshold:.5});
+  slides.forEach(function(s){slideObs.observe(s);});
+  dots.forEach(function(d,i){
+    d.addEventListener('click',function(){slides[i].scrollIntoView({behavior:'smooth'});});
+  });
+  setActive(0);
+})();
+
+// Lightweight tracking
+function trackEvent(eventName,payload){
+  var evt={event:eventName,ts:Date.now(),path:location.pathname+location.hash};
+  if(payload&&typeof payload==='object'){for(var k in payload){evt[k]=payload[k]}}
+  window.dataLayer=window.dataLayer||[];
+  window.dataLayer.push(evt);
+  if(window.console&&console.debug){console.debug('[track]',evt);}
+}
+document.querySelectorAll('[data-track]').forEach(function(el){
+  el.addEventListener('click',function(){
+    trackEvent(el.getAttribute('data-track'));
+  });
+});
+
+// Contact modal
+var contactChannels={
+  wechat:{
+    img:'assets/wechat-qr.jpg',
+    alt:'WeChat QR Code',
+    note:{zh:'微信扫码添加我，点击二维码可复制微信号',en:'Scan with WeChat, or click QR to copy my WeChat ID'},
+    copyable:true
+  },
+  feishu:{
+    img:'assets/feishu-qr.png',
+    alt:'Feishu QR Code',
+    note:{zh:'飞书扫码添加我',en:'Scan with Feishu to add me'},
+    copyable:false
+  }
+};
+function setContactChannel(channel){
+  var data=contactChannels[channel]||contactChannels.wechat;
+  var img=document.getElementById('wechatQrImg');
+  var note=document.getElementById('wechatQrNote');
+  if(!img||!note)return;
+  img.src=data.img;
+  img.alt=data.alt;
+  img.dataset.channel=channel;
+  img.classList.toggle('is-copyable',!!data.copyable);
+  img.title=data.copyable?(lang==='zh'?'点击复制微信号':'Click to copy WeChat ID'):'';
+  note.textContent=data.note[lang]||data.note.zh;
+  document.querySelectorAll('.wechat-modal-tab').forEach(function(tab){
+    tab.classList.toggle('active',tab.getAttribute('data-channel')===channel);
+  });
+}
+function openWechatModal(){
+  var modal=document.getElementById('wechatModal');
+  if(!modal)return;
+  setContactChannel('wechat');
+  modal.classList.add('open');
+  modal.setAttribute('aria-hidden','false');
+}
+function closeWechatModal(){
+  var modal=document.getElementById('wechatModal');
+  if(!modal)return;
+  modal.classList.remove('open');
+  modal.setAttribute('aria-hidden','true');
+}
+document.querySelectorAll('.js-open-wechat-modal').forEach(function(el){
+  el.addEventListener('click',function(e){
+    e.preventDefault();
+    openWechatModal();
+  });
+});
+document.querySelectorAll('.wechat-modal-tab').forEach(function(tab){
+  tab.addEventListener('click',function(){
+    setContactChannel(tab.getAttribute('data-channel'));
+  });
+});
+document.getElementById('wechatModalClose').addEventListener('click',closeWechatModal);
+document.getElementById('wechatModal').addEventListener('click',function(e){
+  if(e.target.id==='wechatModal'){closeWechatModal();}
+});
+document.addEventListener('keydown',function(e){
+  if(e.key==='Escape'){closeWechatModal();}
+});
+var wechatBtn=document.getElementById('wechatBtn');
+if(wechatBtn){
+  wechatBtn.addEventListener('click',function(e){
+    e.preventDefault();
+    copyWechat();
+  });
+}
+var wechatQrImg=document.getElementById('wechatQrImg');
+if(wechatQrImg){
+  wechatQrImg.addEventListener('click',function(){
+    if(wechatQrImg.dataset.channel==='wechat'){
+      copyWechat();
+    }
+  });
+}
+
+// WeChat copy
+function copyWechat(){
+  var wechatId='MRP18565682722';
+  trackEvent('contact_wechat_copy');
+  function showCopyToast(){
+    var t=document.getElementById('copyToast');
+    if(!t)return;
+    t.style.display='block';
+    applyI18n(t);
+    setTimeout(function(){t.style.display='none'},2000);
+  }
+  function fallbackCopy(){
+    var input=document.createElement('input');
+    input.type='text';
+    input.value=wechatId;
+    input.setAttribute('readonly','readonly');
+    input.style.position='fixed';
+    input.style.opacity='0';
+    document.body.appendChild(input);
+    input.focus();
+    input.select();
+    input.setSelectionRange(0,wechatId.length);
+    try{
+      var copied=document.execCommand('copy');
+      document.body.removeChild(input);
+      if(copied){
+        showCopyToast();
+      }else{
+        prompt('复制微信号：',wechatId);
+      }
+    }catch(err){
+      document.body.removeChild(input);
+      prompt('复制微信号：',wechatId);
+    }
+  }
+  if(navigator.clipboard&&window.isSecureContext){
+    navigator.clipboard.writeText(wechatId).then(showCopyToast).catch(fallbackCopy);
+    return;
+  }
+  fallbackCopy();
+}
+</script>
+
+</body>
+</html>
