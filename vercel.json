@@ -2,7 +2,17 @@
   "rewrites": [
     {
       "source": "/",
-      "destination": "/index%20v4.html"
+      "destination": "/index%20v4.html",
+      "has": [{ "type": "host", "value": "maropion.fun" }]
+    },
+    {
+      "source": "/",
+      "destination": "/index%20v4.html",
+      "has": [{ "type": "host", "value": "www.maropion.fun" }]
+    },
+    {
+      "source": "/",
+      "destination": "/index%20v4%20en.html"
     }
   ]
 }
