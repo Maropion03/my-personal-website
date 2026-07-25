@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Maropion — AI 产品经理 / Builder</title>
-<meta name="description" content="Maropion — AI 产品经理 / Builder。香港城市大学 MSc AI in Business · 美团 · 上海守扣科技 · 安点科技。RAG · Multi-Agent · NPU 端侧推理。">
+<meta name="description" content="Maropion — AI 产品经理 / Builder。香港城市大学 MSc AI in Business · 百度 MEG · 美团 · 上海守扣科技 · 广州安点科技。AI 原生交互 · RAG · Multi-Agent。">
 <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
 <link rel="alternate icon" href="assets/favicon.svg">
 <link rel="apple-touch-icon" href="assets/favicon.svg">
@@ -425,8 +425,8 @@ main{position:relative;z-index:2;padding-top:100px}
   transition:border-color var(--t-base) var(--ease), background var(--t-base) var(--ease);
 }
 .edu-card:hover{border-color:var(--border-hl)}
-.edu-card.is-current::after{
-  content:'CURRENT';
+.edu-card.is-upcoming::after{
+  content:'SEP · 2026';
   position:absolute;top:-1px;right:-1px;
   font-family:var(--mono);font-size:9.5px;letter-spacing:.16em;font-weight:600;
   background:var(--amber);color:#0E1F1A;
@@ -885,7 +885,7 @@ main{position:relative;z-index:2;padding-top:100px}
 <div class="status-bar" id="statusBar">
   <span class="sb-block"><span class="sb-dot"></span><span class="sb-key">SYS</span><span class="sb-val">ONLINE</span></span>
   <span class="sb-block"><span class="sb-key">SESSION</span><span class="sb-val" id="sbSess">init//00:00</span></span>
-  <span class="sb-block"><span class="sb-key">LOC</span><span class="sb-val">BEIJING · SH · GZ · SZ</span></span>
+  <span class="sb-block"><span class="sb-key">LOC</span><span class="sb-val">BEIJING · SH · GZ · SZ · HK</span></span>
   <span class="sb-block"><span class="sb-key">UTC+8</span><span class="sb-val" id="sbClock">--:--:--</span></span>
   <span class="sb-block"><span class="sb-key">SCROLL</span><span class="sb-val" id="sbScroll">000%</span></span>
   <span class="sb-spacer"></span>
@@ -928,7 +928,7 @@ main{position:relative;z-index:2;padding-top:100px}
 
       <p class="hero-role reveal d2">
         AI <em>产品经理</em> / Builder<br>
-        把 LLM、RAG、Multi-Agent 落到 <em>生产级</em> 的人。
+        把 AI 原生交互、Agent 与 Workflow 做成<em>可验证产品</em>。
       </p>
 
       <div class="hero-meta reveal d3">
@@ -1011,7 +1011,7 @@ main{position:relative;z-index:2;padding-top:100px}
   </div>
 
   <div class="edu-grid">
-    <article class="edu-card is-current reveal">
+    <article class="edu-card is-upcoming reveal">
       <div class="edu-row">
         <h3 class="edu-school">香港城市大学</h3>
         <span class="edu-date">2026.09 — 2027.06</span>
@@ -1058,35 +1058,22 @@ main{position:relative;z-index:2;padding-top:100px}
   <div class="sec-head reveal">
     <span class="sec-num alt">02_EXPERIENCE</span>
     <h2 class="sec-title">实习经历 / Field Work</h2>
-    <span class="sec-sub">5 roles · 2024 – present</span>
+    <span class="sec-sub">6 roles · 2024 – 2026</span>
   </div>
 
   <ul class="exp-list">
 
     <li class="exp-item is-current reveal">
       <div class="exp-head">
-        <span class="exp-date">2026.04 — 至今</span>
-        <span class="exp-tag live">● LIVE</span>
+        <span class="exp-date">2026.04 — 2026.07</span>
+        <span class="exp-tag live">AI PM</span>
       </div>
-      <div class="exp-org">上海守扣科技</div>
-      <div class="exp-role">AI 产品经理 · SoMark 文档解析</div>
-      <ul class="exp-bullets">
-        <li><strong>端侧文档判断引擎「答于言」V1</strong>（🏆 2025 骁龙人工智能创新应用大赛 · AI PC 赛道创意赛亚军 · <a class="inline-link" href="https://github.com/Maropion03/DaYuYan-engine" target="_blank" rel="noopener">开源 ↗</a>）：主导「不止 OCR、而是 OCR 之上判断引擎」的产品定义——论文抽取结构后匹配研究方向、简历一次抽取后做 JD 匹配评分并生成面试题、合同双版本变更对比 + 风险标记、报销单手写大写金额识别 + 自动核对税额。设计 <strong>Snapdragon NPU + Qwen2.5-VL-3B + Tesseract/PyMuPDF</strong> 多模态融合四层推理架构；定位编译 ar128_cl2048 上下文硬约束，主导 <strong>token 预算压缩 · 异步 OCR 注入 · 字段污染修复</strong> 三项工程改造，将 3B 小模型在 2048 上下文下推至生产级。</li>
-        <li><strong>竞品研究与技术路线判断</strong> <a class="inline-link" href="https://ecnucwapzdad.feishu.cn/wiki/BBngw99Tois5c3kiacOcBasmnWe" target="_blank" rel="noopener">竞品调研 ↗</a> · <a class="inline-link" href="https://ecnucwapzdad.feishu.cn/wiki/FVNwwap8Fi6weMkOz7Qc2rvknsi" target="_blank" rel="noopener">技术拆解 ↗</a>：系统拆解海内外 <strong>20+ 文档解析竞品</strong>（Mathpix、Reducto、Mistral OCR 3、TextIn、MinerU），覆盖 OCR/VLM 架构、Agentic OCR、复杂表格重建、私有化部署等竞争维度，为产品定位提供依据。</li>
-        <li><strong>AI 工作流设计与落地</strong>：围绕合同分析、简历解析、研报分析等 <strong>5 个场景</strong>，基于飞书多维表格 + Workflow 设计「触发器—文档解析—并行分析—结果回写」链路，覆盖 Markdown 解析、JSON 输出、联网搜索与风险识别，推动 AI 工作流从单点演示走向可复用方案。</li>
-      </ul>
-    </li>
-
-    <li class="exp-item reveal">
-      <div class="exp-head">
-        <span class="exp-date">2026.01 — 2026.03</span>
-        <span class="exp-tag">AI PM</span>
-      </div>
-      <div class="exp-org">广州安点科技</div>
+      <div class="exp-org">百度 MEG · 人工智能创作产品部</div>
       <div class="exp-role">AI 产品经理</div>
       <ul class="exp-bullets">
-        <li><strong>PRD 智能评审工作台</strong>（独立 0 → 1 · <a class="inline-link" href="https://github.com/Maropion03/awesome-requirement-review-agent" target="_blank" rel="noopener">GitHub ↗</a> · <a class="inline-link" href="#" target="_blank" rel="noopener">在线体验 ↗</a>）：基于 <strong>CrewAI 多 Agent 架构</strong> 设计 6 维度评审系统，Orchestrator 协调研发 / 设计 / 测试三 Agent 并行评审；后端 FastAPI + SSE 实时流式推送，前端 HTML + Tailwind；完成多阶段 Docker 部署与 slowapi 限流，支持 PDF/Markdown 导出。<em>单次评审 2 小时（人工）→ 3 分钟（AI）</em>。</li>
-        <li><strong>期货平台自定义指标 AI 助手</strong>（产品规划）：通过 TradingView 竞品分析提出「自然语言 → PineScript」方案，撰写完整版 PRD（<strong>6 模块、25 项验收标准</strong>）与 MVP 裁剪，定义 Electron + React + Monaco Editor 架构与 SSE 流式规范；引入「代码解释」功能解决 AI 生成代码信任问题。</li>
+        <li>面向泛知识与资讯创作者，拆解度加从<strong>选题、脚本、分镜、素材匹配到数字人成片</strong>的创作链路，识别入口割裂、生成过程不透明等问题。</li>
+        <li>提出由“工具入口”向<strong>“创作任务入口”</strong>升级的方案，设计 Agent 意图理解与任务规划层，并以 Workflow 承载脚本、分镜、素材、配音、审核及导出等稳定执行节点。</li>
+        <li>设计<strong>“对话 + 分镜工作区”</strong>混合交互，支持进度透明、镜头级修改、影响范围提示与版本回退；结合用户价值、模型成熟度与调用成本完成 MVP 裁剪，优先覆盖文章转口播、热点资讯及知识讲解场景。</li>
       </ul>
     </li>
 
@@ -1098,21 +1085,48 @@ main{position:relative;z-index:2;padding-top:100px}
       <div class="exp-org">美团 · 核心本地商业 — 点评事业部</div>
       <div class="exp-role">产品运营（AI / 风控方向）</div>
       <ul class="exp-bullets">
-        <li><strong>AI Agent 开发与 LLM 优化</strong> <a class="inline-link" href="https://ecnucwapzdad.feishu.cn/wiki/UL8ZwG8lOi8G5rk2uBrcHTHpnxe" target="_blank" rel="noopener">Agent 说明文档 ↗</a>：基于 Claude Sonnet-4.5 全流程 Nocode 接入美团 SSO，开发「小红书评论筛选」workflow Agent（迭代至 V35 并部署）；通过 CoT + Few-Shot 调优与预览纠错机制，将单帖评论处理 <em>60s → 30s（提效 50%）</em>，沉淀标准化文档并开源。</li>
-        <li><strong>机器学习数据洞察</strong>：运用文本挖掘分析 1800+ 条小红书帖子，关键词提取与情感分析周均匹配潜在用户 <em>300+</em>；基于聚类算法对负面舆情分类分级，月均识别舆情 <em>150+</em> 并制定应对策略。</li>
-        <li><strong>黑灰产防控与合规</strong>：建立覆盖成都、重庆、长沙等城市的 <em>300+ 社群</em> 情报网络，搜集分析风险情报 <em>2500+</em> 条，精准打击违规商户 <em>50+</em> 户。</li>
+        <li><strong>评论线索结构化 Workflow</strong> <a class="inline-link" href="https://ecnucwapzdad.feishu.cn/wiki/UL8ZwG8lOi8G5rk2uBrcHTHpnxe" target="_blank" rel="noopener">Agent 说明文档 ↗</a>：基于 Claude Sonnet-4.5 全流程 Nocode 接入美团 SSO，开发“小红书评论筛选”workflow Agent（迭代至 V35 并部署）；通过 CoT + Few-Shot 调优与预览纠错机制，将单帖评论处理 <em>60s → 30s（提效 50%）</em>，沉淀标准化文档并开源。</li>
+        <li><strong>机器学习数据洞察</strong>：运用文本挖掘分析 <strong>1800+ 条</strong>小红书帖子，通过关键词提取与情感分析周均匹配潜在用户 <em>300+</em>；基于聚类算法对负面舆情分类分级，月均识别舆情 <em>150+</em> 并制定应对策略。</li>
+        <li><strong>黑灰产防控</strong>：搭建覆盖多城市的社群情报网络，累计分析风险情报 <strong>2500+ 条</strong>，协助识别并处置违规商户 <strong>50+ 户</strong>。</li>
       </ul>
     </li>
 
     <li class="exp-item reveal">
       <div class="exp-head">
-        <span class="exp-date">2025.09 — 2025.11</span>
+        <span class="exp-date">2026.02 — 2026.04</span>
+        <span class="exp-tag">AI PM</span>
+      </div>
+      <div class="exp-org">上海守扣科技</div>
+      <div class="exp-role">AI 产品经理 · SoMark 文档智能</div>
+      <ul class="exp-bullets">
+        <li><strong>端侧文档判断引擎「答于言」V1</strong>（<a class="inline-link" href="https://github.com/Maropion03/DaYuYan-engine" target="_blank" rel="noopener">演示 ↗</a>）：中途接手基础图片问答 Demo，重新定义面向高敏文档工作者的端侧判断产品；围绕论文 / 简历评估、合同对比及票据核验等场景重构“文件解析 → 结构化提取 → 场景结论”的完整链路。针对长文档截断问题，引入 PDF 逐页解析与 OCR 辅助方案，完成前后端 Demo 与答辩交付，获 AI PC 赛道创意赛亚军。</li>
+        <li><strong>竞品研究与技术路线判断</strong> <a class="inline-link" href="https://ecnucwapzdad.feishu.cn/wiki/BBngw99Tois5c3kiacOcBasmnWe" target="_blank" rel="noopener">竞品调研 ↗</a> · <a class="inline-link" href="https://ecnucwapzdad.feishu.cn/wiki/FVNwwap8Fi6weMkOz7Qc2rvknsi" target="_blank" rel="noopener">技术拆解 ↗</a>：系统拆解海内外 <strong>20+ 文档智能产品</strong>，从用户任务、解析质量、复杂表格、私有化部署与 Agentic OCR 等维度进行对比，形成场景定位与产品路线建议。</li>
+        <li><strong>AI 工作流设计与落地</strong>：围绕合同分析、简历解析、研报分析等 <strong>5 类用户任务</strong>，设计“触发器 → 文档解析 → 并行分析 → 结果回写”的端到端链路，并补充任务状态、异常提示与结果回看等交互设计。</li>
+      </ul>
+    </li>
+
+    <li class="exp-item reveal">
+      <div class="exp-head">
+        <span class="exp-date">2025.11 — 2026.02</span>
+        <span class="exp-tag">AI PM</span>
+      </div>
+      <div class="exp-org">广州安点科技</div>
+      <div class="exp-role">AI 产品经理</div>
+      <ul class="exp-bullets">
+        <li><strong>PRD 智能评审工作台</strong>（独立 0 → 1 · <a class="inline-link" href="https://github.com/Maropion03/awesome-requirement-review-agent" target="_blank" rel="noopener">GitHub ↗</a> · <a class="inline-link" href="https://awesome-requirement-review-agent.vercel.app/single-page-shell.html" target="_blank" rel="noopener">在线体验 ↗</a>）：基于 CrewAI 设计研发、设计、测试三类 Agent 并行评审与机制；围绕 6 个维度输出结构化结论，并通过实时进度、运行日志、报告切换等交互降低长任务不确定感。完成前后端、Docker 部署与导出能力，将单次评审初稿由人工约 2 小时缩短至 AI 约 3 分钟。</li>
+        <li><strong>期货平台自定义指标 AI 助手</strong>（产品规划）：针对 PineScript 门槛高、生成代码难验证的问题，完成 <strong>6 个模块、25 项验收标准</strong>及 MVP 裁剪；设计需求输入、流式生成、代码编辑、错误定位与解释链路。</li>
+      </ul>
+    </li>
+
+    <li class="exp-item reveal">
+      <div class="exp-head">
+        <span class="exp-date">2025.08 — 2025.10</span>
         <span class="exp-tag">金融</span>
       </div>
       <div class="exp-org">国泰海通证券 · 债务融资部</div>
       <div class="exp-role">行业研究</div>
       <ul class="exp-bullets">
-        <li>独立完成 <strong>三峡新能源千亿级发债前财务核查</strong>，基于回归分析构建偿债能力评估模型，穿透 4700 亿应收账款与现金流数据，为债券利率（<em>1.70%</em>）定价提供数据支撑。</li>
+        <li>参与三峡新能源发债项目财务核查与行业研究，围绕<strong>应收账款、经营现金流及偿债能力</strong>完成数据分析，支持项目材料与债券发行工作。</li>
       </ul>
     </li>
 
@@ -1124,7 +1138,7 @@ main{position:relative;z-index:2;padding-top:100px}
       <div class="exp-org">信永中和会计师事务所</div>
       <div class="exp-role">审计实习生</div>
       <ul class="exp-bullets">
-        <li>应用聚类算法重构存货盘点流程，识别 <em>42 处</em> 高危异常数据并搭建 <em>15 家子公司</em> BI 可视化看板。</li>
+        <li>基于库存数据聚类识别 <strong>42 处异常记录</strong>，并搭建覆盖 <strong>15 家子公司</strong>的业务流看板，支持审计复核与项目复盘。</li>
       </ul>
     </li>
   </ul>
@@ -1138,7 +1152,7 @@ main{position:relative;z-index:2;padding-top:100px}
   <div class="sec-head reveal">
     <span class="sec-num">03_PROJECTS</span>
     <h2 class="sec-title">项目与学术经历 / Selected Work</h2>
-    <span class="sec-sub">5 builds · 2025 – 2026</span>
+    <span class="sec-sub">6 builds · 2025 – 2026</span>
   </div>
 
   <div class="proj-grid">
@@ -1154,11 +1168,9 @@ main{position:relative;z-index:2;padding-top:100px}
           <h3 class="proj-name">答于言文档解析引擎</h3>
           <span class="proj-date">2025 · 骁龙创新大赛</span>
         </div>
-        <div class="proj-role">全栈开发 · 荣获骁龙人工智能创新应用大赛亚军 🥈</div>
+        <div class="proj-role">AI 产品经理 · 前后端 Demo 交付 · 创意赛亚军 🥈</div>
         <p class="proj-desc">
-          <strong>答于言（DaYuYan-engine）</strong> 是一款完全运行在<strong>骁龙 AI PC 本地</strong>的文档智能引擎，依托 Snapdragon NPU 与 Qualcomm AI Stack，在设备端完成文档解析、结构还原与场景分析，无需上传云端，适合处理简历、合同、论文、报销单据等高敏感文件。
-          与常见 OCR 不同，答于言的定位是<strong>「OCR 之上的判断引擎」</strong>：不只把 PDF 变成文字，而是理解文档的阅读顺序、表格结构、公式版式与业务语义，输出可供 AI 进一步使用的结构化结果——例如从简历抽取经历并做 JD 匹配、对比合同两版差异并标记风险、从手写报销单识别大写金额并与银行流水核对。
-          在 <em>2025 骁龙人工智能创新应用大赛 · AI PC 赛道 · 创意赛</em> 获<strong>亚军</strong>（高通技术公司主办、极视角承办），展示文档智能在<strong>隐私优先 · 零上云</strong>场景下的可行路径。答于言与 SoMark 云端文档解析能力同源：SoMark 面向 API / RAG / Agent 提供 Beyond OCR 结构化输出（Markdown / JSON）；答于言将同一套文档理解能力带到<strong>端侧 NPU</strong>，为隐私敏感场景提供本地部署选项。
+          中途接手基础图片问答 Demo，重新定义面向高敏文档工作者的<strong>端侧判断产品</strong>，覆盖论文 / 简历评估、合同对比及票据核验等场景；重构“文件解析 → 结构化提取 → 场景结论”的完整链路。针对长文档截断问题，引入 <strong>PDF 逐页解析与 OCR 辅助方案</strong>，完成前后端 Demo 与答辩交付，并在 2025 骁龙人工智能创新应用大赛 AI PC 赛道创意赛中获得亚军。
         </p>
         <div class="proj-metrics">
           <div class="pm-cell"><div class="pm-v">🥈</div><div class="pm-k">创意赛亚军</div></div>
@@ -1191,13 +1203,12 @@ main{position:relative;z-index:2;padding-top:100px}
         </div>
         <div class="proj-role">AI 产品负责人 · 面向产品经理的 SaaS 工具</div>
         <p class="proj-desc">
-          洞察非技术 AI PM 在<strong>模型选型与成本感知</strong>上的痛点，以 Vibe Coding 模式 <em>30 小时</em> 完成需求定义→竞品分析→UI/UX→MVP 上线全生命周期；采用 Serverless 边缘路由压降试错成本，全栈 Fetch API + SSE 流式输出缓解 C 端等待焦虑。
-          创新设计「大模型 ROI 计算器」「可视化参数调试场」「一句话 PRD 生成器」等模块，Break-even 可视化辅助 B 端用户低成本完成模型选型；接入 SiliconFlow 多模型（Qwen / GLM-4）、Supabase OAuth 登录、Cloudflare Pages 部署上线，验证<strong>单人 AI Native 全栈交付能力</strong>。
+          面向非技术 AI 产品经理，在 <em>30 小时</em>内完成<strong>模型 ROI 计算、参数调试与 PRD 生成</strong>等核心模块的需求定义、UI/UX 设计及 MVP 上线；接入多模型服务、OAuth 登录与 SSE 流式反馈，验证从产品设计到部署上线的独立交付能力。
         </p>
         <div class="proj-metrics">
           <div class="pm-cell"><div class="pm-v">30h</div><div class="pm-k">0 → MVP</div></div>
           <div class="pm-cell"><div class="pm-v">1 人</div><div class="pm-k">全栈交付</div></div>
-          <div class="pm-cell"><div class="pm-v">4+</div><div class="pm-k">核心模块</div></div>
+          <div class="pm-cell"><div class="pm-v">3</div><div class="pm-k">核心模块</div></div>
         </div>
         <div class="proj-stack">
           <span class="stack-chip">Cloudflare Pages</span>
@@ -1224,21 +1235,20 @@ main{position:relative;z-index:2;padding-top:100px}
           <h3 class="proj-name">Eval Studio · LLM 评估平台</h3>
           <span class="proj-date">2026.02 · 独立开发</span>
         </div>
-        <div class="proj-role">独立开发 · Linear-style 会话隔离评估工作台</div>
+        <div class="proj-role">独立开发 · 会话隔离、本地优先的评估工作台</div>
         <p class="proj-desc">
-          针对 LLM 输出难以横向对比、幻觉与推理错误难定位的痛点，独立开发<strong>会话隔离 · 本地优先（BYOK 自带密钥）</strong>的评估工作台；基于 LiteLLM 统一接入 SiliconFlow / OpenAI / DeepSeek / Moonshot 多 provider，按 <em>Faithfulness / Relevance / Coherence</em> 三维可视化指标 + diff 视图定位幻觉。技术栈 <strong>React + TypeScript + Vite / FastAPI + SQLite</strong>。
+          针对 LLM 输出难以横向比较、幻觉与推理偏差难定位的问题，设计<strong>会话隔离、本地优先</strong>的评估工作台；以 <em>Faithfulness / Relevance / Coherence</em> 三维指标及 Diff 视图帮助用户定位异常输出。技术栈为 <strong>React + TypeScript + Vite / FastAPI + SQLite</strong>。
         </p>
         <div class="proj-metrics">
-          <div class="pm-cell"><div class="pm-v">4+</div><div class="pm-k">Provider</div></div>
+          <div class="pm-cell"><div class="pm-v">Diff</div><div class="pm-k">输出对比</div></div>
           <div class="pm-cell"><div class="pm-v">3 维</div><div class="pm-k">可视化指标</div></div>
-          <div class="pm-cell"><div class="pm-v">BYOK</div><div class="pm-k">本地优先</div></div>
+          <div class="pm-cell"><div class="pm-v">Local</div><div class="pm-k">本地优先</div></div>
         </div>
         <div class="proj-stack">
           <span class="stack-chip">React + TS</span>
           <span class="stack-chip">Vite</span>
           <span class="stack-chip">FastAPI</span>
           <span class="stack-chip">SQLite</span>
-          <span class="stack-chip">LiteLLM</span>
         </div>
         <div class="proj-links">
           <a class="proj-link is-live" href="https://eval-studio-pxygyj528-maropions-projects.vercel.app" target="_blank" rel="noopener" data-track="cta_proj_eval_live">▶ 在线体验 <span class="ar">→</span></a>
@@ -1256,11 +1266,11 @@ main{position:relative;z-index:2;padding-top:100px}
         <div class="proj-head">
           <span class="proj-idx">P_04</span>
           <h3 class="proj-name">Awesome Requirement Review Agent · PRD 评审助手</h3>
-          <span class="proj-date">2026 · 独立开发</span>
+          <span class="proj-date">2025.11 — 2026.02</span>
         </div>
         <div class="proj-role">独立开发 · 多 Agent PRD 评审工作台</div>
         <p class="proj-desc">
-          针对产品经理写 PRD 后难以自检<strong>完整性、合理性与可落地性</strong>的痛点，构建基于多 Agent 协作的 PRD 评审系统。上传 <em>Markdown / Word</em> 文档后，Orchestrator 调度 6 个维度评审 Agent（完整性、合理性、用户价值、可行性、风险、优先级一致性）并行作业，通过 <strong>SSE 实时推送</strong>评审进度，最终输出结构化评分报告并支持 PDF / Markdown 导出与交互追问。
+          基于 CrewAI 设计研发、设计、测试三类 Agent 并行评审，围绕 <strong>6 个维度</strong>输出结构化结论；通过实时进度、运行日志与报告切换等交互降低长任务不确定感。完成前后端、Docker 部署与导出能力，将单次评审初稿由人工约 <em>2 小时</em>缩短至 AI 约 <em>3 分钟</em>。
         </p>
         <div class="proj-metrics">
           <div class="pm-cell"><div class="pm-v">6 维</div><div class="pm-k">评审维度</div></div>
@@ -1290,11 +1300,11 @@ main{position:relative;z-index:2;padding-top:100px}
         <div class="proj-head">
           <span class="proj-idx">P_05</span>
           <h3 class="proj-name">Meloscape · 实时音乐可视化</h3>
-          <span class="proj-date">2026 · 独立开发</span>
+          <span class="proj-date">2026.07 · 独立产品设计与开发</span>
         </div>
-        <div class="proj-role">独立开发 · 根据节奏与情绪自动切换音景</div>
+        <div class="proj-role">独立产品设计与开发 · 让用户看见音乐</div>
         <p class="proj-desc">
-          受像素艺术美学启发的实时音乐可视化应用。粘贴网易云音乐 / QQ 音乐 / 酷狗链接或上传本地音频，基于 Web Audio API 实时分析 BPM、能量与情绪，驱动 Canvas 生成 5 套动态音景并随歌曲段落自动切换。
+          围绕“让用户看见音乐”设计浏览器端实时音乐可视化产品，支持本地音频及网易云、QQ 音乐、酷狗链接输入；将内容输入、音频解析、实时播放与场景反馈整合为低门槛完整链路。基于 Web Audio API 分析 <strong>BPM、能量、频谱重心与歌曲结构</strong>，结合歌词情绪将结果映射为 5 组随音乐实时变化的像素艺术场景。
         </p>
         <div class="proj-metrics">
           <div class="pm-cell"><div class="pm-v">5+</div><div class="pm-k">动态场景</div></div>
@@ -1357,12 +1367,12 @@ main{position:relative;z-index:2;padding-top:100px}
         </div>
         <div class="proj-role">核心研究员 · 学术项目</div>
         <p class="proj-desc">
-          构建底层<strong>双通道感知网络（TextCNN + FinBERT）</strong>提取短频风险与长文语义，引入异构大模型组合作为「认知决策层」；部署本地 ChromaDB 向量库对百份万字级年报（MD&amp;A）语义切块实现 <strong>RAG 靶向检索</strong>；编排<em>「外部监控-内部审计-主审法官」</em>三节点 Multi-Agent 辩论流执行交叉验证与幻觉核查。在 <em>1:3 极度不平衡控制集</em> 下 F1 显著领跑单模型基线，并跑通机器自动生成的全透明白盒溯源审计报告。
+          构建 <strong>TextCNN + FinBERT 双通道网络</strong>，结合 ChromaDB 对百份年报 MD&amp;A 内容进行语义切块与 RAG 检索，并设计<em>“外部监控 → 内部审计 → 主审法官”</em>三节点 Multi-Agent 辩论流程；在 <em>1:3 不平衡控制集</em>下，模型 F1 优于单模型基线，并实现带证据引用的可溯源审计报告。
         </p>
         <div class="proj-metrics">
           <div class="pm-cell"><div class="pm-v">1:3</div><div class="pm-k">不平衡控制集</div></div>
           <div class="pm-cell"><div class="pm-v">F1 ↑</div><div class="pm-k">vs 单模型基线</div></div>
-          <div class="pm-cell"><div class="pm-v">100+</div><div class="pm-k">万字级年报</div></div>
+          <div class="pm-cell"><div class="pm-v">100+</div><div class="pm-k">年报语料</div></div>
         </div>
         <div class="proj-stack">
           <span class="stack-chip">TextCNN</span>
@@ -1400,7 +1410,7 @@ main{position:relative;z-index:2;padding-top:100px}
         <li><span class="label">Agent 协同机制</span><span class="lvl">MULTI-AGENT</span></li>
         <li><span class="label">大模型能力边界评估</span><span class="lvl">EVAL</span></li>
       </ul>
-      <p class="skill-desc">熟练 Prompt Engineering (CoT/Few-shot) 调优；深刻理解 RAG 架构、多模型路由、Agent 协同机制；能独立评估大模型能力边界并指导产品功能落地。</p>
+      <p class="skill-desc">熟悉 Prompt Engineering、RAG、多模型路由与 Agent 协同，能够围绕用户任务设计结构化输出、状态反馈、异常处理及 Human-in-the-loop 机制。</p>
     </div>
 
     <div class="skill-col reveal d1">
@@ -1410,11 +1420,10 @@ main{position:relative;z-index:2;padding-top:100px}
         <li><span class="label">Python</span><span class="lvl">PANDAS · SKLEARN</span></li>
         <li><span class="label">SQL</span><span class="lvl">CLEAN · MODEL</span></li>
         <li><span class="label">FastAPI</span><span class="lvl">SERVE</span></li>
-        <li><span class="label">CrewAI</span><span class="lvl">AGENT</span></li>
-        <li><span class="label">ChromaDB</span><span class="lvl">VECTOR</span></li>
-        <li><span class="label">Axure · Postman</span><span class="lvl">DESIGN · API</span></li>
+        <li><span class="label">React · Tailwind</span><span class="lvl">FRONTEND</span></li>
+        <li><span class="label">CrewAI · ChromaDB</span><span class="lvl">AGENT · RAG</span></li>
       </ul>
-      <p class="skill-desc">Python (Pandas/Scikit-learn)、SQL 数据清洗与建模；常见机器学习算法；FastAPI、CrewAI、ChromaDB；Axure、Postman。</p>
+      <p class="skill-desc">可使用 Python、SQL、FastAPI、React、Tailwind 等完成 AI 工作流验证与可交互 Demo。</p>
     </div>
 
     <div class="skill-col reveal d2">
@@ -1426,9 +1435,9 @@ main{position:relative;z-index:2;padding-top:100px}
         <li><span class="label">竞品分析</span><span class="lvl">RESEARCH</span></li>
         <li><span class="label">MVP 敏捷迭代</span><span class="lvl">SHIP</span></li>
         <li><span class="label">UX/UI 全生命周期</span><span class="lvl">DESIGN</span></li>
-        <li><span class="label">技术 ROI 与商业化</span><span class="lvl">MONETIZE</span></li>
+        <li><span class="label">AI 工作流验证</span><span class="lvl">DEMO</span></li>
       </ul>
-      <p class="skill-desc">需求挖掘、PRD 规划、竞品分析、MVP 敏捷迭代、UX/UI 设计全生命周期管理；具备技术 ROI 评估与商业化思维。</p>
+      <p class="skill-desc">具备需求分析、竞品研究、PRD、MVP 裁剪与 UI/UX 设计能力，能够独立完成从产品定义到可交互 Demo 的验证闭环。</p>
     </div>
 
   </div>
@@ -1494,13 +1503,13 @@ main{position:relative;z-index:2;padding-top:100px}
       <div style="font-family:var(--mono);font-size:13px;line-height:1.85;color:var(--text-d)">
         <p style="color:var(--text);font-weight:600;letter-spacing:.02em">// SUMMARY</p>
         <p style="margin-top:8px;color:var(--muted)">
-          22 岁 / 男 / 随时到岗。会计学背景 → 金融实习（国泰海通 · 信永中和）→ 互联网产品运营（美团）→ AI 产品（守扣 · 安点 · 灵构）→ 学术（财务舞弊 RAG）→ 港城大 MSc AI in Business（2026.09）。
+          22 岁 / 男 / 随时到岗。会计学背景 → 金融与审计（国泰海通 · 信永中和）→ AI / 风控产品运营（美团）→ AI 产品（安点 · 守扣 · 百度 MEG）→ 港城大 MSc AI in Business（2026.09）。
         </p>
         <p style="margin-top:18px;color:var(--text);font-weight:600;letter-spacing:.02em">// I CARE ABOUT</p>
         <ul style="margin-top:8px;list-style:none;display:flex;flex-direction:column;gap:6px;color:var(--muted)">
           <li>▸ 把模型当成<em style="color:var(--amber);font-style:normal">能力边界明确</em>的零件，不是炼丹炉</li>
           <li>▸ 让 AI 工程<em style="color:var(--amber);font-style:normal">可解释 · 可溯源 · 可商业化</em></li>
-          <li>▸ 单人也能 ship 出生产级产品</li>
+          <li>▸ 独立完成从产品定义到可交互 Demo 的验证闭环</li>
         </ul>
         <p style="margin-top:18px;color:var(--text);font-weight:600;letter-spacing:.02em">// LOOKING FOR</p>
         <p style="margin-top:8px;color:var(--muted)">
@@ -2545,8 +2554,8 @@ main{z-index:3}
 
   /* ──────── 16. MARQUEE STRIPS BETWEEN SECTIONS ──────── */
   const MQ_DATA = [
-    {after:'education',  items:['// MILESTONE :: 港城大 MSc AI 2026.09','MAJOR // 商业人工智能','GPA // 3.86 / 5','STATUS // 在读 + 可远程']},
-    {after:'experience', items:['// SHIPPED :: AGENT_V35 部署上线','OUTPUT // 60s → 30s','SCOPE // 1800 帖子 / 300 社群','MODE // 单人全栈']},
+    {after:'education',  items:['// MILESTONE :: 港城大 MSc AI 2026.09','MAJOR // 商业人工智能','GPA // 3.86 / 5','START // 2026.09']},
+    {after:'experience', items:['// LATEST :: 百度 MEG AI 产品','SHIPPED // AGENT_V35 部署上线','OUTPUT // 60s → 30s','RISK_INTEL // 2500+ 条']},
     {after:'projects',   items:['// LIVE :: spirit-construct-maropion.top','STACK // React · FastAPI · CrewAI · RAG','OPEN_SOURCE // GitHub.com/Maropion03','READY_TO_SHIP // ✓']},
     {after:'skills',     items:['// HIRE :: AI PRODUCT MANAGER','LOCATION // 北京 · 上海 · 广州 · 深圳 · 中国香港','LANG // CN · EN (IELTS 6.5) · JP (N2)','AVAILABILITY // 随时到岗']},
   ];
