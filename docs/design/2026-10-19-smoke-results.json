@@ -1,0 +1,60 @@
+{
+  "date": "2026-10-19",
+  "target": "http://127.0.0.1:4177/",
+  "method": "Isolated Playwright context against production build",
+  "checks": [
+    {
+      "name": "async WebGL character ready",
+      "passed": true
+    },
+    {
+      "name": "first language Chinese",
+      "passed": true
+    },
+    {
+      "name": "wheel and deferred project image",
+      "passed": true
+    },
+    {
+      "name": "project dialog",
+      "passed": true
+    },
+    {
+      "name": "Escape close",
+      "passed": true
+    },
+    {
+      "name": "English preserves scene",
+      "passed": true
+    },
+    {
+      "name": "deferred portrait",
+      "passed": true
+    },
+    {
+      "name": "QR image",
+      "passed": true
+    },
+    {
+      "name": "dark theme",
+      "passed": true
+    },
+    {
+      "name": "generated static fallback after context loss",
+      "passed": true
+    },
+    {
+      "name": "navigation works without WebGL",
+      "passed": true
+    },
+    {
+      "name": "horizontal character drag stays in current scene",
+      "passed": true
+    },
+    {
+      "name": "vertical swipe starting over character advances scene",
+      "passed": true
+    }
+  ],
+  "errors": []
+}

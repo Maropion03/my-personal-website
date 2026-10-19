@@ -1,2 +1,6 @@
 .vercel
 .claude/worktrees/
+node_modules/
+dist/
+*.tsbuildinfo
+/docs/design/lighthouse-prototype.json

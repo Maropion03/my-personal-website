@@ -1,0 +1,30 @@
+{
+  "fetchTime": "2026-10-19T04:36:01.974Z",
+  "url": "http://127.0.0.1:4177/",
+  "formFactor": "mobile",
+  "scores": {
+    "performance": 98,
+    "accessibility": 100,
+    "best-practices": 100
+  },
+  "metrics": {
+    "first-contentful-paint": {
+      "numericValue": 1062.4645,
+      "displayValue": "1.1 s"
+    },
+    "largest-contentful-paint": {
+      "numericValue": 2285.69675,
+      "displayValue": "2.3 s"
+    },
+    "total-blocking-time": {
+      "numericValue": 0,
+      "displayValue": "0 ms"
+    },
+    "cumulative-layout-shift": {
+      "numericValue": 0,
+      "displayValue": "0"
+    }
+  },
+  "runtimeError": null,
+  "warnings": []
+}
