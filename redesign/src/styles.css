@@ -26,9 +26,11 @@
   --sans: "Space Grotesk", "PingFang SC", "Microsoft YaHei", sans-serif;
   --mono: "IBM Plex Mono", "PingFang SC", monospace;
   --layer-scene: 0;
+  --layer-scene-back: 1;
+  --layer-scene-front: 4;
   --layer-character: 2;
+  --layer-character-front: 5;
   --layer-copy: 3;
-  --layer-wipe: 5;
   --layer-nav: 10;
   --layer-toast: 30;
   color-scheme: light;
@@ -239,6 +241,13 @@ a:active {
   opacity: 0;
   overflow: hidden;
   z-index: var(--layer-scene);
+  background: var(--paper);
+}
+.scene.is-outgoing {
+  z-index: var(--layer-scene-front);
+}
+.scene.is-incoming {
+  z-index: var(--layer-scene-back);
 }
 .scene.is-active {
   visibility: visible;
@@ -458,6 +467,13 @@ h3 {
   right: -6%;
   top: 8%;
   transform: scale(0.9);
+}
+.character.is-transitioning {
+  transition: none;
+  pointer-events: none;
+}
+.character.is-transitioning.is-outgoing {
+  z-index: var(--layer-character-front);
 }
 .character-hint {
   position: absolute;
@@ -821,22 +837,6 @@ html[lang="zh-CN"] .contact-layout h2 {
   align-items: center;
   gap: 28px;
   flex-wrap: wrap;
-}
-.scene-wipe {
-  position: absolute;
-  inset: -2px;
-  display: grid;
-  grid-template-columns: repeat(8, 1fr);
-  z-index: var(--layer-wipe);
-  pointer-events: none;
-  overflow: hidden;
-}
-.scene-wipe span {
-  background: var(--accent);
-  transform: translateY(103%);
-}
-.scene-wipe span:nth-child(3n) {
-  background: var(--gold);
 }
 .scene-footer {
   position: fixed;

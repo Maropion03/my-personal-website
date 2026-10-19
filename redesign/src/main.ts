@@ -66,6 +66,7 @@ const chapters = [
   "contact",
 ];
 const featured = projects.slice(0, 3);
+const sceneTransitionDuration = 0.9;
 const tr = (zh: string, en: string) => e(lang === "zh" ? zh : en);
 const chapterLabels = () => [
   tr("首页", "Home"),
@@ -133,7 +134,6 @@ function render(): void {
       <section class="scene contact-scene" id="contact" data-chapter="contact" aria-labelledby="contact-title" inert>
         <div class="scene-inner contact-layout"><div data-copy><p class="eyebrow">${tr("下一个想法，从一次对话开始", "The next idea starts with a conversation")}</p><h2 id="contact-title">${tr("一起，\n做点有意思的。", "Let’s make\nsomething matter.").replaceAll("\n", "<br>")}</h2><p class="contact-intro">${tr("关于 AI 产品岗位，或一个值得做出来的项目。", "For an AI product role, or an idea worth bringing to life.")}</p><a class="email-link" href="mailto:maropion@163.com" data-track="cta_contact_email">maropion@163.com <span aria-hidden="true">↗</span></a><div class="contact-actions"><button class="button button--accent" data-dialog="wechat" data-track="cta_contact_qr">${tr("微信联系", "Say hello on WeChat")} <span aria-hidden="true">↗</span></button><a class="text-link" href="https://github.com/Maropion03" target="_blank" rel="noopener noreferrer">GitHub <span aria-hidden="true">↗</span></a><button class="text-link" data-copy="18565682722">${tr("复制手机号", "Copy phone number")}</button></div></div></div>
       </section>
-      <div class="scene-wipe" aria-hidden="true">${"<span></span>".repeat(8)}</div>
     </main>
     <footer class="scene-footer"><p>© 2026 Maropion</p><p class="chapter-name"></p><div class="scene-controls"><button data-step="-1" aria-label="${tr("上一幕", "Previous scene")}"><span aria-hidden="true">←</span><span>${tr("上一幕", "Previous")}</span></button><button data-step="1" aria-label="${tr("下一幕", "Next scene")}"><span>${tr("下一幕", "Next")}</span><span aria-hidden="true">→</span></button></div></footer>
     <div class="sr-only" id="scene-announcement" aria-live="polite" aria-atomic="true"></div>
@@ -195,10 +195,14 @@ function activate(index: number): void {
   loadSceneMedia(index);
   current = index;
   document.querySelectorAll<HTMLElement>(".scene").forEach((el, i) => {
+    el.classList.remove("is-outgoing", "is-incoming");
     el.classList.toggle("is-active", i === index);
     el.inert = i !== index;
     el.setAttribute("aria-hidden", String(i !== index));
     gsap.set(el, { autoAlpha: i === index ? 1 : 0 });
+    gsap.set(el.querySelector(".scene-inner"), {
+      clearProps: "transform,opacity,visibility",
+    });
   });
   document
     .querySelectorAll<HTMLAnchorElement>(".main-nav a, .mobile-nav a")
@@ -210,6 +214,8 @@ function activate(index: number): void {
   const host = document.querySelector<HTMLElement>(".character")!;
   const show = index === 0 || index === sceneIds.length - 1;
   host.dataset.mode = index === 0 ? "hero" : show ? "contact" : "hidden";
+  host.classList.remove("is-transitioning", "is-outgoing");
+  gsap.set(host, { clearProps: "transform,opacity,visibility" });
   host.tabIndex = index === 0 ? 0 : -1;
   host.setAttribute("aria-hidden", String(!show));
   character?.setVisible(show);
@@ -240,86 +246,90 @@ function go(index: number): void {
     return;
   }
   busy = true;
-  const from = document.querySelector<HTMLElement>(
-    `#${sceneIds[current]} .scene-inner`,
-  )!;
-  const to = document.querySelector<HTMLElement>(
-    `#${sceneIds[index]} .scene-inner`,
-  )!;
-  const direction = index > current ? 1 : -1;
-  const strips = document.querySelectorAll(".scene-wipe span");
+  const fromScene = document.getElementById(sceneIds[current])!;
+  const toScene = document.getElementById(sceneIds[index])!;
+  const from = fromScene.querySelector<HTMLElement>(".scene-inner")!;
+  const to = toScene.querySelector<HTMLElement>(".scene-inner")!;
   const host = document.querySelector<HTMLElement>(".character")!;
+  const fromHasCharacter = current === 0 || current === sceneIds.length - 1;
+  const toHasCharacter = index === 0 || index === sceneIds.length - 1;
+
+  // The current scene stays in front, including its opaque paper background.
+  // Prepare the target below it before either scene starts fading.
+  fromScene.classList.add("is-outgoing");
+  toScene.classList.add("is-incoming");
+  fromScene.inert = true;
+  gsap.set(fromScene, { autoAlpha: 1 });
+  gsap.set(toScene, { autoAlpha: 0.12 });
+  gsap.set(to, { scale: 0.96, z: -100 });
+  host.classList.add("is-transitioning");
+  host.classList.toggle("is-outgoing", fromHasCharacter);
+
+  let characterOpacity = 0;
+  const prepareIncomingCharacter = () => {
+    host.classList.remove("is-outgoing");
+    host.dataset.mode = index === 0 ? "hero" : "contact";
+    gsap.set(host, { clearProps: "transform,opacity,visibility" });
+    characterOpacity = Number.parseFloat(getComputedStyle(host).opacity);
+    gsap.set(host, { opacity: 0 });
+    character?.setVisible(true);
+  };
+  if (toHasCharacter && !fromHasCharacter) prepareIncomingCharacter();
+
   timeline = gsap.timeline({
     onComplete: () => {
+      activate(index);
       busy = false;
-      gsap.set([from, to, host], {
-        clearProps: "transform,opacity,visibility",
-      });
-      gsap.set(strips, { yPercent: direction * 103 });
       const next = queued;
       queued = null;
       if (next !== null && next !== current) go(next);
     },
   });
   timeline.to(
-    from,
-    {
-      opacity: 0,
-      y: -direction * 30,
-      z: direction * 180,
-      scale: direction > 0 ? 1.12 : 0.9,
-      duration: 0.43,
-      ease: "power2.in",
-    },
+    toScene,
+    { opacity: 1, duration: sceneTransitionDuration, ease: "power2.out" },
     0,
   );
-  if (current === 0)
+  timeline.to(
+    to,
+    { scale: 1, z: 0, duration: sceneTransitionDuration, ease: "power2.out" },
+    0,
+  );
+  timeline.to(
+    from,
+    { scale: 1.025, z: 24, duration: 0.8, ease: "power2.inOut" },
+    0,
+  );
+  timeline.to(
+    fromScene,
+    { opacity: 0, duration: 0.72, ease: "power2.inOut" },
+    0.12,
+  );
+
+  if (fromHasCharacter) {
     timeline.to(
       host,
       {
-        scale: 1.8,
-        xPercent: -8,
         opacity: 0,
-        duration: 0.46,
-        ease: "power2.in",
+        duration: toHasCharacter ? 0.38 : 0.72,
+        ease: "power2.inOut",
       },
-      0,
+      toHasCharacter ? 0 : 0.12,
     );
-  timeline.fromTo(
-    strips,
-    { yPercent: direction * 103 },
-    {
-      yPercent: 0,
-      duration: 0.3,
-      stagger: { each: 0.018, from: direction > 0 ? "start" : "end" },
-      ease: "power2.inOut",
-    },
-    0.19,
-  );
-  timeline.call(
-    () => {
-      activate(index);
-      gsap.set(host, { clearProps: "transform,opacity" });
-    },
-    [],
-    0.66,
-  );
-  timeline.fromTo(
-    to,
-    { opacity: 0, y: direction * 28, z: -direction * 190, scale: 0.96 },
-    { opacity: 1, y: 0, z: 0, scale: 1, duration: 0.66, ease: "power3.out" },
-    0.66,
-  );
-  timeline.to(
-    strips,
-    {
-      yPercent: -direction * 103,
-      duration: 0.34,
-      stagger: { each: 0.018, from: direction > 0 ? "start" : "end" },
-      ease: "power2.inOut",
-    },
-    0.67,
-  );
+  }
+  if (toHasCharacter) {
+    const start = fromHasCharacter ? 0.4 : 0.12;
+    if (fromHasCharacter) timeline.call(prepareIncomingCharacter, [], start);
+    timeline.to(
+      host,
+      {
+        opacity: () => characterOpacity,
+        duration: sceneTransitionDuration - start,
+        ease: "power2.out",
+      },
+      start,
+    );
+  }
 }
 
 function indexForHash(hash: string): number {
@@ -478,7 +488,7 @@ window.addEventListener(
     if (Math.abs(wheelDelta) >= 55) {
       const direction = Math.sign(wheelDelta);
       wheelDelta = 0;
-      wheelLock = performance.now() + 1450;
+      wheelLock = performance.now() + sceneTransitionDuration * 1000 + 180;
       go(current + direction);
     }
   },

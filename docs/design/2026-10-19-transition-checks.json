@@ -1,0 +1,36 @@
+{
+  "date": "2026-10-19",
+  "method": "Isolated Playwright contexts against production preview",
+  "checks": [
+    {
+      "name": "contact to hero restores character opacity and input",
+      "passed": true
+    },
+    {
+      "name": "rapid navigation settles on last requested scene",
+      "passed": true
+    },
+    {
+      "name": "transition layer classes cleared",
+      "passed": true
+    },
+    {
+      "name": "language switch during fade leaves one usable scene",
+      "passed": true
+    },
+    {
+      "name": "mobile target remains behind foreground",
+      "passed": true
+    },
+    {
+      "name": "mobile swipe completes and unlocks target",
+      "passed": true
+    },
+    {
+      "name": "reduced motion switches without overlap layers",
+      "passed": true
+    }
+  ],
+  "errors": [],
+  "preview": "http://127.0.0.1:4177/#project-dayuyan"
+}
