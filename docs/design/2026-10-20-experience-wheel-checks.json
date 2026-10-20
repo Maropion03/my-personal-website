@@ -1,0 +1,122 @@
+{
+  "date": "2026-10-20",
+  "url": "http://127.0.0.1:4177/#experience",
+  "behavior": "Wheel gestures switch employers in a fixed deck; no continuous vertical employer stream.",
+  "build": "tsc --noEmit && vite build: passed",
+  "desktop": [
+    {
+      "name": "fixed deck replaces continuous stream",
+      "pass": true
+    },
+    {
+      "name": "one visible company initially",
+      "pass": true
+    },
+    {
+      "name": "wheel switches employer without vertical movement",
+      "pass": true,
+      "details": {
+        "company": "百度 MEG",
+        "top": 237.875,
+        "scroll": 0,
+        "hash": "#experience"
+      }
+    },
+    {
+      "name": "one momentum burst advances one employer",
+      "pass": true
+    },
+    {
+      "name": "node directly selects employer",
+      "pass": true
+    },
+    {
+      "name": "language keeps current employer",
+      "pass": true
+    },
+    {
+      "name": "last employer advances to work",
+      "pass": true
+    },
+    {
+      "name": "return preserves last employer",
+      "pass": true
+    },
+    {
+      "name": "no runtime errors",
+      "pass": true,
+      "details": {
+        "errors": []
+      }
+    }
+  ],
+  "mobile": [
+    {
+      "name": "390 native touch switches company in place",
+      "pass": true
+    },
+    {
+      "name": "390 no runtime errors",
+      "pass": true,
+      "errors": []
+    },
+    {
+      "name": "375 native touch switches company in place",
+      "pass": true
+    },
+    {
+      "name": "375 no runtime errors",
+      "pass": true,
+      "errors": []
+    },
+    {
+      "name": "320 native touch switches company in place",
+      "pass": true
+    },
+    {
+      "name": "320 no runtime errors",
+      "pass": true,
+      "errors": []
+    }
+  ],
+  "final": [
+    {
+      "name": "320 complete experience retains unabridged content",
+      "pass": true
+    },
+    {
+      "name": "320 keyboard switches immediately with reduced motion",
+      "pass": true
+    },
+    {
+      "name": "1024 complete experience retains unabridged content",
+      "pass": true
+    },
+    {
+      "name": "1024 keyboard switches immediately with reduced motion",
+      "pass": true
+    }
+  ],
+  "responsive": {
+    "uniqueCases": 56,
+    "viewports": [
+      "390x844",
+      "375x667",
+      "320x568",
+      "1024x600"
+    ],
+    "languages": [
+      "zh",
+      "en"
+    ],
+    "employersPerCase": 7,
+    "finalUnresolvedFailures": [],
+    "resolution": "An initial 4.4px bottom overflow at 320x568 English Meituan was resolved by compact spacing; all 28 targeted small-screen and short-desktop rerun cases passed."
+  },
+  "limits": [
+    "Chromium and emulated touch; no physical-device Safari check.",
+    "Short/narrow panels clamp long bullet text; unabridged text remains in the full-experience dialog.",
+    "The pre-existing asynchronously loaded 3D bundle still triggers Vite's >500kB warning.",
+    "No new Lighthouse run."
+  ]
+}

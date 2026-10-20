@@ -50,7 +50,13 @@ let timeline: gsap.core.Timeline | undefined;
 let dialogReturn: HTMLElement | null = null;
 let activeDialog: "works" | "experience" | "wechat" | Project | null = null;
 let renderGeneration = 0;
-let selectedExperience = experiences[0].id;
+let selectedExperience =
+  experiences.find((ex) => location.hash === `#internship-${ex.id}`)?.id ??
+  experiences[0].id;
+let experienceBusy = false;
+let experienceQueued: string | null = null;
+let experienceTransition: gsap.core.Timeline | undefined;
+const experienceTransitionDuration = 0.55;
 const featured = projects.slice(0, 3);
 const projectSceneIds = featured.map((project, index) =>
   index === 0 ? "projects" : `project-${project.id}`,
@@ -75,43 +81,112 @@ function organizationLogo(source: string, deferred = true): string {
 }
 
 function experienceDetail(ex: Experience): string {
-  return `<div class="internship-identity">${organizationLogo(ex.logo)}<div><h3>${e(t(ex.company, lang))}</h3>${ex.department ? `<p class="internship-department">${e(t(ex.department, lang))}</p>` : ""}</div></div>
+  return `<div class="internship-identity">${organizationLogo(ex.logo)}<div><h3 id="internship-title-${ex.id}">${e(t(ex.company, lang))}</h3>${ex.department ? `<p class="internship-department">${e(t(ex.department, lang))}</p>` : ""}</div></div>
     <div class="internship-meta"><p>${e(t(ex.role, lang))}</p><p class="internship-period">${e(ex.period)}</p></div>
     <p class="internship-summary">${e(t(ex.summary, lang))}</p>
     <ul class="internship-bullets">${ex.bullets.map((bullet) => `<li>${e(t(bullet, lang))}</li>`).join("")}</ul>`;
 }
 
 function experienceScene(): string {
-  const selected = experiences.find((ex) => ex.id === selectedExperience)!;
   return `<section class="scene experience-scene" id="experience" data-chapter="experience" aria-labelledby="experience-title" inert>
     <div class="scene-inner internship-layout">
       <div class="internship-heading" data-copy><div><p class="eyebrow">${tr("沿途的实践", "Learning by building")}</p><h2 id="experience-title">${tr("实习经历", "Experience, in practice.")}</h2></div><button class="text-link" data-dialog="experience">${tr("完整经历", "Full experience")} <span aria-hidden="true">↗</span></button></div>
-      <div class="internship-tabs" role="tablist" aria-label="${tr("选择实习公司", "Choose an employer")}" aria-orientation="vertical">${experiences.map((ex, i) => `<button class="internship-tab" role="tab" id="experience-tab-${ex.id}" data-experience="${ex.id}" aria-controls="experience-panel" aria-selected="${ex.id === selectedExperience}" tabindex="${ex.id === selectedExperience ? 0 : -1}">${organizationLogo(ex.logo)}<span class="internship-tab-name">${e(t(ex.company, lang))}</span><span class="internship-tab-index" aria-hidden="true">${String(i + 1).padStart(2, "0")}</span></button>`).join("")}</div>
-      <article class="internship-panel" id="experience-panel" role="tabpanel" tabindex="0" aria-labelledby="experience-tab-${selected.id}" data-depth>${experienceDetail(selected)}</article>
+      <nav class="internship-timeline" aria-label="${tr("实习经历时间线", "Experience timeline")}"><ol>${experiences.map((ex) => `<li><a class="internship-node" href="#internship-${ex.id}" data-experience="${ex.id}" aria-label="${e(t(ex.company, lang))}, ${e(ex.period)}" ${ex.id === selectedExperience ? 'aria-current="location"' : ""}><span class="internship-node-mark" aria-hidden="true"></span><span class="internship-node-label"><span>${e(t(ex.company, lang))}</span><time>${e(ex.period)}</time></span></a></li>`).join("")}</ol></nav>
+      <div class="internship-deck" tabindex="0" role="region" aria-label="${tr("实习经历内容，使用上下方向键切换", "Internship details. Use up and down arrows to change employers.")}" data-depth>${experiences.map((ex) => `<section class="internship-panel" id="internship-${ex.id}" data-employer="${ex.id}" aria-labelledby="internship-title-${ex.id}" aria-hidden="${ex.id !== selectedExperience}" ${ex.id !== selectedExperience ? "inert" : ""}>${experienceDetail(ex)}</section>`).join("")}</div>
     </div>
   </section>`;
 }
 
-function selectExperience(id: string, focus = false): void {
-  const selected = experiences.find((ex) => ex.id === id);
-  if (!selected) return;
+function markExperience(id: string): void {
   selectedExperience = id;
   document
-    .querySelectorAll<HTMLButtonElement>(".internship-tab")
-    .forEach((tab) => {
-      const active = tab.dataset.experience === id;
-      tab.setAttribute("aria-selected", String(active));
-      tab.tabIndex = active ? 0 : -1;
-      if (active && focus) {
-        tab.focus({ preventScroll: true });
-        tab.scrollIntoView({ block: "nearest", inline: "nearest" });
-      }
+    .querySelectorAll<HTMLAnchorElement>(".internship-node")
+    .forEach((node) => {
+      if (node.dataset.experience === id)
+        node.setAttribute("aria-current", "location");
+      else node.removeAttribute("aria-current");
     });
-  const panel = document.querySelector<HTMLElement>(".internship-panel")!;
-  panel.setAttribute("aria-labelledby", `experience-tab-${id}`);
-  panel.innerHTML = experienceDetail(selected);
-  panel.scrollTop = 0;
-  loadSceneMedia(sceneIds.indexOf("experience"));
+  const node = document.querySelector<HTMLElement>(
+    `.internship-node[data-experience="${id}"]`,
+  )!;
+  const rail = document.querySelector<HTMLElement>(".internship-timeline")!;
+  const nodeRect = node.getBoundingClientRect();
+  const railRect = rail.getBoundingClientRect();
+  if (nodeRect.top < railRect.top)
+    rail.scrollTop += nodeRect.top - railRect.top;
+  else if (nodeRect.bottom > railRect.bottom)
+    rail.scrollTop += nodeRect.bottom - railRect.bottom;
+}
+
+function activateExperience(id: string, announce = false): void {
+  document
+    .querySelectorAll<HTMLElement>(".internship-panel")
+    .forEach((panel) => {
+      const active = panel.dataset.employer === id;
+      panel.classList.toggle("is-current", active);
+      panel.classList.remove("is-incoming", "is-outgoing");
+      panel.inert = !active;
+      panel.setAttribute("aria-hidden", String(!active));
+      gsap.set(panel, { autoAlpha: active ? 1 : 0 });
+    });
+  markExperience(id);
+  if (announce) {
+    const ex = experiences.find((item) => item.id === id)!;
+    document.querySelector("#scene-announcement")!.textContent =
+      `${t(ex.company, lang)} / ${t(ex.role, lang)}`;
+  }
+}
+
+function changeExperience(id: string, focus = false): void {
+  if (!experiences.some((ex) => ex.id === id)) return;
+  if (focus)
+    document
+      .querySelector<HTMLElement>(`.internship-node[data-experience="${id}"]`)
+      ?.focus({ preventScroll: true });
+  if (experienceBusy) {
+    experienceQueued = id;
+    return;
+  }
+  if (selectedExperience === id) return;
+  if (reduced.matches) {
+    activateExperience(id, true);
+    return;
+  }
+  experienceBusy = true;
+  const from = document.getElementById(`internship-${selectedExperience}`)!;
+  const to = document.getElementById(`internship-${id}`)!;
+  from.classList.add("is-outgoing");
+  to.classList.add("is-incoming");
+  from.inert = true;
+  gsap.set(from, { autoAlpha: 1 });
+  gsap.set(to, { autoAlpha: 0.12 });
+  experienceTransition = gsap.timeline({
+    onComplete: () => {
+      activateExperience(id, true);
+      experienceBusy = false;
+      const next = experienceQueued;
+      experienceQueued = null;
+      if (next && next !== selectedExperience) changeExperience(next);
+    },
+  });
+  experienceTransition.to(
+    to,
+    { opacity: 1, duration: experienceTransitionDuration, ease: "power2.out" },
+    0,
+  );
+  experienceTransition.to(
+    from,
+    { opacity: 0, duration: 0.44, ease: "power2.inOut" },
+    0.08,
+  );
+}
+
+function stepExperience(direction: number): void {
+  if (busy || experienceBusy) return;
+  const index = experiences.findIndex((ex) => ex.id === selectedExperience);
+  const next = index + direction;
+  if (next < 0 || next >= experiences.length) go(current + direction);
+  else changeExperience(experiences[next].id);
 }
 
 function projectScene(project: Project, index: number): string {
@@ -135,6 +210,9 @@ function projectScene(project: Project, index: number): string {
 }
 
 function render(): void {
+  experienceTransition?.kill();
+  experienceBusy = false;
+  experienceQueued = null;
   menuOpen = false;
   const labels = chapterLabels();
   document.documentElement.lang = lang === "zh" ? "zh-CN" : "en";
@@ -191,14 +269,7 @@ function render(): void {
     }),
   );
   activate(current);
-  if (sceneIds[current] === "experience") {
-    document
-      .querySelector('.internship-tab[aria-selected="true"]')
-      ?.scrollIntoView({
-        block: "nearest",
-        inline: "nearest",
-      });
-  }
+  activateExperience(selectedExperience);
   if (current === 0 && !reduced.matches) {
     gsap.from(".hero-copy > :not(h1)", {
       opacity: 0,
@@ -276,6 +347,12 @@ function go(index: number): void {
   setMenu(false);
   index = Math.max(0, Math.min(sceneIds.length - 1, index));
   if (index === current) return;
+  if (experienceBusy) {
+    experienceTransition?.kill();
+    experienceBusy = false;
+    experienceQueued = null;
+    activateExperience(selectedExperience);
+  }
   loadSceneMedia(index);
   if (busy) {
     queued = index;
@@ -374,6 +451,8 @@ function go(index: number): void {
 
 function indexForHash(hash: string): number {
   const key = hash.replace("#", "");
+  if (experiences.some((ex) => key === `internship-${ex.id}`))
+    return sceneIds.indexOf("experience");
   if (key === "education" || key === "skills") return sceneIds.indexOf("about");
   return Math.max(0, sceneIds.indexOf(key));
 }
@@ -429,7 +508,6 @@ async function copy(value: string): Promise<void> {
 }
 
 function wire(): void {
-  syncTabOrientation();
   document
     .querySelector<HTMLDialogElement>(".detail-dialog")!
     .addEventListener("close", () => {
@@ -445,8 +523,20 @@ app.addEventListener("click", (event) => {
     event.preventDefault();
     go(indexForHash(target.dataset.go));
   }
-  if (target.dataset.step) go(current + Number(target.dataset.step));
-  if (target.dataset.experience) selectExperience(target.dataset.experience);
+  if (target.dataset.step) {
+    if (sceneIds[current] === "experience")
+      stepExperience(Number(target.dataset.step));
+    else go(current + Number(target.dataset.step));
+  }
+  if (target.dataset.experience) {
+    if (
+      event instanceof MouseEvent &&
+      (event.metaKey || event.ctrlKey || event.shiftKey || event.altKey)
+    )
+      return;
+    event.preventDefault();
+    changeExperience(target.dataset.experience);
+  }
   if (target.dataset.project)
     showDialog(projects.find((p) => p.id === target.dataset.project) ?? null);
   if (target.dataset.dialog)
@@ -503,16 +593,6 @@ app.addEventListener("click", (event) => {
     document.querySelector<HTMLDialogElement>(".detail-dialog")!.close();
 });
 
-const compactExperience = matchMedia("(max-width: 767px)");
-function syncTabOrientation(): void {
-  document
-    .querySelector(".internship-tabs")
-    ?.setAttribute(
-      "aria-orientation",
-      compactExperience.matches ? "horizontal" : "vertical",
-    );
-}
-compactExperience.addEventListener("change", syncTabOrientation);
 app.addEventListener("keydown", (event) => {
   const tab = (event.target as Element).closest<HTMLElement>(
     "[data-experience]",
@@ -541,12 +621,12 @@ app.addEventListener("keydown", (event) => {
             (["ArrowDown", "ArrowRight"].includes(event.key) ? 1 : -1) +
             experiences.length) %
           experiences.length;
-  selectExperience(experiences[next].id, true);
+  changeExperience(experiences[next].id, true);
 });
 
 function hasReadingScroll(target: Element): boolean {
   let element: HTMLElement | null = target.closest<HTMLElement>(
-    ".scene,.internship-panel,.internship-tabs",
+    ".scene,.internship-timeline",
   );
   while (element) {
     if (
@@ -556,7 +636,7 @@ function hasReadingScroll(target: Element): boolean {
       return true;
     element =
       element.parentElement?.closest<HTMLElement>(
-        ".scene,.internship-panel,.internship-tabs",
+        ".scene,.internship-timeline",
       ) ?? null;
   }
   return false;
@@ -565,6 +645,7 @@ function hasReadingScroll(target: Element): boolean {
 let wheelDelta = 0;
 let wheelReset: ReturnType<typeof setTimeout>;
 let wheelLock = 0;
+let wheelGestureClaimed = false;
 window.addEventListener(
   "wheel",
   (event) => {
@@ -575,21 +656,47 @@ window.addEventListener(
       Math.abs(event.deltaX) > Math.abs(event.deltaY)
     )
       return;
-    if (hasReadingScroll(event.target as Element)) return;
+    const inExperience = sceneIds[current] === "experience";
+    if (!inExperience && hasReadingScroll(event.target as Element)) return;
     event.preventDefault();
-    if (busy || performance.now() < wheelLock || Math.abs(event.deltaY) < 3)
-      return;
-    if (Math.sign(wheelDelta) !== Math.sign(event.deltaY)) wheelDelta = 0;
-    wheelDelta += event.deltaY;
     clearTimeout(wheelReset);
     wheelReset = setTimeout(() => {
       wheelDelta = 0;
-    }, 130);
+      wheelGestureClaimed = false;
+    }, 180);
+    if (
+      wheelGestureClaimed ||
+      busy ||
+      experienceBusy ||
+      performance.now() < wheelLock ||
+      Math.abs(event.deltaY) < 3
+    )
+      return;
+    const delta =
+      event.deltaMode === 1
+        ? event.deltaY * 20
+        : event.deltaMode === 2
+          ? event.deltaY * innerHeight
+          : event.deltaY;
+    if (Math.sign(wheelDelta) !== Math.sign(delta)) wheelDelta = 0;
+    wheelDelta += delta;
     if (Math.abs(wheelDelta) >= 55) {
       const direction = Math.sign(wheelDelta);
       wheelDelta = 0;
-      wheelLock = performance.now() + sceneTransitionDuration * 1000 + 180;
-      go(current + direction);
+      wheelGestureClaimed = true;
+      const index = experiences.findIndex((ex) => ex.id === selectedExperience);
+      const withinExperience =
+        inExperience &&
+        index + direction >= 0 &&
+        index + direction < experiences.length;
+      const duration = reduced.matches
+        ? 0.12
+        : withinExperience
+          ? experienceTransitionDuration
+          : sceneTransitionDuration;
+      wheelLock = performance.now() + duration * 1000 + 140;
+      if (inExperience) stepExperience(direction);
+      else go(current + direction);
     }
   },
   { passive: false },
@@ -609,10 +716,22 @@ window.addEventListener("keydown", (event) => {
   }
   if (menuOpen || busy) return;
   if (
-    (event.target as Element).closest(".internship-panel") &&
-    hasReadingScroll(event.target as Element)
-  )
+    sceneIds[current] === "experience" &&
+    ["ArrowDown", "PageDown", "ArrowUp", "PageUp", " ", "Home", "End"].includes(
+      event.key,
+    )
+  ) {
+    if (event.key === " " && (event.target as Element).closest("button,a"))
+      return;
+    event.preventDefault();
+    if (experienceBusy) return;
+    if (event.key === "Home" || event.key === "End")
+      changeExperience(
+        experiences[event.key === "Home" ? 0 : experiences.length - 1].id,
+      );
+    else stepExperience(event.key.includes("Up") ? -1 : 1);
     return;
+  }
   if (["ArrowDown", "PageDown", "ArrowUp", "PageUp", " "].includes(event.key)) {
     if (event.key === " " && (event.target as Element).closest("button,a"))
       return;
@@ -645,17 +764,27 @@ app.addEventListener(
 app.addEventListener(
   "touchend",
   (event) => {
-    if (touchExcluded || activeDialog || menuOpen || busy) return;
+    if (touchExcluded || activeDialog || menuOpen || busy || experienceBusy)
+      return;
     const dy = touchY - event.changedTouches[0].clientY;
     const dx = touchX - event.changedTouches[0].clientX;
-    if (Math.abs(dy) > 65 && Math.abs(dy) > Math.abs(dx) * 1.2)
-      go(current + Math.sign(dy));
+    if (Math.abs(dy) > 65 && Math.abs(dy) > Math.abs(dx) * 1.2) {
+      if (sceneIds[current] === "experience") stepExperience(Math.sign(dy));
+      else go(current + Math.sign(dy));
+    }
   },
   { passive: true },
 );
-window.addEventListener("hashchange", () => go(indexForHash(location.hash)));
+window.addEventListener("hashchange", () => {
+  const id = experiences.find(
+    (ex) => location.hash === `#internship-${ex.id}`,
+  )?.id;
+  go(indexForHash(location.hash));
+  if (id) changeExperience(id);
+});
 window.addEventListener("beforeunload", () => {
   timeline?.kill();
+  experienceTransition?.kill();
   character?.dispose();
 });
 systemDark.addEventListener("change", () => {
