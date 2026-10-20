@@ -1,0 +1,177 @@
+{
+  "date": "2026-10-20",
+  "target": "http://127.0.0.1:4177/",
+  "branch": "codex/personal-site-redesign-20261019",
+  "build": "tsc --noEmit && vite build: passed",
+  "desktop": [
+    {
+      "name": "hero CTA prioritizes experience",
+      "pass": true
+    },
+    {
+      "name": "experience follows hero",
+      "pass": true
+    },
+    {
+      "name": "seven employer tabs and logos",
+      "pass": true
+    },
+    {
+      "name": "updated GTH dates",
+      "pass": true
+    },
+    {
+      "name": "language preserves selected company",
+      "pass": true
+    },
+    {
+      "name": "English navigation",
+      "pass": true
+    },
+    {
+      "name": "End selects last employer without leaving scene",
+      "pass": true
+    },
+    {
+      "name": "Home selects first employer without leaving scene",
+      "pass": true
+    },
+    {
+      "name": "full experience has seven branded entries",
+      "pass": true
+    },
+    {
+      "name": "work follows experience",
+      "pass": true
+    },
+    {
+      "name": "Dayuyan stable hash",
+      "pass": true
+    },
+    {
+      "name": "two school SVG emblems",
+      "pass": true
+    },
+    {
+      "name": "latest education periods",
+      "pass": true
+    },
+    {
+      "name": "latest resume path",
+      "pass": true
+    },
+    {
+      "name": "dark theme",
+      "pass": true
+    },
+    {
+      "name": "no unexpected runtime errors",
+      "pass": true,
+      "details": {
+        "errors": [],
+        "broken": []
+      }
+    }
+  ],
+  "mobileReading": [
+    {
+      "name": "wheel scroll stays within experience",
+      "pass": true,
+      "details": {
+        "scrollTop": 113
+      }
+    },
+    {
+      "name": "native touch scroll stays within experience",
+      "pass": true,
+      "details": {
+        "scrollTop": 113
+      }
+    },
+    {
+      "name": "hidden jellyfish stays invisible",
+      "pass": true
+    },
+    {
+      "name": "mobile English retains employer",
+      "pass": true
+    },
+    {
+      "name": "mobile English fits width",
+      "pass": true
+    }
+  ],
+  "finalBuild": [
+    {
+      "name": "depth fade keeps target behind current scene",
+      "pass": true,
+      "details": {
+        "front": 4,
+        "back": 1,
+        "targetInert": true,
+        "hash": "#hero"
+      }
+    },
+    {
+      "name": "transition finishes on experience",
+      "pass": true
+    },
+    {
+      "name": "previous returns to hero",
+      "pass": true
+    },
+    {
+      "name": "served resume matches source PDF",
+      "pass": true
+    },
+    {
+      "name": "language toggle reveals selected employer on mobile",
+      "pass": true
+    },
+    {
+      "name": "reduced motion changes scenes immediately",
+      "pass": true
+    },
+    {
+      "name": "no wipe overlay",
+      "pass": true
+    }
+  ],
+  "responsive": [
+    {
+      "viewport": "1440x900",
+      "language": "zh",
+      "result": "7 employer tabs, all company marks loaded; no horizontal overflow"
+    },
+    {
+      "viewport": "390x844",
+      "language": "zh",
+      "result": "company list scrolls horizontally; school emblems loaded; no horizontal overflow"
+    },
+    {
+      "viewport": "375x667",
+      "language": "zh",
+      "result": "detail panel scrolls; no horizontal overflow"
+    },
+    {
+      "viewport": "320x568",
+      "language": "zh",
+      "result": "detail panel and about scene allow reading scroll; no horizontal overflow"
+    },
+    {
+      "viewport": "375x667",
+      "language": "en",
+      "result": "selected employer preserved; no horizontal overflow"
+    }
+  ],
+  "resume": {
+    "bytes": 795993,
+    "sha256": "34dffbd83971409db726cb3e5898792b8105d10846cca17d6357ee436ef38ae3",
+    "sourceCopyDistAndHttpMatch": true
+  },
+  "limits": [
+    "Chromium desktop and emulated mobile; no physical-device Safari check.",
+    "No new Lighthouse run.",
+    "CEC Cloud official SVG embeds a PNG; CityU asset is a public native SVG, not asserted to be the latest official brand package."
+  ]
+}

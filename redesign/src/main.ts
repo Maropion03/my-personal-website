@@ -2,17 +2,20 @@ import { gsap } from "gsap";
 import {
   projects,
   experiences,
+  education,
   t,
   type Language,
   type Project,
+  type Experience,
 } from "./content";
 import type { JellyfishController } from "./jellyfish";
 import "./styles.css";
+import "./organizations.css";
 
 const app = document.querySelector<HTMLDivElement>("#app")!;
 const reduced = matchMedia("(prefers-reduced-motion: reduce)");
 const systemDark = matchMedia("(prefers-color-scheme: dark)");
-const resume = new URL("../../assets/resume.pdf", import.meta.url).href;
+const resume = `${import.meta.env.BASE_URL}resume.pdf`;
 const portrait = new URL("../../assets/hero-portrait.jpg", import.meta.url)
   .href;
 const favicon = new URL("../../assets/favicon.svg", import.meta.url).href;
@@ -47,38 +50,72 @@ let timeline: gsap.core.Timeline | undefined;
 let dialogReturn: HTMLElement | null = null;
 let activeDialog: "works" | "experience" | "wechat" | Project | null = null;
 let renderGeneration = 0;
-const sceneIds = [
-  "hero",
-  "projects",
-  "project-dayuyan",
-  "project-requirement-review",
-  "experience",
-  "about",
-  "contact",
-];
-const chapters = [
-  "hero",
-  "projects",
-  "projects",
-  "projects",
-  "experience",
-  "about",
-  "contact",
-];
+let selectedExperience = experiences[0].id;
 const featured = projects.slice(0, 3);
+const projectSceneIds = featured.map((project, index) =>
+  index === 0 ? "projects" : `project-${project.id}`,
+);
+const sceneIds = ["hero", "experience", ...projectSceneIds, "about", "contact"];
+const chapters = sceneIds.map((id) =>
+  projectSceneIds.includes(id) ? "projects" : id,
+);
 const sceneTransitionDuration = 0.9;
 const tr = (zh: string, en: string) => e(lang === "zh" ? zh : en);
 const chapterLabels = () => [
   tr("首页", "Home"),
+  tr("实习经历", "Experience"),
   tr("作品", "Work"),
-  tr("经历", "Experience"),
   tr("关于我", "About"),
   tr("联系", "Contact"),
 ];
-const chapterKeys = ["hero", "projects", "experience", "about", "contact"];
+const chapterKeys = ["hero", "experience", "projects", "about", "contact"];
+
+function organizationLogo(source: string, deferred = true): string {
+  return `<span class="organization-logo"><img ${deferred ? "data-src" : "src"}="${e(source)}" alt="" width="64" height="64" /></span>`;
+}
+
+function experienceDetail(ex: Experience): string {
+  return `<div class="internship-identity">${organizationLogo(ex.logo)}<div><h3>${e(t(ex.company, lang))}</h3>${ex.department ? `<p class="internship-department">${e(t(ex.department, lang))}</p>` : ""}</div></div>
+    <div class="internship-meta"><p>${e(t(ex.role, lang))}</p><p class="internship-period">${e(ex.period)}</p></div>
+    <p class="internship-summary">${e(t(ex.summary, lang))}</p>
+    <ul class="internship-bullets">${ex.bullets.map((bullet) => `<li>${e(t(bullet, lang))}</li>`).join("")}</ul>`;
+}
+
+function experienceScene(): string {
+  const selected = experiences.find((ex) => ex.id === selectedExperience)!;
+  return `<section class="scene experience-scene" id="experience" data-chapter="experience" aria-labelledby="experience-title" inert>
+    <div class="scene-inner internship-layout">
+      <div class="internship-heading" data-copy><div><p class="eyebrow">${tr("沿途的实践", "Learning by building")}</p><h2 id="experience-title">${tr("实习经历", "Experience, in practice.")}</h2></div><button class="text-link" data-dialog="experience">${tr("完整经历", "Full experience")} <span aria-hidden="true">↗</span></button></div>
+      <div class="internship-tabs" role="tablist" aria-label="${tr("选择实习公司", "Choose an employer")}" aria-orientation="vertical">${experiences.map((ex, i) => `<button class="internship-tab" role="tab" id="experience-tab-${ex.id}" data-experience="${ex.id}" aria-controls="experience-panel" aria-selected="${ex.id === selectedExperience}" tabindex="${ex.id === selectedExperience ? 0 : -1}">${organizationLogo(ex.logo)}<span class="internship-tab-name">${e(t(ex.company, lang))}</span><span class="internship-tab-index" aria-hidden="true">${String(i + 1).padStart(2, "0")}</span></button>`).join("")}</div>
+      <article class="internship-panel" id="experience-panel" role="tabpanel" tabindex="0" aria-labelledby="experience-tab-${selected.id}" data-depth>${experienceDetail(selected)}</article>
+    </div>
+  </section>`;
+}
+
+function selectExperience(id: string, focus = false): void {
+  const selected = experiences.find((ex) => ex.id === id);
+  if (!selected) return;
+  selectedExperience = id;
+  document
+    .querySelectorAll<HTMLButtonElement>(".internship-tab")
+    .forEach((tab) => {
+      const active = tab.dataset.experience === id;
+      tab.setAttribute("aria-selected", String(active));
+      tab.tabIndex = active ? 0 : -1;
+      if (active && focus) {
+        tab.focus({ preventScroll: true });
+        tab.scrollIntoView({ block: "nearest", inline: "nearest" });
+      }
+    });
+  const panel = document.querySelector<HTMLElement>(".internship-panel")!;
+  panel.setAttribute("aria-labelledby", `experience-tab-${id}`);
+  panel.innerHTML = experienceDetail(selected);
+  panel.scrollTop = 0;
+  loadSceneMedia(sceneIds.indexOf("experience"));
+}
 
 function projectScene(project: Project, index: number): string {
-  return `<section class="scene project-scene project-scene--${project.id}" id="${sceneIds[index + 1]}" data-chapter="projects" aria-labelledby="title-${project.id}" inert>
+  return `<section class="scene project-scene project-scene--${project.id}" id="${projectSceneIds[index]}" data-chapter="projects" aria-labelledby="title-${project.id}" inert>
     <div class="scene-inner project-layout">
       <figure class="project-visual" data-depth>
         <div class="project-image-wrap"><img data-src="${e(project.image!)}" alt="${e(t(project.imageAlt, lang))}" loading="lazy" width="1600" height="1000" /></div>
@@ -114,22 +151,14 @@ function render(): void {
       <section class="scene hero-scene" id="hero" data-chapter="hero" aria-labelledby="hero-title">
         <div class="hero-pixels" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i></div>
         <div class="scene-inner hero-layout">
-          <div class="hero-copy" data-copy><p class="eyebrow">AI Product Manager & Builder</p><h1 id="hero-title" class="display-name" data-text="Maropion.">Maropion<span>.</span></h1><p class="hero-statement">${tr("把想法，做成体验。", "Ideas, made tangible.")}</p><p class="hero-intro">${tr("在 AI、交互与想象之间，\n探索新的可能。", "Exploring the space between\nAI, interaction and imagination.").replaceAll("\n", "<br>")}</p><div class="hero-actions"><a class="button button--accent" href="#projects" data-go="projects">${tr("走进我的作品", "Step into my work")} <span aria-hidden="true">↗</span></a><a class="text-link" href="#about" data-go="about">${tr("关于我", "A little about me")} <span aria-hidden="true">↗</span></a></div></div>
+          <div class="hero-copy" data-copy><p class="eyebrow">AI Product Manager & Builder</p><h1 id="hero-title" class="display-name" data-text="Maropion.">Maropion<span>.</span></h1><p class="hero-statement">${tr("把想法，做成体验。", "Ideas, made tangible.")}</p><p class="hero-intro">${tr("在 AI、交互与想象之间，\n探索新的可能。", "Exploring the space between\nAI, interaction and imagination.").replaceAll("\n", "<br>")}</p><div class="hero-actions"><a class="button button--accent" href="#experience" data-go="experience">${tr("先看实习经历", "My experience")} <span aria-hidden="true">↗</span></a><a class="text-link" href="#projects" data-go="projects">${tr("精选作品", "Selected work")} <span aria-hidden="true">↗</span></a></div></div>
         </div>
         <p class="character-hint">${tr("和水母打个招呼，拖动试试。", "Say hello. Give the jellyfish a little turn.")}</p>
       </section>
+      ${experienceScene()}
       ${featured.map(projectScene).join("")}
-      <section class="scene experience-scene" id="experience" data-chapter="experience" aria-labelledby="experience-title" inert>
-        <div class="scene-inner experience-layout"><div class="experience-heading" data-copy><p class="eyebrow">${tr("沿途的实践", "Learning by building")}</p><h2 id="experience-title">${tr("在真实问题里，\n练习产品判断。", "Real problems.\nBetter questions.").replaceAll("\n", "<br>")}</h2><p class="section-intro">${tr("从业务理解，到 AI 体验与可交付的产品。", "From understanding a business to shaping useful AI experiences.")}</p><button class="text-link" data-dialog="experience">${tr("完整经历", "Full experience")} <span aria-hidden="true">↗</span></button></div><div class="experience-list" data-depth>${experiences
-          .slice(0, 3)
-          .map(
-            (ex, i) =>
-              `<article class="experience-row"><p class="experience-period">${e(ex.period)}</p><div class="experience-name"><h3>${e(t(ex.company, lang))}</h3><span>${e(t(ex.role, lang))}</span></div><p class="experience-summary">${e(t(ex.summary, lang))}</p><span class="experience-glyph glyph-${i}" aria-hidden="true"></span></article>`,
-          )
-          .join("")}</div></div>
-      </section>
       <section class="scene about-scene" id="about" data-chapter="about" aria-labelledby="about-title" inert>
-        <div class="scene-inner about-layout"><figure class="portrait" data-depth><img data-src="${e(portrait)}" alt="Maropion" loading="lazy" width="600" height="800" /><figcaption>Maropion / ${tr("毛睿平", "Mao Ruiping")}</figcaption><span class="portrait-pixel" aria-hidden="true"></span></figure><div class="about-copy" data-copy><p class="eyebrow">${tr("认识一下", "A little about me")}</p><h2 id="about-title">${tr("从商业问题，\n走向 AI 体验。", "A business mind.\nA builder’s instinct.").replaceAll("\n", "<br>")}</h2><p class="about-intro">${tr("会计学背景，AI 产品经理与独立开发者。喜欢把模糊的想法，变成可以体验、讨论和验证的东西。", "An accounting background, an AI product perspective, and a habit of building. I like turning ambiguous ideas into something people can try, discuss and improve.")}</p><div class="education"><div><h3>${tr("香港城市大学", "City University of Hong Kong")}</h3><p>MSc Artificial Intelligence in Business</p><time>2026.09 - 2027.06</time></div><div><h3>${tr("广东财经大学", "Guangdong University of Finance & Economics")}</h3><p>${tr("会计学学士", "Bachelor’s degree in Accounting")}</p><time>2022.09 - 2026.06</time></div></div><a class="text-link" href="${e(resume)}" download="Maropion-Resume.pdf" data-track="cta_about_resume">${tr("下载完整简历", "Download my résumé")} <span aria-hidden="true">↗</span></a></div></div>
+        <div class="scene-inner about-layout"><figure class="portrait" data-depth><img data-src="${e(portrait)}" alt="Maropion" loading="lazy" width="600" height="800" /><figcaption>Maropion / ${tr("毛睿平", "Mao Ruiping")}</figcaption><span class="portrait-pixel" aria-hidden="true"></span></figure><div class="about-copy" data-copy><p class="eyebrow">${tr("认识一下", "A little about me")}</p><h2 id="about-title">${tr("从商业问题，\n走向 AI 体验。", "A business mind.\nA builder’s instinct.").replaceAll("\n", "<br>")}</h2><p class="about-intro">${tr("会计学背景，AI 产品经理与独立开发者。喜欢把模糊的想法，变成可以体验、讨论和验证的东西。", "An accounting background, an AI product perspective, and a habit of building. I like turning ambiguous ideas into something people can try, discuss and improve.")}</p><div class="education education--branded">${education.map((school) => `<div class="education-row">${organizationLogo(school.logo)}<div><h3>${e(t(school.school, lang))}</h3><p>${e(t(school.degree, lang))}</p><time>${e(school.period)}</time>${school.note ? `<p class="education-note">${e(t(school.note, lang))}</p>` : ""}</div></div>`).join("")}</div><a class="text-link" href="${e(resume)}" download="Maropion-Resume.pdf" data-track="cta_about_resume">${tr("下载完整简历", "Download my résumé")} <span aria-hidden="true">↗</span></a></div></div>
       </section>
       <section class="scene contact-scene" id="contact" data-chapter="contact" aria-labelledby="contact-title" inert>
         <div class="scene-inner contact-layout"><div data-copy><p class="eyebrow">${tr("下一个想法，从一次对话开始", "The next idea starts with a conversation")}</p><h2 id="contact-title">${tr("一起，\n做点有意思的。", "Let’s make\nsomething matter.").replaceAll("\n", "<br>")}</h2><p class="contact-intro">${tr("关于 AI 产品岗位，或一个值得做出来的项目。", "For an AI product role, or an idea worth bringing to life.")}</p><a class="email-link" href="mailto:maropion@163.com" data-track="cta_contact_email">maropion@163.com <span aria-hidden="true">↗</span></a><div class="contact-actions"><button class="button button--accent" data-dialog="wechat" data-track="cta_contact_qr">${tr("微信联系", "Say hello on WeChat")} <span aria-hidden="true">↗</span></button><a class="text-link" href="https://github.com/Maropion03" target="_blank" rel="noopener noreferrer">GitHub <span aria-hidden="true">↗</span></a><button class="text-link" data-copy="18565682722">${tr("复制手机号", "Copy phone number")}</button></div></div></div>
@@ -162,6 +191,14 @@ function render(): void {
     }),
   );
   activate(current);
+  if (sceneIds[current] === "experience") {
+    document
+      .querySelector('.internship-tab[aria-selected="true"]')
+      ?.scrollIntoView({
+        block: "nearest",
+        inline: "nearest",
+      });
+  }
   if (current === 0 && !reduced.matches) {
     gsap.from(".hero-copy > :not(h1)", {
       opacity: 0,
@@ -194,16 +231,19 @@ function loadSceneMedia(index: number): void {
 function activate(index: number): void {
   loadSceneMedia(index);
   current = index;
-  document.querySelectorAll<HTMLElement>(".scene").forEach((el, i) => {
+  document.querySelectorAll<HTMLElement>(".scene").forEach((el) => {
+    const active = el.id === sceneIds[index];
     el.classList.remove("is-outgoing", "is-incoming");
-    el.classList.toggle("is-active", i === index);
-    el.inert = i !== index;
-    el.setAttribute("aria-hidden", String(i !== index));
-    gsap.set(el, { autoAlpha: i === index ? 1 : 0 });
+    el.classList.toggle("is-active", active);
+    el.inert = !active;
+    el.setAttribute("aria-hidden", String(!active));
+    gsap.set(el, { autoAlpha: active ? 1 : 0 });
     gsap.set(el.querySelector(".scene-inner"), {
       clearProps: "transform,opacity,visibility",
     });
   });
+  document.querySelector<HTMLElement>(".stage")!.dataset.chapter =
+    chapters[index];
   document
     .querySelectorAll<HTMLAnchorElement>(".main-nav a, .mobile-nav a")
     .forEach((link) => {
@@ -334,7 +374,7 @@ function go(index: number): void {
 
 function indexForHash(hash: string): number {
   const key = hash.replace("#", "");
-  if (key === "education" || key === "skills") return 5;
+  if (key === "education" || key === "skills") return sceneIds.indexOf("about");
   return Math.max(0, sceneIds.indexOf(key));
 }
 
@@ -362,7 +402,7 @@ function showDialog(value: typeof activeDialog): void {
   if (value === "works") {
     target.innerHTML = `<p class="eyebrow">${tr("继续看看", "More to explore")}</p><h2 id="dialog-title">${tr("全部作品", "All projects")}</h2><div class="work-index">${projects.map((p) => `<button class="work-index-row" data-project="${p.id}">${p.image ? `<img src="${e(p.image)}" alt="" width="140" height="90" loading="lazy" />` : '<span class="research-mark">RAG</span>'}<span><strong>${e(t(p.subtitle, lang))}</strong><span>${e(t(p.category, lang))}</span></span><span aria-hidden="true">↗</span></button>`).join("")}</div>`;
   } else if (value === "experience") {
-    target.innerHTML = `<p class="eyebrow">${tr("实践与学习", "Practice & learning")}</p><h2 id="dialog-title">${tr("完整经历", "Experience")}</h2><div class="full-experience">${experiences.map((ex) => `<article><p class="eyebrow">${e(ex.period)}</p><h3>${e(t(ex.company, lang))}</h3><p class="detail-role">${e(t(ex.role, lang))}</p><p>${e(t(ex.summary, lang))}</p></article>`).join("")}</div><a class="button button--ink" href="${e(resume)}" download="Maropion-Resume.pdf">${tr("完整简历 PDF", "Full résumé PDF")} ↗</a>`;
+    target.innerHTML = `<p class="eyebrow">${tr("实践与学习", "Practice & learning")}</p><h2 id="dialog-title">${tr("完整经历", "Experience")}</h2><div class="full-experience">${experiences.map((ex) => `<article class="full-experience-entry"><div class="full-experience-heading">${organizationLogo(ex.logo, false)}<div><h3>${e(t(ex.company, lang))}</h3><p class="detail-role">${e(t(ex.role, lang))}</p>${ex.department ? `<p class="internship-department">${e(t(ex.department, lang))}</p>` : ""}<p class="internship-period">${e(ex.period)}</p></div></div><p>${e(t(ex.summary, lang))}</p><ul class="internship-bullets">${ex.bullets.map((bullet) => `<li>${e(t(bullet, lang))}</li>`).join("")}</ul></article>`).join("")}</div><a class="button button--ink" href="${e(resume)}" download="Maropion-Resume.pdf">${tr("完整简历 PDF", "Full résumé PDF")} ↗</a>`;
   } else if (value === "wechat") {
     target.innerHTML = `<p class="eyebrow">${tr("认识一下", "Let’s connect")}</p><h2 id="dialog-title">${tr("微信聊聊。", "Say hello on WeChat.")}</h2><img class="wechat-qr" src="${e(wechatQR)}" alt="${tr("Maropion 的微信二维码", "Maropion’s WeChat QR code")}" width="280" height="280" /><button class="button button--ink" data-copy="MRP18565682722">${tr("复制微信号", "Copy WeChat ID")} ↗</button>`;
   } else {
@@ -389,6 +429,7 @@ async function copy(value: string): Promise<void> {
 }
 
 function wire(): void {
+  syncTabOrientation();
   document
     .querySelector<HTMLDialogElement>(".detail-dialog")!
     .addEventListener("close", () => {
@@ -405,6 +446,7 @@ app.addEventListener("click", (event) => {
     go(indexForHash(target.dataset.go));
   }
   if (target.dataset.step) go(current + Number(target.dataset.step));
+  if (target.dataset.experience) selectExperience(target.dataset.experience);
   if (target.dataset.project)
     showDialog(projects.find((p) => p.id === target.dataset.project) ?? null);
   if (target.dataset.dialog)
@@ -461,6 +503,65 @@ app.addEventListener("click", (event) => {
     document.querySelector<HTMLDialogElement>(".detail-dialog")!.close();
 });
 
+const compactExperience = matchMedia("(max-width: 767px)");
+function syncTabOrientation(): void {
+  document
+    .querySelector(".internship-tabs")
+    ?.setAttribute(
+      "aria-orientation",
+      compactExperience.matches ? "horizontal" : "vertical",
+    );
+}
+compactExperience.addEventListener("change", syncTabOrientation);
+app.addEventListener("keydown", (event) => {
+  const tab = (event.target as Element).closest<HTMLElement>(
+    "[data-experience]",
+  );
+  if (
+    !tab ||
+    ![
+      "ArrowDown",
+      "ArrowRight",
+      "ArrowUp",
+      "ArrowLeft",
+      "Home",
+      "End",
+    ].includes(event.key)
+  )
+    return;
+  event.preventDefault();
+  event.stopPropagation();
+  const index = experiences.findIndex((ex) => ex.id === tab.dataset.experience);
+  const next =
+    event.key === "Home"
+      ? 0
+      : event.key === "End"
+        ? experiences.length - 1
+        : (index +
+            (["ArrowDown", "ArrowRight"].includes(event.key) ? 1 : -1) +
+            experiences.length) %
+          experiences.length;
+  selectExperience(experiences[next].id, true);
+});
+
+function hasReadingScroll(target: Element): boolean {
+  let element: HTMLElement | null = target.closest<HTMLElement>(
+    ".scene,.internship-panel,.internship-tabs",
+  );
+  while (element) {
+    if (
+      element.scrollHeight > element.clientHeight + 3 ||
+      element.scrollWidth > element.clientWidth + 3
+    )
+      return true;
+    element =
+      element.parentElement?.closest<HTMLElement>(
+        ".scene,.internship-panel,.internship-tabs",
+      ) ?? null;
+  }
+  return false;
+}
+
 let wheelDelta = 0;
 let wheelReset: ReturnType<typeof setTimeout>;
 let wheelLock = 0;
@@ -474,8 +575,7 @@ window.addEventListener(
       Math.abs(event.deltaX) > Math.abs(event.deltaY)
     )
       return;
-    const reading = (event.target as Element).closest<HTMLElement>(".scene");
-    if (reading && reading.scrollHeight > reading.clientHeight + 3) return;
+    if (hasReadingScroll(event.target as Element)) return;
     event.preventDefault();
     if (busy || performance.now() < wheelLock || Math.abs(event.deltaY) < 3)
       return;
@@ -508,6 +608,11 @@ window.addEventListener("keydown", (event) => {
     return;
   }
   if (menuOpen || busy) return;
+  if (
+    (event.target as Element).closest(".internship-panel") &&
+    hasReadingScroll(event.target as Element)
+  )
+    return;
   if (["ArrowDown", "PageDown", "ArrowUp", "PageUp", " "].includes(event.key)) {
     if (event.key === " " && (event.target as Element).closest("button,a"))
       return;
@@ -531,10 +636,9 @@ app.addEventListener(
   (event) => {
     touchX = event.touches[0].clientX;
     touchY = event.touches[0].clientY;
-    const reading = (event.target as Element).closest<HTMLElement>(".scene");
     touchExcluded =
       !!(event.target as Element).closest("dialog,.mobile-nav") ||
-      !!(reading && reading.scrollHeight > reading.clientHeight + 3);
+      hasReadingScroll(event.target as Element);
   },
   { passive: true },
 );

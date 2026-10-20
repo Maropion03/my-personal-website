@@ -459,6 +459,7 @@ h3 {
 }
 .character[data-mode="hidden"] {
   opacity: 0;
+  visibility: hidden;
   pointer-events: none;
 }
 .character[data-mode="contact"] {

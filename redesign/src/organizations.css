@@ -1,0 +1,406 @@
+.organization-logo {
+  display: grid;
+  place-items: center;
+  flex: 0 0 auto;
+  width: 64px;
+  height: 64px;
+  padding: 10px;
+  background: #fffdf8;
+  border: 1px solid #e8e2d7;
+}
+.organization-logo img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+.internship-layout {
+  display: grid;
+  grid-template-columns: minmax(220px, 0.8fr) minmax(0, 2fr);
+  grid-template-rows: auto minmax(0, 1fr);
+  column-gap: clamp(36px, 6vw, 92px);
+  row-gap: 30px;
+  max-width: 1380px;
+  padding-top: clamp(28px, 4vh, 48px);
+  padding-bottom: clamp(28px, 4vh, 48px);
+}
+.internship-heading {
+  grid-column: 1 / -1;
+  display: flex;
+  justify-content: space-between;
+  align-items: end;
+  gap: 20px;
+}
+.internship-heading .eyebrow {
+  margin-bottom: 8px;
+}
+.internship-heading h2 {
+  font-size: clamp(32px, 3.4vw, 48px);
+  letter-spacing: -0.045em;
+  line-height: 1.2;
+  margin: 0;
+}
+.internship-heading .text-link {
+  flex-shrink: 0;
+  margin-bottom: 4px;
+}
+.internship-tabs {
+  min-height: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  scrollbar-width: thin;
+  align-self: start;
+  max-height: 100%;
+}
+.internship-tab {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  min-height: 62px;
+  padding: 10px 12px;
+  border: 0;
+  border-left: 3px solid transparent;
+  border-bottom: 1px solid var(--line);
+  background: transparent;
+  text-align: left;
+  transition: background 160ms ease;
+}
+.internship-tab:hover {
+  background: var(--paper-2);
+}
+.internship-tab[aria-selected="true"] {
+  background: var(--paper-2);
+  border-left-color: var(--accent);
+}
+.internship-tab .organization-logo {
+  width: 38px;
+  height: 38px;
+  padding: 6px;
+}
+.internship-tab-name {
+  font-size: 13px;
+  line-height: 1.5;
+  font-weight: 500;
+}
+.internship-tab-index {
+  font: 9px var(--mono);
+  color: var(--muted);
+  margin-left: auto;
+}
+.internship-panel {
+  min-height: 0;
+  min-width: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  scrollbar-width: thin;
+  padding: 0 12px 16px 0;
+  align-self: stretch;
+}
+.internship-identity {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  margin-bottom: 22px;
+}
+.internship-identity h3 {
+  margin: 0;
+  font-size: clamp(25px, 2.5vw, 36px);
+  line-height: 1.3;
+  letter-spacing: -0.04em;
+}
+.internship-department {
+  margin: 7px 0 0;
+  font-size: 12px;
+  line-height: 1.6;
+  color: var(--muted);
+}
+.internship-meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 8px 20px;
+  border-bottom: 1px solid var(--line);
+  padding-bottom: 18px;
+  margin-bottom: 20px;
+}
+.internship-meta p {
+  font-size: 13px;
+  line-height: 1.6;
+  margin: 0;
+}
+.internship-period,
+.internship-meta .internship-period {
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--muted);
+  white-space: nowrap;
+}
+.internship-summary {
+  font-size: 17px;
+  line-height: 1.7;
+  margin-bottom: 24px;
+  max-width: 38em;
+}
+.internship-bullets {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+.internship-bullets li {
+  position: relative;
+  padding-left: 18px;
+  margin-bottom: 20px;
+  font-size: 13px;
+  line-height: 1.9;
+  color: var(--muted);
+}
+.internship-bullets li::before {
+  content: "";
+  position: absolute;
+  top: 0.72em;
+  left: 0;
+  width: 5px;
+  height: 5px;
+  background: var(--accent);
+}
+.stage[data-chapter="experience"] {
+  touch-action: pan-x pan-y;
+}
+.education.education--branded {
+  grid-template-columns: 1fr;
+  gap: 16px;
+  padding-top: 18px;
+}
+.education-row {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+.education-row .organization-logo {
+  width: 52px;
+  height: 58px;
+  padding: 7px;
+}
+.education--branded h3 {
+  font-size: 14px;
+  line-height: 1.4;
+  margin-bottom: 3px;
+}
+.education--branded p {
+  font-size: 11px;
+  margin-bottom: 4px;
+}
+.education--branded time {
+  font-size: 10px;
+}
+.education--branded .education-note {
+  font-size: 10px;
+  margin: 4px 0 0;
+}
+.full-experience {
+  grid-template-columns: 1fr;
+  gap: 36px;
+}
+.full-experience-entry + .full-experience-entry {
+  border-top: 1px solid var(--line);
+  padding-top: 30px;
+}
+.full-experience-heading {
+  display: flex;
+  align-items: start;
+  gap: 18px;
+  margin-bottom: 18px;
+}
+.full-experience-heading h3 {
+  margin: 0 0 7px;
+}
+.full-experience-heading .internship-period {
+  margin: 8px 0 0;
+}
+.full-experience-entry > p {
+  font-size: 15px;
+  line-height: 1.8;
+}
+@media (max-height: 740px) and (min-width: 768px) {
+  .internship-layout {
+    padding-top: 22px;
+    padding-bottom: 22px;
+    row-gap: 22px;
+  }
+  .internship-heading h2 {
+    font-size: 32px;
+  }
+  .internship-tab {
+    min-height: 54px;
+    padding-block: 6px;
+  }
+  .internship-identity {
+    margin-bottom: 16px;
+  }
+  .internship-summary {
+    margin-bottom: 18px;
+  }
+  .internship-bullets li {
+    margin-bottom: 16px;
+  }
+}
+@media (max-width: 767px) {
+  .internship-layout {
+    display: flex;
+    flex-direction: column;
+    gap: 22px;
+    padding-top: 26px;
+    padding-bottom: 12px;
+    height: 100%;
+    min-height: 0;
+  }
+  .internship-heading {
+    align-items: end;
+    flex-shrink: 0;
+    gap: 10px;
+  }
+  .internship-heading h2 {
+    font-size: 29px;
+    max-width: 8.5em;
+  }
+  :lang(en) .internship-heading h2 {
+    font-size: 26px;
+    max-width: 7em;
+  }
+  .internship-heading .eyebrow {
+    font-size: 9px;
+    margin-bottom: 7px;
+  }
+  .internship-heading .text-link {
+    font-size: 10px;
+    margin-bottom: 3px;
+  }
+  .internship-tabs {
+    display: flex;
+    flex-shrink: 0;
+    align-self: stretch;
+    overflow-x: auto;
+    overflow-y: hidden;
+    gap: 6px;
+    scrollbar-width: none;
+    scroll-snap-type: x proximity;
+    padding-bottom: 3px;
+  }
+  .internship-tab {
+    flex: 0 0 auto;
+    flex-direction: column;
+    justify-content: center;
+    align-items: start;
+    gap: 7px;
+    width: auto;
+    min-width: 96px;
+    max-width: 150px;
+    min-height: 83px;
+    padding: 7px 12px 10px;
+    border-left: 0;
+    border-bottom: 3px solid transparent;
+    scroll-snap-align: start;
+  }
+  .internship-tab[aria-selected="true"] {
+    border-bottom-color: var(--accent);
+  }
+  .internship-tab .organization-logo {
+    width: 34px;
+    height: 34px;
+    padding: 5px;
+  }
+  .internship-tab-name {
+    font-size: 11px;
+  }
+  .internship-tab-index {
+    display: none;
+  }
+  .internship-panel {
+    flex: 1;
+    padding-right: 5px;
+    padding-bottom: 24px;
+  }
+  .internship-identity {
+    gap: 14px;
+    margin-bottom: 15px;
+  }
+  .internship-identity .organization-logo {
+    width: 47px;
+    height: 47px;
+    padding: 7px;
+  }
+  .internship-identity h3 {
+    font-size: 24px;
+  }
+  .internship-department {
+    font-size: 10px;
+    margin-top: 4px;
+  }
+  .internship-meta {
+    display: block;
+    padding-bottom: 13px;
+    margin-bottom: 16px;
+  }
+  .internship-meta p {
+    font-size: 11px;
+  }
+  .internship-meta .internship-period {
+    margin-top: 6px;
+    font-size: 10px;
+  }
+  .internship-summary {
+    font-size: 15px;
+    margin-bottom: 18px;
+  }
+  .internship-bullets li {
+    font-size: 12px;
+    line-height: 1.9;
+    margin-bottom: 17px;
+    padding-left: 14px;
+  }
+  .education.education--branded {
+    gap: 14px;
+    padding-top: 16px;
+  }
+  .education-row {
+    gap: 13px;
+  }
+  .education-row .organization-logo {
+    width: 46px;
+    height: 53px;
+    padding: 6px;
+  }
+  .education--branded h3 {
+    font-size: 12px;
+  }
+  .education--branded p,
+  .education--branded time,
+  .education--branded .education-note {
+    font-size: 9px;
+  }
+  .full-experience-heading .organization-logo {
+    width: 48px;
+    height: 48px;
+    padding: 7px;
+  }
+  .full-experience-heading {
+    gap: 13px;
+  }
+  .full-experience-heading h3 {
+    font-size: 21px;
+  }
+}
+@media (max-width: 767px) and (max-height: 720px) {
+  .internship-layout {
+    padding-top: 18px;
+    gap: 15px;
+  }
+  .internship-tab {
+    min-height: 76px;
+  }
+  .internship-heading h2 {
+    font-size: 25px;
+  }
+}

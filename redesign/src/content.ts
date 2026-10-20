@@ -198,65 +198,270 @@ export const projects: Project[] = [
 ];
 
 export interface Experience {
+  id: string;
+  logo: string;
   company: LocalText;
   role: LocalText;
+  department?: LocalText;
   period: string;
   summary: LocalText;
+  bullets: LocalText[];
 }
 
+const logo = (name: string) => `${import.meta.env.BASE_URL}logos/${name}.svg`;
+
+// Employment and education follow the user-provided latest resume.
+// The resume is the source for these claims, not an independent verification.
 export const experiences: Experience[] = [
   {
-    company: { zh: "百度 MEG", en: "Baidu MEG" },
-    role: { zh: "AI 产品经理", en: "AI Product Manager" },
+    id: "cecloud",
+    logo: logo("cecloud"),
+    company: {
+      zh: "中国电子云",
+      en: "CEC Cloud",
+    },
+    role: {
+      zh: "AI 产品经理（智能体与管控产品）",
+      en: "AI Product Manager / Agents & Governance",
+    },
+    period: "2026.07 - 2026.09",
+    summary: {
+      zh: "参与 Graph RAG、Agent 管控与多租户权限体系设计。",
+      en: "Graph RAG, agent governance and multi-tenant permissions.",
+    },
+    bullets: [
+      {
+        zh: "参与知识图谱检索系统设计，落地多策略内容合并与图谱可视化，支持 1000 节点 / 2000 边展示；P95 检索耗时 <2s，准确率提升约 40%。",
+        en: "Contributed to knowledge-graph retrieval, multi-strategy result merging and graph visualization supporting 1,000 nodes and 2,000 edges. P95 retrieval latency was below 2s, with approximately 40% better accuracy.",
+      },
+      {
+        zh: "设计 Claw Agent 事件驱动对话与自动化调度，覆盖 8 类事件、5 种任务触发方式，支持技能插件化与热加载，任务完成效率提升约 60%。",
+        en: "Designed event-driven conversations and scheduling for Claw Agent, covering eight event types, five trigger methods, skill plugins and hot loading, with approximately 60% better task-completion efficiency.",
+      },
+      {
+        zh: "参与多租户 RBAC / ABAC 及三员管理设计，覆盖 50+ 权限点和 3 个应用平台，权限管理效率提升约 50%。",
+        en: "Contributed to multi-tenant RBAC / ABAC and three-role administration across 50+ permission points and three application platforms, with approximately 50% better permission-management efficiency.",
+      },
+    ],
+  },
+  {
+    id: "baidu",
+    logo: logo("baidu"),
+    company: {
+      zh: "百度 MEG",
+      en: "Baidu MEG",
+    },
+    role: {
+      zh: "AI 产品经理",
+      en: "AI Product Manager",
+    },
     period: "2026.04 - 2026.07",
     summary: {
       zh: "从选题到成片，梳理 AI 创作任务与分镜工作区。",
       en: "AI creation workflows, from ideation to storyboard-based production.",
     },
+    bullets: [
+      {
+        zh: "面向泛知识与资讯创作者，拆解选题、脚本、分镜、素材和数字人成片链路，定位入口割裂、过程不透明与成本问题。",
+        en: "Mapped the ideation, script, storyboard, asset and digital-presenter workflow for knowledge and news creators, identifying fragmented entry points, opaque processes and cost issues.",
+      },
+      {
+        zh: "推动由工具入口升级为创作任务入口，设计 Agent 意图理解、任务规划，以及脚本、分镜、素材、配音、审核与导出 Workflow。",
+        en: "Developed the creation-task entry concept, including agent intent understanding, task planning and workflows for scripts, storyboards, assets, voice-over, review and export.",
+      },
+      {
+        zh: "设计对话 + 分镜工作区，支持进度展示、镜头级修改、影响提示和版本回退，并结合用户价值、模型成熟度与成本完成 MVP 裁剪。",
+        en: "Designed a conversation-and-storyboard workspace with progress, shot-level edits, impact notices and version rollback; scoped the MVP around user value, model readiness and cost.",
+      },
+    ],
+    department: {
+      zh: "人工智能创作产品部",
+      en: "AI Creation Products",
+    },
   },
   {
-    company: { zh: "上海守扣科技", en: "Shanghai SoMark" },
-    role: { zh: "AI 产品经理", en: "AI Product Manager" },
+    id: "meituan",
+    logo: logo("meituan"),
+    company: {
+      zh: "美团 · 点评",
+      en: "Meituan / Dianping",
+    },
+    role: {
+      zh: "产品运营（AI / 风控方向）",
+      en: "Product Operations / AI & Risk",
+    },
+    period: "2025.07 - 2025.09",
+    summary: {
+      zh: "评论线索 Agent、用户与舆情洞察、黑灰产风险分析。",
+      en: "Comment-lead agents, user insights and risk intelligence.",
+    },
+    bullets: [
+      {
+        zh: "基于 Claude Sonnet 4.5 和 Nocode 接入美团 SSO，迭代评论线索 Agent 至 V35 并部署；结合 CoT、Few-Shot 和预览纠错，将单帖处理耗时由 60s 降至 30s。",
+        en: "Integrated a no-code comment-lead agent with Meituan SSO using Claude Sonnet 4.5, iterating to V35 and deploying it. CoT, few-shot prompts and preview correction reduced per-post processing from 60s to 30s.",
+      },
+      {
+        zh: "分析 1800+ 条小红书帖子，周均匹配潜在用户 300+；通过聚类分级负面舆情，月均识别 150+ 并制定应对策略。",
+        en: "Analyzed 1,800+ Xiaohongshu posts, identifying 300+ potential users weekly. Clustered negative sentiment, identifying 150+ cases monthly and developing response strategies.",
+      },
+      {
+        zh: "搭建多城市社群情报网络，分析 2500+ 条风险情报，协助识别并处置 50+ 违规商户。",
+        en: "Built a multi-city community intelligence network, analyzed 2,500+ risk signals and helped identify and address 50+ non-compliant merchants.",
+      },
+    ],
+    department: {
+      zh: "核心本地商业 · 点评事业部",
+      en: "Core Local Commerce / Dianping",
+    },
+  },
+  {
+    id: "somark",
+    logo: logo("somark"),
+    company: {
+      zh: "上海守扣科技",
+      en: "SoMark",
+    },
+    role: {
+      zh: "AI 产品经理",
+      en: "AI Product Manager",
+    },
     period: "2026.02 - 2026.04",
     summary: {
       zh: "文档智能产品定义、工作流设计与端侧 Demo 交付。",
       en: "Document intelligence, workflows and on-device demo delivery.",
     },
+    bullets: [
+      {
+        zh: "接手图片问答 Demo，重定义简历评估、合同对比、票据核验等高敏场景，重构文件解析、结构化提取与场景结论链路；引入 PDF 逐页解析与 OCR，完成前后端 Demo 和答辩交付，获 AI PC 赛道创意赛亚军。",
+        en: "Reframed an image-Q&A demo for sensitive-document tasks, rebuilding parsing, structured extraction and contextual judgments with page-by-page PDF parsing and OCR. Delivered the end-to-end demo and presentation; the project won second place in the AI PC creative track.",
+      },
+      {
+        zh: "拆解 20+ 文档智能产品，从用户任务、解析质量、复杂表格、私有化部署和 Agentic OCR 等维度形成定位与路线建议。",
+        en: "Studied 20+ document-intelligence products across user tasks, parsing quality, complex tables, private deployment and agentic OCR, informing positioning and roadmap recommendations.",
+      },
+      {
+        zh: "围绕合同、简历、研报等 5 类任务，设计触发、解析、并行分析、结果回写链路，以及状态、异常和结果回看交互。",
+        en: "Designed trigger, parsing, parallel-analysis and write-back flows for five task types, including contracts, resumes and research reports, with status, error and result-review interactions.",
+      },
+    ],
   },
   {
-    company: { zh: "广州安点科技", en: "Guangzhou Andian" },
-    role: { zh: "AI 产品经理", en: "AI Product Manager" },
+    id: "annpoint",
+    logo: logo("annpoint"),
+    company: {
+      zh: "广州安点科技",
+      en: "Annpoint",
+    },
+    role: {
+      zh: "AI 产品经理",
+      en: "AI Product Manager",
+    },
     period: "2025.11 - 2026.02",
     summary: {
       zh: "多 Agent 评审工作台与 AI 指标助手产品规划。",
       en: "Multi-agent review workspace and AI indicator assistant planning.",
     },
+    bullets: [
+      {
+        zh: "独立 0 → 1 完成 PRD 智能评审工作台，基于 CrewAI 搭建研发、设计、测试三类 Agent 并行评审，按 6 个维度输出结论；完成前后端、Docker 部署和导出，将初稿耗时由约 2 小时降至约 3 分钟。",
+        en: "Independently built a PRD review workspace with parallel engineering, design and QA agents in CrewAI, producing findings across six dimensions. Delivered frontend, backend, Docker deployment and export, reducing first-draft time from about two hours to about three minutes.",
+      },
+      {
+        zh: "围绕 PineScript 生成和验证难点，规划期货指标 AI 助手的 6 个模块、25 项验收标准与 MVP，设计需求输入、流式生成、代码编辑、错误定位与解释链路。",
+        en: "Planned six modules, 25 acceptance criteria and the MVP for an AI indicator assistant, covering requirements, streaming PineScript generation, editing, error location and explanation.",
+      },
+    ],
   },
   {
-    company: { zh: "美团 · 点评", en: "Meituan / Dianping" },
-    role: { zh: "产品运营（AI / 风控）", en: "Product Operations / AI & Risk" },
-    period: "2025.07 - 2025.09",
-    summary: {
-      zh: "评论线索结构化、文本数据洞察与风险情报分析。",
-      en: "Structured comment workflows, text insights and risk intelligence.",
+    id: "gtht",
+    logo: logo("gtht"),
+    company: {
+      zh: "国泰海通证券",
+      en: "Guotai Haitong Securities",
     },
-  },
-  {
-    company: { zh: "国泰海通证券", en: "Guotai Haitong Securities" },
-    role: { zh: "行业研究", en: "Industry Research" },
-    period: "2025.08 - 2025.10",
+    role: {
+      zh: "行业研究",
+      en: "Industry Research",
+    },
+    period: "2025.09 - 2025.11",
     summary: {
       zh: "新能源发债项目财务核查与行业研究。",
-      en: "Financial review and industry research for a renewable-energy bond project.",
+      en: "Financial review and research for a renewable-energy bond project.",
+    },
+    bullets: [
+      {
+        zh: "参与三峡新能源发债项目财务核查与行业研究，分析应收账款、经营现金流和偿债能力，支持发债项目材料准备。",
+        en: "Supported financial review and industry research for a China Three Gorges Renewables bond project, analyzing receivables, operating cash flow and debt-servicing capacity, and preparing project materials.",
+      },
+    ],
+    department: {
+      zh: "债务融资部",
+      en: "Debt Financing",
     },
   },
   {
-    company: { zh: "信永中和", en: "ShineWing" },
-    role: { zh: "审计实习生", en: "Audit Intern" },
+    id: "shinewing",
+    logo: logo("shinewing"),
+    company: {
+      zh: "信永中和会计师事务所",
+      en: "ShineWing",
+    },
+    role: {
+      zh: "审计实习生",
+      en: "Audit Intern",
+    },
     period: "2024.06 - 2024.09",
     summary: {
       zh: "库存数据分析与多家子公司的业务流看板。",
       en: "Inventory analysis and business-flow dashboards across subsidiaries.",
+    },
+    bullets: [
+      {
+        zh: "基于库存数据聚类识别 42 处异常记录，并搭建覆盖 15 家子公司的业务流看板，支持审计复核与项目复盘。",
+        en: "Identified 42 anomalous inventory records through clustering and built business-flow dashboards spanning 15 subsidiaries to support audit review and project retrospectives.",
+      },
+    ],
+  },
+];
+
+export interface Education {
+  id: string;
+  logo: string;
+  school: LocalText;
+  degree: LocalText;
+  period: string;
+  note?: LocalText;
+}
+
+export const education: Education[] = [
+  {
+    id: "cityu",
+    logo: logo("cityu"),
+    school: {
+      zh: "香港城市大学",
+      en: "City University of Hong Kong",
+    },
+    degree: {
+      zh: "计算机科学与技术（商业人工智能）· 硕士",
+      en: "Master’s · Artificial Intelligence in Business",
+    },
+    period: "2026.09 - 2027.06",
+  },
+  {
+    id: "gdufe",
+    logo: logo("gdufe"),
+    school: {
+      zh: "广东财经大学",
+      en: "Guangdong University of Finance and Economics",
+    },
+    degree: {
+      zh: "会计学 · 本科",
+      en: "Bachelor’s degree · Accounting",
+    },
+    period: "2022.09 - 2026.06",
+    note: {
+      zh: "GPA 3.86 / 5 · 专业前 10%",
+      en: "GPA 3.86 / 5 · Top 10%",
     },
   },
 ];
