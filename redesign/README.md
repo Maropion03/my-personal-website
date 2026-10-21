@@ -22,11 +22,13 @@ npm run preview
 
 ## Vercel 自动部署
 
+- 固定在线地址：[maropion-redesign.vercel.app](https://maropion-redesign.vercel.app/)。
+- [Vercel 项目](https://vercel.com/maropions-projects/maropion-redesign) · [GitHub 分支](https://github.com/Maropion03/my-personal-website/tree/codex/personal-site-redesign-20261019)。
 - 项目：`maropion-redesign`，连接 `Maropion03/my-personal-website`。
 - Root Directory：`redesign`，允许读取根目录外的仓库素材。
 - Node.js：24.x；安装 `npm ci`，构建 `npm run build`，输出 `dist`。
 - 分支范围及构建命令记录在本目录的 `vercel.json`。
-- 当前分支推送后，Git 集成会自动构建 Preview Deployment，并更新该分支的固定预览地址。
+- 固定域名已绑定 `codex/personal-site-redesign-20261019`，当前分支推送后，Git 集成自动构建并更新该地址。
 
 修改后在仓库中提交并推送：
 
@@ -37,6 +39,8 @@ git push origin codex/personal-site-redesign-20261019
 ```
 
 自动部署由 GitHub push 触发。本地保存后可先用开发服务器检查，再提交推送。构建失败时，预览地址继续提供上一份成功构建。
+
+这是独立项目的分支地址。原项目生产分支保持 `master`，`maropion.fun` 沿用原站。
 
 ## 已确认的设计范围
 
@@ -55,7 +59,7 @@ git push origin codex/personal-site-redesign-20261019
 - 转场：下一幕在当前幕后方淡入，当前幕渐隐，约 0.9 秒后完成页面状态交接；不使用色块遮罩。
 - 拖动水母、聚焦水母后使用左右方向键：旋转角色。
 - 项目按钮与“完整经历”：原生模态框，支持 Escape 关闭和焦点返回。
-- 手机目录和纵向滑动：切换章节。矮屏有内容溢出时优先允许本幕内部滚动，底部按钮继续提供翻幕。
+- 手机目录和纵向滑动：切换章节。实习经历使用原位切换；其他章节在矮屏有内容溢出时允许本幕内部滚动，底部按钮继续提供翻幕。
 - 中英切换保留当前场景；语言与手动主题选择保存在本机。
 - 尊重 `prefers-reduced-motion`，关闭自动摆动、字体切片和转场动画。
 
