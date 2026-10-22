@@ -28,7 +28,9 @@ npm run preview
 - Root Directory：`redesign`，允许读取根目录外的仓库素材。
 - Node.js：24.x；安装 `npm ci`，构建 `npm run build`，输出 `dist`。
 - 分支范围及构建命令记录在本目录的 `vercel.json`。
-- 固定域名已绑定 `codex/personal-site-redesign-20261019`，当前分支推送后，Git 集成自动构建并更新该地址。
+- 固定域名已绑定 `codex/personal-site-redesign-20261019`。
+- 自动部署流程：当前分支 push → GitHub Actions → Vercel Deploy Hook → 云端构建 → 更新固定地址。
+- 工作流：`.github/workflows/deploy-redesign.yml`；Hook URL 存放在 GitHub Actions Secret `MAROPION_REDESIGN_DEPLOY_HOOK`，仓库中不保存该 URL。
 
 修改后在仓库中提交并推送：
 
@@ -39,6 +41,8 @@ git push origin codex/personal-site-redesign-20261019
 ```
 
 自动部署由 GitHub push 触发。本地保存后可先用开发服务器检查，再提交推送。构建失败时，预览地址继续提供上一份成功构建。
+
+[查看自动部署运行记录](https://github.com/Maropion03/my-personal-website/actions/workflows/deploy-redesign.yml)。
 
 这是独立项目的分支地址。原项目生产分支保持 `master`，`maropion.fun` 沿用原站。
 

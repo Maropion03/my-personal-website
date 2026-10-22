@@ -1,0 +1,15 @@
+name: Deploy redesign to Vercel
+
+on:
+  push:
+    branches:
+      - codex/personal-site-redesign-20261019
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Deploy branch on Vercel
+        env:
+          VERCEL_DEPLOY_HOOK: ${{ secrets.MAROPION_REDESIGN_DEPLOY_HOOK }}
+        run: curl --fail-with-body --request POST "$VERCEL_DEPLOY_HOOK"
