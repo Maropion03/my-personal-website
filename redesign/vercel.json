@@ -7,7 +7,8 @@
   "git": {
     "deploymentEnabled": {
       "**": false,
-      "codex/personal-site-redesign-20261019": true
+      "codex/personal-site-redesign-20261019": true,
+      "feat/motion-and-wxg-update-20261108": true
     }
   }
 }

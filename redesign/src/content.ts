@@ -205,6 +205,7 @@ export interface Experience {
   department?: LocalText;
   period: string;
   summary: LocalText;
+  metrics: LocalText[];
   bullets: LocalText[];
 }
 
@@ -213,6 +214,38 @@ const logo = (name: string) => `${import.meta.env.BASE_URL}logos/${name}.svg`;
 // Employment and education follow the user-provided latest resume.
 // The resume is the source for these claims, not an independent verification.
 export const experiences: Experience[] = [
+  {
+    id: "tencent",
+    logo: logo("tencent"),
+    company: {
+      zh: "腾讯 · 微信事业群",
+      en: "Tencent · WXG",
+    },
+    department: {
+      zh: "微信支付 · AI 产品",
+      en: "WeChat Pay · AI Product",
+    },
+    role: {
+      zh: "AI 产品经理（微信支付）",
+      en: "AI Product Manager / WeChat Pay",
+    },
+    period: "2026.11 - 至今",
+    summary: {
+      zh: "围绕微信支付业务场景，推进 AI 智能体与大模型应用产品设计。",
+      en: "Designing AI agents and LLM product experiences within WeChat Pay scenarios.",
+    },
+    metrics: [
+      { zh: "微信事业群 WXG", en: "WeChat Group (WXG)" },
+      { zh: "微信支付 AI 产品", en: "WeChat Pay AI Product" },
+      { zh: "Agent 场景落地", en: "Agent Scenario Delivery" },
+    ],
+    bullets: [
+      {
+        zh: "聚焦微信支付核心业务与服务链路，参与 AI 智能体能力规划、交互链路设计与场景化落地验证。",
+        en: "Focused on core WeChat Pay service flows, contributing to AI agent capability planning, interaction design and scenario validation.",
+      },
+    ],
+  },
   {
     id: "cecloud",
     logo: logo("cecloud"),
@@ -224,23 +257,33 @@ export const experiences: Experience[] = [
       zh: "AI 产品经理（智能体与管控产品）",
       en: "AI Product Manager / Agents & Governance",
     },
-    period: "2026.07 - 2026.09",
+    period: "2026.07 - 2026.11",
     summary: {
-      zh: "参与 Graph RAG、Agent 管控与多租户权限体系设计。",
-      en: "Graph RAG, agent governance and multi-tenant permissions.",
+      zh: "负责第三方 Agent 纳管、资源审批治理、Claw 澄清机制与 Agent 评测体系设计。",
+      en: "Third-party agent onboarding, resource approval governance, Claw clarification strategies and agent evaluation systems.",
     },
+    metrics: [
+      { zh: "A2A / API 第三方纳管", en: "A2A & API Agent Onboarding" },
+      { zh: "4 类上下架审批治理", en: "4 Approval Governance Flows" },
+      { zh: "4 类 Claw 澄清判定", en: "4-Tier Clarification Logic" },
+      { zh: "Judge 评测 + ALHF 链路", en: "Multi-Judge Eval & ALHF" },
+    ],
     bullets: [
       {
-        zh: "参与知识图谱检索系统设计，落地多策略内容合并与图谱可视化，支持 1000 节点 / 2000 边展示；P95 检索耗时 <2s，准确率提升约 40%。",
-        en: "Contributed to knowledge-graph retrieval, multi-strategy result merging and graph visualization supporting 1,000 nodes and 2,000 edges. P95 retrieval latency was below 2s, with approximately 40% better accuracy.",
+        zh: "第三方 Agent 纳管：针对客户自建及外部平台 Agent 难以在 AF 中统一使用的问题，撰写纳管 PRD，设计 A2A 与 API 接入、认证校验、资产权限和启停管理；定义引用关系、异步任务状态及结果回传规则，明确平台管理与外部运行的职责边界。",
+        en: "Third-party agent onboarding: Authored the onboarding PRD to unify customer-built and external agents in AF, designing A2A and API integration, auth verification, asset permissions and lifecycle controls alongside async state and callback rules.",
       },
       {
-        zh: "设计 Claw Agent 事件驱动对话与自动化调度，覆盖 8 类事件、5 种任务触发方式，支持技能插件化与热加载，任务完成效率提升约 60%。",
-        en: "Designed event-driven conversations and scheduling for Claw Agent, covering eight event types, five trigger methods, skill plugins and hot loading, with approximately 60% better task-completion efficiency.",
+        zh: "资源审批与版本治理：负责 AF 平台流程管理与消息待办，覆盖写作智能体、插件/MCP 上下架 4 类审批场景；设计申请发起、审批处理及结果回写流程，制定写作智能体审批后切换版本、插件/MCP 下架后恢复编辑等规则，统一上架范围、状态展示与操作交互。",
+        en: "Resource approval & version governance: Led workflow management and todo notifications across four approval scenarios for writing agents and plugin/MCP publishing, defining version-switching and rollback rules.",
       },
       {
-        zh: "参与多租户 RBAC / ABAC 及三员管理设计，覆盖 50+ 权限点和 3 个应用平台，权限管理效率提升约 50%。",
-        en: "Contributed to multi-tenant RBAC / ABAC and three-role administration across 50+ permission points and three application platforms, with approximately 50% better permission-management efficiency.",
+        zh: "Claw 澄清机制设计：针对内部 Claw 缺参时猜测参数并执行的问题，撰写澄清策略优化 PRD，定义必须澄清、高影响澄清、说明假设后推进及直接执行 4 类判定；设计逐题跳过、任务受阻与续接、子智能体反馈主智能体补齐后重新派发机制，制定任务完成与策略合规双维验收。",
+        en: "Claw clarification mechanism: Authored the clarification strategy PRD to prevent blind parameter guessing, defining four decision tiers, question skipping, blocked-task resumption and sub-agent parameter handoff with dual-dimension acceptance.",
+      },
+      {
+        zh: "Agent 评测体系设计：针对智能体与工作流的质量验收、失败定位和迭代验证需求，设计从评测集、LLM / Code / Agent Judge 评估器到批量实验、版本对比和过程诊断的评测体系；串联日常运行评分、异常样本回流与回归验证，进一步规划 AI 目标识别 → 问题归因 → 修复及策略候选生成 → 固定判据自评 → 人工审核的 ALHF 链路，定义改动应用后的运行反馈与版本恢复机制。",
+        en: "Agent evaluation system: Designed end-to-end evaluation from datasets and LLM/Code/Agent Judges to batch experiments, version comparison and trace diagnosis, connecting production scoring, anomaly write-back and an ALHF optimization loop.",
       },
     ],
   },
@@ -260,6 +303,11 @@ export const experiences: Experience[] = [
       zh: "从选题到成片，梳理 AI 创作任务与分镜工作区。",
       en: "AI creation workflows, from ideation to storyboard-based production.",
     },
+    metrics: [
+      { zh: "工具入口 → 任务入口", en: "Tool → Task Entry" },
+      { zh: "全链路 Agent 规划", en: "End-to-End Agent Planning" },
+      { zh: "对话 + 分镜工作区", en: "Chat + Storyboard Studio" },
+    ],
     bullets: [
       {
         zh: "面向泛知识与资讯创作者，拆解选题、脚本、分镜、素材和数字人成片链路，定位入口割裂、过程不透明与成本问题。",
@@ -295,6 +343,11 @@ export const experiences: Experience[] = [
       zh: "评论线索 Agent、用户与舆情洞察、黑灰产风险分析。",
       en: "Comment-lead agents, user insights and risk intelligence.",
     },
+    metrics: [
+      { zh: "Agent V35 · 60s → 30s", en: "Agent V35 · 60s → 30s" },
+      { zh: "周均匹配线索 300+", en: "300+ Weekly Leads" },
+      { zh: "2500+ 情报 · 处置 50+ 商户", en: "2,500+ Signals · 50+ Handled" },
+    ],
     bullets: [
       {
         zh: "基于 Claude Sonnet 4.5 和 Nocode 接入美团 SSO，迭代评论线索 Agent 至 V35 并部署；结合 CoT、Few-Shot 和预览纠错，将单帖处理耗时由 60s 降至 30s。",
@@ -330,6 +383,11 @@ export const experiences: Experience[] = [
       zh: "文档智能产品定义、工作流设计与端侧 Demo 交付。",
       en: "Document intelligence, workflows and on-device demo delivery.",
     },
+    metrics: [
+      { zh: "AI PC 赛道创意赛亚军", en: "2nd Place · AI PC Track" },
+      { zh: "拆解 20+ 文档智能产品", en: "20+ Products Analyzed" },
+      { zh: "5 类高敏文档工作流", en: "5 Sensitive-Doc Workflows" },
+    ],
     bullets: [
       {
         zh: "接手图片问答 Demo，重定义简历评估、合同对比、票据核验等高敏场景，重构文件解析、结构化提取与场景结论链路；引入 PDF 逐页解析与 OCR，完成前后端 Demo 和答辩交付，获 AI PC 赛道创意赛亚军。",
@@ -361,6 +419,11 @@ export const experiences: Experience[] = [
       zh: "多 Agent 评审工作台与 AI 指标助手产品规划。",
       en: "Multi-agent review workspace and AI indicator assistant planning.",
     },
+    metrics: [
+      { zh: "0 → 1 独立全栈交付", en: "0 → 1 Solo Delivery" },
+      { zh: "初稿耗时 2h → 3min", en: "Draft Time 2h → 3min" },
+      { zh: "6 大模块 · 25 项验收标准", en: "6 Modules · 25 Criteria" },
+    ],
     bullets: [
       {
         zh: "独立 0 → 1 完成 PRD 智能评审工作台，基于 CrewAI 搭建研发、设计、测试三类 Agent 并行评审，按 6 个维度输出结论；完成前后端、Docker 部署和导出，将初稿耗时由约 2 小时降至约 3 分钟。",
@@ -388,6 +451,10 @@ export const experiences: Experience[] = [
       zh: "新能源发债项目财务核查与行业研究。",
       en: "Financial review and research for a renewable-energy bond project.",
     },
+    metrics: [
+      { zh: "三峡新能源发债项目", en: "Three Gorges Bond Project" },
+      { zh: "应收账款与现金流核查", en: "Cash Flow & Solvency Review" },
+    ],
     bullets: [
       {
         zh: "参与三峡新能源发债项目财务核查与行业研究，分析应收账款、经营现金流和偿债能力，支持发债项目材料准备。",
@@ -415,6 +482,10 @@ export const experiences: Experience[] = [
       zh: "库存数据分析与多家子公司的业务流看板。",
       en: "Inventory analysis and business-flow dashboards across subsidiaries.",
     },
+    metrics: [
+      { zh: "聚类识别 42 处异常记录", en: "42 Anomalies Identified" },
+      { zh: "15 家子公司业务流看板", en: "15-Subsidiary Dashboards" },
+    ],
     bullets: [
       {
         zh: "基于库存数据聚类识别 42 处异常记录，并搭建覆盖 15 家子公司的业务流看板，支持审计复核与项目复盘。",
@@ -446,6 +517,10 @@ export const education: Education[] = [
       en: "Master’s · Artificial Intelligence in Business",
     },
     period: "2026.09 - 2027.06",
+    note: {
+      zh: "QS 62 · 商业 GenAI / 金融科技与 AI / 预测建模",
+      en: "QS 62 · GenAI in Business, FinTech & Predictive Modeling",
+    },
   },
   {
     id: "gdufe",

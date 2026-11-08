@@ -8,7 +8,7 @@ import {
   type Project,
   type Experience,
 } from "./content";
-import type { JellyfishController } from "./jellyfish";
+import type { JellyfishController, JellyfishMode } from "./jellyfish";
 import "./styles.css";
 import "./organizations.css";
 
@@ -56,7 +56,7 @@ let selectedExperience =
 let experienceBusy = false;
 let experienceQueued: string | null = null;
 let experienceTransition: gsap.core.Timeline | undefined;
-const experienceTransitionDuration = 0.55;
+const experienceTransitionDuration = 0.58;
 const featured = projects.slice(0, 3);
 const projectSceneIds = featured.map((project, index) =>
   index === 0 ? "projects" : `project-${project.id}`,
@@ -65,7 +65,7 @@ const sceneIds = ["hero", "experience", ...projectSceneIds, "about", "contact"];
 const chapters = sceneIds.map((id) =>
   projectSceneIds.includes(id) ? "projects" : id,
 );
-const sceneTransitionDuration = 0.9;
+const sceneTransitionDuration = 0.88;
 const tr = (zh: string, en: string) => e(lang === "zh" ? zh : en);
 const chapterLabels = () => [
   tr("首页", "Home"),
@@ -83,6 +83,7 @@ function organizationLogo(source: string, deferred = true): string {
 function experienceDetail(ex: Experience): string {
   return `<div class="internship-identity">${organizationLogo(ex.logo)}<div><h3 id="internship-title-${ex.id}">${e(t(ex.company, lang))}</h3>${ex.department ? `<p class="internship-department">${e(t(ex.department, lang))}</p>` : ""}</div></div>
     <div class="internship-meta"><p>${e(t(ex.role, lang))}</p><p class="internship-period">${e(ex.period)}</p></div>
+    <div class="internship-metrics" aria-label="${tr("核心成果指标", "Key impact metrics")}">${ex.metrics.map((m) => `<span class="metric-pill"><i aria-hidden="true"></i>${e(t(m, lang))}</span>`).join("")}</div>
     <p class="internship-summary">${e(t(ex.summary, lang))}</p>
     <ul class="internship-bullets">${ex.bullets.map((bullet) => `<li>${e(t(bullet, lang))}</li>`).join("")}</ul>`;
 }
@@ -99,23 +100,34 @@ function experienceScene(): string {
 
 function markExperience(id: string): void {
   selectedExperience = id;
+  const activeIdx = Math.max(
+    0,
+    experiences.findIndex((ex) => ex.id === id),
+  );
+  const progress =
+    experiences.length > 1 ? activeIdx / (experiences.length - 1) : 1;
+  const rail = document.querySelector<HTMLElement>(".internship-timeline");
+  rail?.style.setProperty("--timeline-progress", progress.toFixed(3));
+
   document
     .querySelectorAll<HTMLAnchorElement>(".internship-node")
-    .forEach((node) => {
+    .forEach((node, idx) => {
+      node.classList.toggle("is-passed", idx < activeIdx);
       if (node.dataset.experience === id)
         node.setAttribute("aria-current", "location");
       else node.removeAttribute("aria-current");
     });
   const node = document.querySelector<HTMLElement>(
     `.internship-node[data-experience="${id}"]`,
-  )!;
-  const rail = document.querySelector<HTMLElement>(".internship-timeline")!;
-  const nodeRect = node.getBoundingClientRect();
-  const railRect = rail.getBoundingClientRect();
-  if (nodeRect.top < railRect.top)
-    rail.scrollTop += nodeRect.top - railRect.top;
-  else if (nodeRect.bottom > railRect.bottom)
-    rail.scrollTop += nodeRect.bottom - railRect.bottom;
+  );
+  if (node && rail) {
+    const nodeRect = node.getBoundingClientRect();
+    const railRect = rail.getBoundingClientRect();
+    if (nodeRect.top < railRect.top)
+      rail.scrollTop += nodeRect.top - railRect.top;
+    else if (nodeRect.bottom > railRect.bottom)
+      rail.scrollTop += nodeRect.bottom - railRect.bottom;
+  }
 }
 
 function activateExperience(id: string, announce = false): void {
@@ -127,7 +139,13 @@ function activateExperience(id: string, announce = false): void {
       panel.classList.remove("is-incoming", "is-outgoing");
       panel.inert = !active;
       panel.setAttribute("aria-hidden", String(!active));
-      gsap.set(panel, { autoAlpha: active ? 1 : 0 });
+      gsap.set(panel, { autoAlpha: active ? 1 : 0, y: 0 });
+      gsap.set(
+        panel.querySelectorAll(
+          ".internship-identity, .internship-meta, .metric-pill, .internship-summary, .internship-bullets li",
+        ),
+        { clearProps: "transform,opacity" },
+      );
     });
   markExperience(id);
   if (announce) {
@@ -148,6 +166,11 @@ function changeExperience(id: string, focus = false): void {
     return;
   }
   if (selectedExperience === id) return;
+  const prevIdx = experiences.findIndex((ex) => ex.id === selectedExperience);
+  const nextIdx = experiences.findIndex((ex) => ex.id === id);
+  const direction = nextIdx >= prevIdx ? 1 : -1;
+  character?.pulse(direction * 0.6);
+
   if (reduced.matches) {
     activateExperience(id, true);
     return;
@@ -158,8 +181,15 @@ function changeExperience(id: string, focus = false): void {
   from.classList.add("is-outgoing");
   to.classList.add("is-incoming");
   from.inert = true;
-  gsap.set(from, { autoAlpha: 1 });
-  gsap.set(to, { autoAlpha: 0.12 });
+  markExperience(id);
+
+  const toItems = to.querySelectorAll(
+    ".internship-identity, .internship-meta, .metric-pill, .internship-summary, .internship-bullets li",
+  );
+  gsap.set(from, { autoAlpha: 1, y: 0 });
+  gsap.set(to, { autoAlpha: 1, y: 0 });
+  gsap.set(toItems, { opacity: 0, y: direction * 18 });
+
   experienceTransition = gsap.timeline({
     onComplete: () => {
       activateExperience(id, true);
@@ -170,14 +200,25 @@ function changeExperience(id: string, focus = false): void {
     },
   });
   experienceTransition.to(
-    to,
-    { opacity: 1, duration: experienceTransitionDuration, ease: "power2.out" },
+    from,
+    {
+      opacity: 0,
+      y: direction * -22,
+      duration: 0.28,
+      ease: "power2.in",
+    },
     0,
   );
   experienceTransition.to(
-    from,
-    { opacity: 0, duration: 0.44, ease: "power2.inOut" },
-    0.08,
+    toItems,
+    {
+      opacity: 1,
+      y: 0,
+      duration: 0.42,
+      stagger: 0.035,
+      ease: "power3.out",
+    },
+    0.12,
   );
 }
 
@@ -193,7 +234,12 @@ function projectScene(project: Project, index: number): string {
   return `<section class="scene project-scene project-scene--${project.id}" id="${projectSceneIds[index]}" data-chapter="projects" aria-labelledby="title-${project.id}" inert>
     <div class="scene-inner project-layout">
       <figure class="project-visual" data-depth>
-        <div class="project-image-wrap"><img data-src="${e(project.image!)}" alt="${e(t(project.imageAlt, lang))}" loading="lazy" width="1600" height="1000" /></div>
+        <div class="project-image-wrap">
+          <span class="voxel-corner voxel-corner--tl" aria-hidden="true"></span>
+          <span class="voxel-corner voxel-corner--br" aria-hidden="true"></span>
+          <span class="project-index" aria-hidden="true">0${index + 1} / 0${featured.length}</span>
+          <img data-src="${e(project.image!)}" alt="${e(t(project.imageAlt, lang))}" loading="lazy" width="1600" height="1000" />
+        </div>
         <figcaption>${e(t(project.subtitle, lang))}</figcaption>
       </figure>
       <div class="project-copy" data-copy>
@@ -207,6 +253,25 @@ function projectScene(project: Project, index: number): string {
     </div>
     <button class="all-work-link text-link" data-dialog="works">${tr("全部作品", "All projects")} <span aria-hidden="true">↗</span></button>
   </section>`;
+}
+
+function modeForScene(index: number): {
+  mode: JellyfishMode;
+  variant: number;
+  attr: string;
+} {
+  const id = sceneIds[index];
+  if (id === "hero") return { mode: "hero", variant: 0, attr: "hero" };
+  if (id === "experience")
+    return { mode: "experience", variant: 0, attr: "experience" };
+  if (id === "about") return { mode: "about", variant: 0, attr: "about" };
+  if (id === "contact") return { mode: "contact", variant: 0, attr: "contact" };
+  const pIdx = Math.max(0, projectSceneIds.indexOf(id));
+  return {
+    mode: "projects",
+    variant: pIdx,
+    attr: `projects-${pIdx}`,
+  };
 }
 
 function render(): void {
@@ -225,24 +290,40 @@ function render(): void {
     </header>
     <nav id="mobile-nav" class="mobile-nav" aria-label="${tr("移动导航", "Mobile navigation")}" inert>${chapterKeys.map((id, i) => `<a href="#${id}" data-go="${id}">${labels[i]} <span aria-hidden="true">↗</span></a>`).join("")}</nav>
     <main class="stage" id="main" tabindex="-1" aria-label="${tr("Maropion 个人作品集", "Maropion portfolio")}">
+      <div class="stage-voxels" aria-hidden="true">
+        <i style="--speed: 1.2"></i>
+        <i style="--speed: -0.9"></i>
+        <i style="--speed: 1.5"></i>
+        <i style="--speed: -1.1"></i>
+        <i style="--speed: 0.7"></i>
+        <i style="--speed: -1.4"></i>
+        <i style="--speed: 1.0"></i>
+      </div>
       <div class="character" tabindex="0" role="img" aria-label="${tr("原创体素水母，可拖动旋转，也可用左右方向键旋转", "Original voxel jellyfish. Drag or use left and right arrow keys to rotate.")}" data-mode="hero"><img class="character-fallback" src="${e(favicon)}" data-fallback-src="${import.meta.env.BASE_URL}images/jellyfish-concept.png" width="1200" height="1328" alt="" /></div>
       <section class="scene hero-scene" id="hero" data-chapter="hero" aria-labelledby="hero-title">
-        <div class="hero-pixels" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i></div>
         <div class="scene-inner hero-layout">
           <div class="hero-copy" data-copy><p class="eyebrow">AI Product Manager & Builder</p><h1 id="hero-title" class="display-name" data-text="Maropion.">Maropion<span>.</span></h1><p class="hero-statement">${tr("把想法，做成体验。", "Ideas, made tangible.")}</p><p class="hero-intro">${tr("在 AI、交互与想象之间，\n探索新的可能。", "Exploring the space between\nAI, interaction and imagination.").replaceAll("\n", "<br>")}</p><div class="hero-actions"><a class="button button--accent" href="#experience" data-go="experience">${tr("先看实习经历", "My experience")} <span aria-hidden="true">↗</span></a><a class="text-link" href="#projects" data-go="projects">${tr("精选作品", "Selected work")} <span aria-hidden="true">↗</span></a></div></div>
         </div>
-        <p class="character-hint">${tr("和水母打个招呼，拖动试试。", "Say hello. Give the jellyfish a little turn.")}</p>
+        <p class="character-hint"><span class="hint-dot" aria-hidden="true"></span>${tr("和水母打个招呼，拖动试试。", "Say hello. Give the jellyfish a little turn.")}</p>
       </section>
       ${experienceScene()}
       ${featured.map(projectScene).join("")}
       <section class="scene about-scene" id="about" data-chapter="about" aria-labelledby="about-title" inert>
-        <div class="scene-inner about-layout"><figure class="portrait" data-depth><img data-src="${e(portrait)}" alt="Maropion" loading="lazy" width="600" height="800" /><figcaption>Maropion / ${tr("毛睿平", "Mao Ruiping")}</figcaption><span class="portrait-pixel" aria-hidden="true"></span></figure><div class="about-copy" data-copy><p class="eyebrow">${tr("认识一下", "A little about me")}</p><h2 id="about-title">${tr("从商业问题，\n走向 AI 体验。", "A business mind.\nA builder’s instinct.").replaceAll("\n", "<br>")}</h2><p class="about-intro">${tr("会计学背景，AI 产品经理与独立开发者。喜欢把模糊的想法，变成可以体验、讨论和验证的东西。", "An accounting background, an AI product perspective, and a habit of building. I like turning ambiguous ideas into something people can try, discuss and improve.")}</p><div class="education education--branded">${education.map((school) => `<div class="education-row">${organizationLogo(school.logo)}<div><h3>${e(t(school.school, lang))}</h3><p>${e(t(school.degree, lang))}</p><time>${e(school.period)}</time>${school.note ? `<p class="education-note">${e(t(school.note, lang))}</p>` : ""}</div></div>`).join("")}</div><a class="text-link" href="${e(resume)}" download="Maropion-Resume.pdf" data-track="cta_about_resume">${tr("下载完整简历", "Download my résumé")} <span aria-hidden="true">↗</span></a></div></div>
+        <div class="scene-inner about-layout"><figure class="portrait" data-depth><div class="portrait-card"><img data-src="${e(portrait)}" alt="Maropion" loading="lazy" width="600" height="800" /><span class="portrait-pixel" aria-hidden="true"></span></div><figcaption>Maropion</figcaption></figure><div class="about-copy" data-copy><p class="eyebrow">${tr("认识一下", "A little about me")}</p><h2 id="about-title">${tr("从商业问题，\n走向 AI 体验。", "A business mind.\nA builder’s instinct.").replaceAll("\n", "<br>")}</h2><p class="about-intro">${tr("会计学背景，AI 产品经理与独立开发者。喜欢把模糊的想法，变成可以体验、讨论和验证的东西。", "An accounting background, an AI product perspective, and a habit of building. I like turning ambiguous ideas into something people can try, discuss and improve.")}</p><div class="education education--branded">${education.map((school) => `<div class="education-row">${organizationLogo(school.logo)}<div><h3>${e(t(school.school, lang))}</h3><p>${e(t(school.degree, lang))}</p><time>${e(school.period)}</time>${school.note ? `<p class="education-note">${e(t(school.note, lang))}</p>` : ""}</div></div>`).join("")}</div><a class="text-link" href="${e(resume)}" download="Maropion-Resume.pdf" data-track="cta_about_resume">${tr("下载完整简历", "Download my résumé")} <span aria-hidden="true">↗</span></a></div></div>
       </section>
       <section class="scene contact-scene" id="contact" data-chapter="contact" aria-labelledby="contact-title" inert>
         <div class="scene-inner contact-layout"><div data-copy><p class="eyebrow">${tr("下一个想法，从一次对话开始", "The next idea starts with a conversation")}</p><h2 id="contact-title">${tr("一起，\n做点有意思的。", "Let’s make\nsomething matter.").replaceAll("\n", "<br>")}</h2><p class="contact-intro">${tr("关于 AI 产品岗位，或一个值得做出来的项目。", "For an AI product role, or an idea worth bringing to life.")}</p><a class="email-link" href="mailto:maropion@163.com" data-track="cta_contact_email">maropion@163.com <span aria-hidden="true">↗</span></a><div class="contact-actions"><button class="button button--accent" data-dialog="wechat" data-track="cta_contact_qr">${tr("微信联系", "Say hello on WeChat")} <span aria-hidden="true">↗</span></button><a class="text-link" href="https://github.com/Maropion03" target="_blank" rel="noopener noreferrer">GitHub <span aria-hidden="true">↗</span></a><button class="text-link" data-copy="18565682722">${tr("复制手机号", "Copy phone number")}</button></div></div></div>
       </section>
     </main>
-    <footer class="scene-footer"><p>© 2026 Maropion</p><p class="chapter-name"></p><div class="scene-controls"><button data-step="-1" aria-label="${tr("上一幕", "Previous scene")}"><span aria-hidden="true">←</span><span>${tr("上一幕", "Previous")}</span></button><button data-step="1" aria-label="${tr("下一幕", "Next scene")}"><span>${tr("下一幕", "Next")}</span><span aria-hidden="true">→</span></button></div></footer>
+    <footer class="scene-footer">
+      <p>© 2026 Maropion</p>
+      <div class="scene-progress" aria-hidden="true">
+        <span class="scene-counter">01 / 07</span>
+        <span class="scene-progress-track"><i class="scene-progress-fill"></i></span>
+        <span class="chapter-name"></span>
+      </div>
+      <div class="scene-controls"><button data-step="-1" aria-label="${tr("上一幕", "Previous scene")}"><span aria-hidden="true">←</span><span>${tr("上一幕", "Previous")}</span></button><button data-step="1" aria-label="${tr("下一幕", "Next scene")}"><span>${tr("下一幕", "Next")}</span><span aria-hidden="true">→</span></button></div>
+    </footer>
     <div class="sr-only" id="scene-announcement" aria-live="polite" aria-atomic="true"></div>
     <dialog class="detail-dialog" aria-labelledby="dialog-title"><div class="dialog-surface"><button class="dialog-close" aria-label="${tr("关闭详情", "Close details")}">×</button><div class="dialog-content"></div></div></dialog>
     <div class="toast" role="status"></div>`;
@@ -256,9 +337,9 @@ function render(): void {
         .then(({ createJellyfish }) => {
           if (generation !== renderGeneration) return;
           character = createJellyfish(host);
-          character.setVisible(
-            current === 0 || current === sceneIds.length - 1,
-          );
+          const { mode, variant } = modeForScene(current);
+          character.setVisible(true);
+          character.setMode(mode, variant);
         })
         .catch(() => {
           host.dataset.fallback = "true";
@@ -271,19 +352,27 @@ function render(): void {
   activate(current);
   activateExperience(selectedExperience);
   if (current === 0 && !reduced.matches) {
-    gsap.from(".hero-copy > :not(h1)", {
+    gsap.from(".hero-copy > *", {
       opacity: 0,
-      y: 22,
-      duration: 0.55,
-      stagger: 0.06,
+      y: 26,
+      duration: 0.65,
+      stagger: 0.075,
       ease: "power3.out",
       clearProps: "transform,opacity",
     });
     gsap.from(".character", {
-      scale: 0.94,
-      y: 12,
-      duration: 0.65,
+      scale: 0.9,
+      y: 18,
+      duration: 0.8,
       ease: "power3.out",
+      clearProps: "transform",
+    });
+    gsap.from(".stage-voxels i", {
+      scale: 0,
+      opacity: 0,
+      duration: 0.6,
+      stagger: 0.06,
+      ease: "back.out(2)",
       clearProps: "transform,opacity",
     });
   }
@@ -299,6 +388,21 @@ function loadSceneMedia(index: number): void {
       delete image.dataset.src;
     });
 }
+
+function updateFooterProgress(index: number): void {
+  const label = chapterLabels()[chapterKeys.indexOf(chapters[index])];
+  const chapterEl = document.querySelector(".chapter-name");
+  if (chapterEl) chapterEl.textContent = label;
+  const counterEl = document.querySelector(".scene-counter");
+  if (counterEl)
+    counterEl.textContent = `0${index + 1} / 0${sceneIds.length}`;
+  const fillEl = document.querySelector<HTMLElement>(".scene-progress-fill");
+  if (fillEl) {
+    const ratio = (index + 1) / sceneIds.length;
+    fillEl.style.transform = `scaleX(${ratio.toFixed(3)})`;
+  }
+}
+
 function activate(index: number): void {
   loadSceneMedia(index);
   current = index;
@@ -312,9 +416,16 @@ function activate(index: number): void {
     gsap.set(el.querySelector(".scene-inner"), {
       clearProps: "transform,opacity,visibility",
     });
+    gsap.set(
+      el.querySelectorAll(
+        "[data-copy] > *, [data-depth], .stack li, .education-row",
+      ),
+      { clearProps: "transform,opacity" },
+    );
   });
-  document.querySelector<HTMLElement>(".stage")!.dataset.chapter =
-    chapters[index];
+  const stage = document.querySelector<HTMLElement>(".stage")!;
+  stage.dataset.chapter = chapters[index];
+  stage.style.setProperty("--scene-index", String(index));
   document
     .querySelectorAll<HTMLAnchorElement>(".main-nav a, .mobile-nav a")
     .forEach((link) => {
@@ -323,19 +434,20 @@ function activate(index: number): void {
       else link.removeAttribute("aria-current");
     });
   const host = document.querySelector<HTMLElement>(".character")!;
-  const show = index === 0 || index === sceneIds.length - 1;
-  host.dataset.mode = index === 0 ? "hero" : show ? "contact" : "hidden";
-  host.classList.remove("is-transitioning", "is-outgoing");
-  gsap.set(host, { clearProps: "transform,opacity,visibility" });
+  const { mode, variant, attr } = modeForScene(index);
+  host.dataset.mode = attr;
+  host.classList.remove("is-transitioning");
   host.tabIndex = index === 0 ? 0 : -1;
-  host.setAttribute("aria-hidden", String(!show));
-  character?.setVisible(show);
+  host.setAttribute("aria-hidden", String(index !== 0));
+  character?.setVisible(true);
+  character?.setMode(mode, variant);
+
   document.querySelector<HTMLButtonElement>('[data-step="-1"]')!.disabled =
     index === 0;
   document.querySelector<HTMLButtonElement>('[data-step="1"]')!.disabled =
     index === sceneIds.length - 1;
+  updateFooterProgress(index);
   const label = chapterLabels()[chapterKeys.indexOf(chapters[index])];
-  document.querySelector(".chapter-name")!.textContent = label;
   const title =
     document.querySelector(`#${sceneIds[index]} h1, #${sceneIds[index]} h2`)
       ?.textContent ?? label;
@@ -358,6 +470,17 @@ function go(index: number): void {
     queued = index;
     return;
   }
+  const direction = index > current ? 1 : -1;
+  const { mode, variant, attr } = modeForScene(index);
+  const host = document.querySelector<HTMLElement>(".character")!;
+  host.dataset.mode = attr;
+  character?.setMode(mode, variant);
+  character?.pulse(direction);
+
+  const stage = document.querySelector<HTMLElement>(".stage")!;
+  stage.style.setProperty("--scene-index", String(index));
+  updateFooterProgress(index);
+
   if (reduced.matches) {
     activate(index);
     return;
@@ -365,33 +488,32 @@ function go(index: number): void {
   busy = true;
   const fromScene = document.getElementById(sceneIds[current])!;
   const toScene = document.getElementById(sceneIds[index])!;
-  const from = fromScene.querySelector<HTMLElement>(".scene-inner")!;
-  const to = toScene.querySelector<HTMLElement>(".scene-inner")!;
-  const host = document.querySelector<HTMLElement>(".character")!;
-  const fromHasCharacter = current === 0 || current === sceneIds.length - 1;
-  const toHasCharacter = index === 0 || index === sceneIds.length - 1;
+  const fromInner = fromScene.querySelector<HTMLElement>(".scene-inner")!;
+  const toInner = toScene.querySelector<HTMLElement>(".scene-inner")!;
+  const toCopyItems = toScene.querySelectorAll<HTMLElement>("[data-copy] > *");
+  const toDepth = toScene.querySelector<HTMLElement>("[data-depth]");
+  const toSubItems = toScene.querySelectorAll<HTMLElement>(
+    ".stack li, .education-row",
+  );
 
-  // The current scene stays in front, including its opaque paper background.
-  // Prepare the target below it before either scene starts fading.
   fromScene.classList.add("is-outgoing");
   toScene.classList.add("is-incoming");
   fromScene.inert = true;
   gsap.set(fromScene, { autoAlpha: 1 });
-  gsap.set(toScene, { autoAlpha: 0.12 });
-  gsap.set(to, { scale: 0.96, z: -100 });
-  host.classList.add("is-transitioning");
-  host.classList.toggle("is-outgoing", fromHasCharacter);
-
-  let characterOpacity = 0;
-  const prepareIncomingCharacter = () => {
-    host.classList.remove("is-outgoing");
-    host.dataset.mode = index === 0 ? "hero" : "contact";
-    gsap.set(host, { clearProps: "transform,opacity,visibility" });
-    characterOpacity = Number.parseFloat(getComputedStyle(host).opacity);
-    gsap.set(host, { opacity: 0 });
-    character?.setVisible(true);
-  };
-  if (toHasCharacter && !fromHasCharacter) prepareIncomingCharacter();
+  gsap.set(toScene, { autoAlpha: 1 });
+  gsap.set(toInner, { scale: 0.97, z: -60 });
+  gsap.set(toCopyItems, { opacity: 0, y: direction * 28 });
+  if (toDepth) {
+    gsap.set(toDepth, {
+      opacity: 0,
+      y: direction * 36,
+      scale: 0.94,
+      rotateX: direction * -5,
+    });
+  }
+  if (toSubItems.length) {
+    gsap.set(toSubItems, { opacity: 0, y: 12 });
+  }
 
   timeline = gsap.timeline({
     onComplete: () => {
@@ -402,49 +524,80 @@ function go(index: number): void {
       if (next !== null && next !== current) go(next);
     },
   });
+
+  // Outgoing scene glides and fades out cleanly
   timeline.to(
-    toScene,
-    { opacity: 1, duration: sceneTransitionDuration, ease: "power2.out" },
-    0,
-  );
-  timeline.to(
-    to,
-    { scale: 1, z: 0, duration: sceneTransitionDuration, ease: "power2.out" },
-    0,
-  );
-  timeline.to(
-    from,
-    { scale: 1.025, z: 24, duration: 0.8, ease: "power2.inOut" },
+    fromInner,
+    {
+      y: direction * -32,
+      scale: 1.02,
+      z: 20,
+      duration: 0.42,
+      ease: "power2.in",
+    },
     0,
   );
   timeline.to(
     fromScene,
-    { opacity: 0, duration: 0.72, ease: "power2.inOut" },
-    0.12,
+    { opacity: 0, duration: 0.38, ease: "power2.inOut" },
+    0.04,
   );
 
-  if (fromHasCharacter) {
+  // Incoming scene container settles into place
+  timeline.to(
+    toInner,
+    {
+      scale: 1,
+      z: 0,
+      duration: sceneTransitionDuration,
+      ease: "power3.out",
+    },
+    0.1,
+  );
+
+  // Visual / depth container rises with 3D perspective
+  if (toDepth) {
     timeline.to(
-      host,
+      toDepth,
       {
-        opacity: 0,
-        duration: toHasCharacter ? 0.38 : 0.72,
-        ease: "power2.inOut",
+        opacity: 1,
+        y: 0,
+        scale: 1,
+        rotateX: 0,
+        duration: 0.68,
+        ease: "power3.out",
       },
-      toHasCharacter ? 0 : 0.12,
+      0.16,
     );
   }
-  if (toHasCharacter) {
-    const start = fromHasCharacter ? 0.4 : 0.12;
-    if (fromHasCharacter) timeline.call(prepareIncomingCharacter, [], start);
+
+  // Copy elements stagger in
+  if (toCopyItems.length) {
     timeline.to(
-      host,
+      toCopyItems,
       {
-        opacity: () => characterOpacity,
-        duration: sceneTransitionDuration - start,
+        opacity: 1,
+        y: 0,
+        duration: 0.56,
+        stagger: 0.06,
+        ease: "power3.out",
+      },
+      0.18,
+    );
+  }
+
+  // Stack tags or education rows cascade in
+  if (toSubItems.length) {
+    timeline.to(
+      toSubItems,
+      {
+        opacity: 1,
+        y: 0,
+        duration: 0.44,
+        stagger: 0.045,
         ease: "power2.out",
       },
-      start,
+      0.34,
     );
   }
 }
@@ -481,7 +634,7 @@ function showDialog(value: typeof activeDialog): void {
   if (value === "works") {
     target.innerHTML = `<p class="eyebrow">${tr("继续看看", "More to explore")}</p><h2 id="dialog-title">${tr("全部作品", "All projects")}</h2><div class="work-index">${projects.map((p) => `<button class="work-index-row" data-project="${p.id}">${p.image ? `<img src="${e(p.image)}" alt="" width="140" height="90" loading="lazy" />` : '<span class="research-mark">RAG</span>'}<span><strong>${e(t(p.subtitle, lang))}</strong><span>${e(t(p.category, lang))}</span></span><span aria-hidden="true">↗</span></button>`).join("")}</div>`;
   } else if (value === "experience") {
-    target.innerHTML = `<p class="eyebrow">${tr("实践与学习", "Practice & learning")}</p><h2 id="dialog-title">${tr("完整经历", "Experience")}</h2><div class="full-experience">${experiences.map((ex) => `<article class="full-experience-entry"><div class="full-experience-heading">${organizationLogo(ex.logo, false)}<div><h3>${e(t(ex.company, lang))}</h3><p class="detail-role">${e(t(ex.role, lang))}</p>${ex.department ? `<p class="internship-department">${e(t(ex.department, lang))}</p>` : ""}<p class="internship-period">${e(ex.period)}</p></div></div><p>${e(t(ex.summary, lang))}</p><ul class="internship-bullets">${ex.bullets.map((bullet) => `<li>${e(t(bullet, lang))}</li>`).join("")}</ul></article>`).join("")}</div><a class="button button--ink" href="${e(resume)}" download="Maropion-Resume.pdf">${tr("完整简历 PDF", "Full résumé PDF")} ↗</a>`;
+    target.innerHTML = `<p class="eyebrow">${tr("实践与学习", "Practice & learning")}</p><h2 id="dialog-title">${tr("完整经历", "Experience")}</h2><div class="full-experience">${experiences.map((ex) => `<article class="full-experience-entry"><div class="full-experience-heading">${organizationLogo(ex.logo, false)}<div><h3>${e(t(ex.company, lang))}</h3><p class="detail-role">${e(t(ex.role, lang))}</p>${ex.department ? `<p class="internship-department">${e(t(ex.department, lang))}</p>` : ""}<p class="internship-period">${e(ex.period)}</p></div></div><div class="internship-metrics">${ex.metrics.map((m) => `<span class="metric-pill"><i aria-hidden="true"></i>${e(t(m, lang))}</span>`).join("")}</div><p>${e(t(ex.summary, lang))}</p><ul class="internship-bullets">${ex.bullets.map((bullet) => `<li>${e(t(bullet, lang))}</li>`).join("")}</ul></article>`).join("")}</div><a class="button button--ink" href="${e(resume)}" download="Maropion-Resume.pdf">${tr("完整简历 PDF", "Full résumé PDF")} ↗</a>`;
   } else if (value === "wechat") {
     target.innerHTML = `<p class="eyebrow">${tr("认识一下", "Let’s connect")}</p><h2 id="dialog-title">${tr("微信聊聊。", "Say hello on WeChat.")}</h2><img class="wechat-qr" src="${e(wechatQR)}" alt="${tr("Maropion 的微信二维码", "Maropion’s WeChat QR code")}" width="280" height="280" /><button class="button button--ink" data-copy="MRP18565682722">${tr("复制微信号", "Copy WeChat ID")} ↗</button>`;
   } else {
@@ -490,6 +643,33 @@ function showDialog(value: typeof activeDialog): void {
   if (!dialog.open) dialog.showModal();
   dialog.querySelector<HTMLButtonElement>(".dialog-close")!.focus();
   dialog.scrollTop = 0;
+
+  if (!reduced.matches) {
+    gsap.fromTo(
+      dialog.querySelector(".dialog-surface"),
+      { opacity: 0, y: 20, scale: 0.97 },
+      {
+        opacity: 1,
+        y: 0,
+        scale: 1,
+        duration: 0.36,
+        ease: "power3.out",
+        clearProps: "transform,opacity",
+      },
+    );
+    gsap.fromTo(
+      target.children,
+      { opacity: 0, y: 14 },
+      {
+        opacity: 1,
+        y: 0,
+        duration: 0.38,
+        stagger: 0.045,
+        ease: "power2.out",
+        clearProps: "transform,opacity",
+      },
+    );
+  }
 }
 
 let toastTimer: ReturnType<typeof setTimeout>;
@@ -514,7 +694,55 @@ function wire(): void {
       activeDialog = null;
       if (dialogReturn?.isConnected) dialogReturn.focus();
     });
+
+  // Subtle magnetic pull on primary buttons
+  document.querySelectorAll<HTMLElement>(".button").forEach((btn) => {
+    btn.addEventListener("pointermove", (e) => {
+      if (reduced.matches || innerWidth < 768) return;
+      const rect = btn.getBoundingClientRect();
+      const bx = ((e.clientX - rect.left) / rect.width - 0.5) * 8;
+      const by = ((e.clientY - rect.top) / rect.height - 0.5) * 6;
+      btn.style.setProperty("--bx", `${bx.toFixed(1)}px`);
+      btn.style.setProperty("--by", `${by.toFixed(1)}px`);
+    });
+    btn.addEventListener("pointerleave", () => {
+      btn.style.setProperty("--bx", "0px");
+      btn.style.setProperty("--by", "0px");
+    });
+  });
 }
+
+// Smooth 3D cursor parallax loop for stage voxels and depth frames
+let targetPx = 0;
+let targetPy = 0;
+let curPx = 0;
+let curPy = 0;
+let parallaxRaf = 0;
+
+function stepParallax(): void {
+  parallaxRaf = 0;
+  curPx += (targetPx - curPx) * 0.1;
+  curPy += (targetPy - curPy) * 0.1;
+  const stage = document.querySelector<HTMLElement>(".stage");
+  if (stage) {
+    stage.style.setProperty("--px", curPx.toFixed(4));
+    stage.style.setProperty("--py", curPy.toFixed(4));
+  }
+  if (Math.abs(targetPx - curPx) > 0.001 || Math.abs(targetPy - curPy) > 0.001) {
+    parallaxRaf = requestAnimationFrame(stepParallax);
+  }
+}
+
+window.addEventListener(
+  "pointermove",
+  (event) => {
+    if (reduced.matches || innerWidth < 768) return;
+    targetPx = (event.clientX / Math.max(1, innerWidth) - 0.5) * 2;
+    targetPy = (event.clientY / Math.max(1, innerHeight) - 0.5) * 2;
+    if (!parallaxRaf) parallaxRaf = requestAnimationFrame(stepParallax);
+  },
+  { passive: true },
+);
 
 app.addEventListener("click", (event) => {
   const target = (event.target as Element).closest<HTMLElement>("a,button");
@@ -562,6 +790,7 @@ app.addEventListener("click", (event) => {
     theme = theme === "dark" ? "light" : "dark";
     save("maropion-theme", theme);
     document.documentElement.dataset.theme = theme;
+    character?.pulse(0.5);
     target.textContent =
       lang === "zh"
         ? theme === "dark"
