@@ -13,14 +13,14 @@ export interface Project {
   detail: LocalText;
   role: LocalText;
   image?: string;
+  diagram?: "rag-arch";
   imageAlt: LocalText;
+  metrics: LocalText[];
   stack: string[];
   live?: string;
   github?: string;
 }
 
-// These are short translations of the master branch's index v4.html.
-// They describe the existing portfolio, not freshly verified production results.
 export const projects: Project[] = [
   {
     id: "meloscape",
@@ -35,8 +35,8 @@ export const projects: Project[] = [
       en: "Turning rhythm, energy and lyrical emotion into living pixel landscapes.",
     },
     detail: {
-      zh: "围绕“让用户看见音乐”设计浏览器端实时音乐可视化产品，整合音频输入、解析、播放与场景反馈。通过 Web Audio API 分析 BPM、能量、频谱重心和歌曲结构，并结合歌词情绪映射为不同的像素艺术场景。",
-      en: "A browser-based music visualization product connecting audio input, analysis, playback and visual feedback. Web Audio API analysis of BPM, energy, spectral centroid and song structure combines with lyrical emotion to shape pixel-art scenes.",
+      zh: "围绕“让用户看见音乐”设计浏览器端实时音乐可视化产品，整合音频输入、解析、播放与场景反馈。通过 Web Audio API 分析 BPM、能量、频谱重心和歌曲结构，并结合歌词情绪映射为 5 组随音乐实时变化的像素艺术场景。",
+      en: "A browser-based music visualization product connecting audio input, analysis, playback and visual feedback. Web Audio API analysis of BPM, energy, spectral centroid and song structure combines with lyrical emotion to shape 5 dynamic pixel-art scenes.",
     },
     role: {
       zh: "独立产品设计与开发",
@@ -47,7 +47,12 @@ export const projects: Project[] = [
       zh: "Meloscape 音乐可视化产品的实际界面",
       en: "Actual interface of the Meloscape music visualizer",
     },
-    stack: ["Web Audio", "Canvas", "Node.js"],
+    metrics: [
+      { zh: "5+ 动态像素场景", en: "5+ Dynamic Scenes" },
+      { zh: "Web Audio 实时分析", en: "Real-Time Web Audio" },
+      { zh: "多平台音乐链接解析", en: "Multi-Platform Parsing" },
+    ],
+    stack: ["Web Audio", "Canvas", "Node.js", "Vercel"],
     live: "https://meloscape-inn2.vercel.app",
     github: "https://github.com/Maropion03/Meloscape",
   },
@@ -58,7 +63,7 @@ export const projects: Project[] = [
       en: "Read the document.\nUnderstand the question.",
     },
     subtitle: {
-      zh: "答于言 / 端侧文档判断",
+      zh: "答于言 / 端侧文档判断引擎",
       en: "DaYuYan / On-device document intelligence",
     },
     category: {
@@ -70,19 +75,24 @@ export const projects: Project[] = [
       en: "From document parsing to grounded judgments, keeping sensitive files on-device.",
     },
     detail: {
-      zh: "中途接手基础图片问答 Demo，重新定义面向高敏文档工作者的端侧判断产品，覆盖论文与简历评估、合同对比和票据核验。重构“文件解析 → 结构化提取 → 场景结论”链路，使用 PDF 逐页解析与 OCR 辅助处理长文档，完成前后端 Demo 与答辩交付。",
-      en: "Reframed an image-Q&A demo around sensitive-document tasks: paper and résumé evaluation, contract comparison and receipt verification. Rebuilt the parsing → structured extraction → contextual judgment flow, with page-by-page PDF parsing and OCR support, and delivered the end-to-end demo and presentation.",
+      zh: "中途接手基础图片问答 Demo，重新定义面向高敏文档工作者的端侧判断产品，覆盖论文与简历评估、合同对比和票据核验。重构“文件解析 → 结构化提取 → 场景结论”链路，使用 PDF 逐页解析与 OCR 辅助处理长文档，完成前后端 Demo 与答辩交付，获 2025 骁龙人工智能创新应用大赛 AI PC 赛道创意赛亚军。",
+      en: "Reframed an image-Q&A demo around sensitive-document tasks: paper and résumé evaluation, contract comparison and receipt verification. Rebuilt the parsing → structured extraction → contextual judgment flow with page-by-page PDF parsing and OCR support, winning 2nd Place in the Snapdragon AI PC Creative Track.",
     },
     role: {
-      zh: "AI 产品定义与前后端 Demo 交付",
-      en: "AI product definition & end-to-end demo delivery",
+      zh: "AI 产品定义 · 前后端 Demo 交付 · 创意赛亚军 🥈",
+      en: "AI product definition · End-to-end demo · 2nd Place 🥈",
     },
     image: image("dayuyan"),
     imageAlt: {
       zh: "答于言文档解析引擎的实际界面",
       en: "Actual interface of the DaYuYan document engine",
     },
-    stack: ["On-device AI", "Qwen VL", "OCR"],
+    metrics: [
+      { zh: "🥈 AI PC 创意赛亚军", en: "🥈 2nd Place · AI PC Track" },
+      { zh: "ZERO 零上云端侧推理", en: "ZERO Cloud · On-Device" },
+      { zh: "4 类高敏文档场景", en: "4 Sensitive-Doc Scenarios" },
+    ],
+    stack: ["Snapdragon NPU", "Qwen2.5-VL-3B", "PyMuPDF / OCR", "On-Device AI"],
     github: "https://github.com/Maropion03/DaYuYan-engine",
   },
   {
@@ -104,19 +114,24 @@ export const projects: Project[] = [
       en: "A visible review process bringing engineering, design and QA perspectives together.",
     },
     detail: {
-      zh: "基于 CrewAI 设计研发、设计和测试三类 Agent 的并行评审机制，以六个维度组织结构化结论。通过实时进度、运行日志和报告切换降低长任务的不确定感，完成前后端、Docker 部署和报告导出。",
-      en: "Designed parallel engineering, design and QA review agents with CrewAI, organizing findings across six dimensions. Live progress, run logs and report navigation make long-running reviews easier to follow. Delivered the frontend, backend, Docker setup and report export.",
+      zh: "基于 CrewAI 设计研发、设计和测试三类 Agent 的并行评审机制，以六个维度组织结构化结论。通过实时进度、运行日志和报告切换降低长任务的不确定感，完成前后端、Docker 部署和报告导出，将单次评审初稿由人工约 2 小时缩短至 AI 约 3 分钟。",
+      en: "Designed parallel engineering, design and QA review agents with CrewAI, organizing findings across six dimensions. Live progress, run logs and report navigation make long-running reviews transparent, cutting initial review time from ~2 hours to ~3 minutes.",
     },
     role: {
-      zh: "独立产品设计与开发",
-      en: "Independent product design & development",
+      zh: "独立 0 → 1 产品设计与全栈开发",
+      en: "Independent 0 → 1 product design & full-stack build",
     },
     image: image("requirement-review"),
     imageAlt: {
       zh: "PRD 智能评审工作台的实际界面",
       en: "Actual interface of the requirement review workspace",
     },
-    stack: ["CrewAI", "FastAPI", "SSE"],
+    metrics: [
+      { zh: "2h → 3min 评审提效", en: "2h → 3min Review Speedup" },
+      { zh: "6 维结构化评审结论", en: "6-Dimension Structured Output" },
+      { zh: "Multi-Agent 并行协作", en: "Multi-Agent Parallel Flow" },
+    ],
+    stack: ["CrewAI", "FastAPI", "SSE", "Tailwind"],
     live: "https://awesome-requirement-review-agent.vercel.app/single-page-shell.html",
     github: "https://github.com/Maropion03/awesome-requirement-review-agent",
   },
@@ -124,78 +139,102 @@ export const projects: Project[] = [
     id: "spirit-construct",
     title: { zh: "Spirit Construct / 灵构", en: "Spirit Construct" },
     subtitle: {
-      zh: "面向 AI 产品经理的工具箱",
-      en: "A toolkit for AI product managers",
+      zh: "Spirit Construct · 灵构 AI PM 工具箱",
+      en: "Spirit Construct · Toolkit for AI PMs",
     },
-    category: { zh: "产品工具", en: "Product tools" },
+    category: { zh: "产品工具 SaaS", en: "Product SaaS toolkit" },
     summary: {
       zh: "将模型 ROI 计算、参数调试与 PRD 生成整合进一个工作台。",
       en: "Model ROI estimation, parameter tuning and PRD generation in one workspace.",
     },
     detail: {
-      zh: "面向非技术 AI 产品经理完成需求定义、UI/UX 与 MVP 开发，接入多模型服务、OAuth 登录和 SSE 流式反馈。",
-      en: "Defined and built an MVP for non-technical AI product managers, with multi-model services, OAuth and streaming feedback.",
+      zh: "面向非技术 AI 产品经理，在 30 小时内完成模型 ROI 计算、参数调试与 PRD 生成等核心模块的需求定义、UI/UX 设计及 MVP 上线；接入多模型服务、OAuth 登录和 SSE 流式反馈，验证从产品设计到部署上线的独立交付能力。",
+      en: "Defined and shipped an MVP in 30 hours for non-technical AI product managers, integrating model ROI calculation, parameter tuning and PRD generation with multi-model services, Supabase OAuth and SSE streaming.",
     },
     role: {
-      zh: "独立产品设计与开发",
-      en: "Independent product design & development",
+      zh: "AI 产品负责人 · 独立全栈交付",
+      en: "AI Product Lead · Solo full-stack delivery",
     },
     image: image("spirit-construct"),
     imageAlt: {
       zh: "Spirit Construct 灵构实际界面",
       en: "Actual interface of Spirit Construct",
     },
-    stack: ["Supabase", "SSE", "Multi-model"],
+    metrics: [
+      { zh: "30h 0 → MVP 上线", en: "30h 0 → MVP Shipped" },
+      { zh: "1 人独立全栈交付", en: "Solo Full-Stack Build" },
+      { zh: "3 大核心产品模块", en: "3 Core PM Modules" },
+    ],
+    stack: ["Cloudflare Pages", "Supabase OAuth", "SiliconFlow", "SSE"],
     live: "https://spirit-construct-maropion.top/",
     github: "https://github.com/Maropion03/Spirit-Construct-AIPM-stack",
   },
   {
     id: "eval-studio",
     title: { zh: "Eval Studio", en: "Eval Studio" },
-    subtitle: { zh: "LLM 评估工作台", en: "An LLM evaluation workspace" },
-    category: { zh: "模型评估", en: "Model evaluation" },
+    subtitle: {
+      zh: "Eval Studio · LLM 评估工作台",
+      en: "Eval Studio · LLM evaluation workspace",
+    },
+    category: { zh: "模型评估工作台", en: "Model evaluation workbench" },
     summary: {
       zh: "用会话隔离、三维指标和 Diff 视图，比较模型的不同回答。",
       en: "Compare model responses with isolated sessions, three evaluation dimensions and a diff view.",
     },
     detail: {
-      zh: "针对模型输出难以横向比较的问题，设计本地优先的评估工作台，以 Faithfulness、Relevance 和 Coherence 三维指标及 Diff 视图帮助定位异常。",
-      en: "A local-first workspace for comparing LLM outputs, using faithfulness, relevance and coherence metrics alongside a diff view.",
+      zh: "针对模型输出难以横向比较、幻觉与推理偏差难定位的问题，设计会话隔离、本地优先的评估工作台，以 Faithfulness、Relevance 和 Coherence 三维指标及 Diff 视图帮助用户快速定位异常输出。",
+      en: "A local-first, session-isolated workspace for comparing LLM outputs, using Faithfulness, Relevance and Coherence metrics alongside a side-by-side Diff view to pinpoint hallucinations and reasoning drift.",
     },
-    role: { zh: "独立开发", en: "Independent development" },
+    role: { zh: "独立设计与开发", en: "Independent design & development" },
     image: image("eval-studio"),
     imageAlt: {
       zh: "Eval Studio 模型评估平台实际界面",
       en: "Actual interface of Eval Studio",
     },
-    stack: ["React", "FastAPI", "SQLite"],
+    metrics: [
+      { zh: "Diff 视图输出对比", en: "Side-by-Side Diff View" },
+      { zh: "3 维评估指标可视化", en: "3-Dimension Eval Metrics" },
+      { zh: "Local 本地优先架构", en: "Local-First Architecture" },
+    ],
+    stack: ["React + TS", "Vite", "FastAPI", "SQLite"],
     live: "https://eval-studio-pxygyj528-maropions-projects.vercel.app",
     github: "https://github.com/Maropion03/Eval-studio",
   },
   {
     id: "financial-research",
-    title: { zh: "财务舞弊识别研究", en: "Financial fraud detection research" },
+    title: { zh: "财务舞弊深度识别研究", en: "Financial fraud detection research" },
     subtitle: {
-      zh: "RAG 与多智能体协同",
-      en: "RAG & multi-agent collaboration",
+      zh: "财务舞弊深度识别 / RAG 与多智能体协同",
+      en: "Financial Fraud Detection / RAG & Multi-Agent",
     },
-    category: { zh: "研究项目", en: "Research project" },
+    category: { zh: "学术与架构研究", en: "Academic & system research" },
     summary: {
       zh: "将年报检索、双通道文本分析与多 Agent 辩论结合，形成可溯源的审计线索。",
       en: "Combining annual-report retrieval, dual-channel text analysis and multi-agent debate for traceable audit signals.",
     },
     detail: {
-      zh: "构建 TextCNN 与 FinBERT 双通道网络，结合 ChromaDB 对年报 MD&A 进行语义切块和检索，组织外部监控、内部审计与主审法官三节点辩论流程。",
-      en: "A TextCNN and FinBERT dual-channel network, semantic retrieval of annual-report MD&A with ChromaDB, and a three-agent monitor, auditor and adjudicator debate flow.",
+      zh: "构建 TextCNN（短频风险）+ FinBERT（长文语义）双通道网络，结合 ChromaDB 对百份上市公司年报 MD&A 进行语义切块与靶向 RAG 检索，并设计“外部监控 → 内部审计 → 主审法官”三节点 Multi-Agent 辩论流；在 1:3 极度不平衡控制集下 F1 优于单模型基线，输出带证据引用的可溯源白盒审计报告。",
+      en: "Built a TextCNN + FinBERT dual-channel network paired with ChromaDB semantic chunking and targeted RAG over 100+ annual-report MD&A sections, orchestrated via a three-node Multi-Agent debate flow (External Monitor → Internal Auditor → Chief Judge). Outperformed single-model F1 baselines on a 1:3 imbalanced control set with white-box citation traceability.",
     },
-    role: { zh: "研究与方案设计", en: "Research & system design" },
+    role: { zh: "核心研究员 · 架构与实验设计", en: "Core Researcher · Architecture & experiments" },
+    diagram: "rag-arch",
     imageAlt: {
-      zh: "财务舞弊识别研究",
-      en: "Financial fraud detection research",
+      zh: "双通道 RAG 与多智能体协同辩论架构图",
+      en: "Dual-channel RAG and multi-agent debate architecture diagram",
     },
-    stack: ["RAG", "FinBERT", "ChromaDB"],
+    metrics: [
+      { zh: "1:3 极度不平衡控制集", en: "1:3 Imbalanced Control Set" },
+      { zh: "F1 ↑ 领跑单模型基线", en: "F1 ↑ vs Single-Model Baseline" },
+      { zh: "100+ 份年报语料溯源", en: "100+ Annual Reports Indexed" },
+    ],
+    stack: ["TextCNN", "FinBERT", "ChromaDB", "Multi-Agent", "RAG"],
   },
 ];
+
+export interface ExperienceLink {
+  label: LocalText;
+  url: string;
+}
 
 export interface Experience {
   id: string;
@@ -206,13 +245,12 @@ export interface Experience {
   period: string;
   summary: LocalText;
   metrics: LocalText[];
+  links?: ExperienceLink[];
   bullets: LocalText[];
 }
 
 const logo = (name: string) => `${import.meta.env.BASE_URL}logos/${name}.svg`;
 
-// Employment and education follow the user-provided latest resume.
-// The resume is the source for these claims, not an independent verification.
 export const experiences: Experience[] = [
   {
     id: "tencent",
@@ -348,6 +386,12 @@ export const experiences: Experience[] = [
       { zh: "周均匹配线索 300+", en: "300+ Weekly Leads" },
       { zh: "2500+ 情报 · 处置 50+ 商户", en: "2,500+ Signals · 50+ Handled" },
     ],
+    links: [
+      {
+        label: { zh: "📄 Agent 说明文档（飞书）", en: "📄 Agent Spec Doc (Feishu)" },
+        url: "https://ecnucwapzdad.feishu.cn/wiki/UL8ZwG8lOi8G5rk2uBrcHTHpnxe",
+      },
+    ],
     bullets: [
       {
         zh: "基于 Claude Sonnet 4.5 和 Nocode 接入美团 SSO，迭代评论线索 Agent 至 V35 并部署；结合 CoT、Few-Shot 和预览纠错，将单帖处理耗时由 60s 降至 30s。",
@@ -388,6 +432,20 @@ export const experiences: Experience[] = [
       { zh: "拆解 20+ 文档智能产品", en: "20+ Products Analyzed" },
       { zh: "5 类高敏文档工作流", en: "5 Sensitive-Doc Workflows" },
     ],
+    links: [
+      {
+        label: { zh: "📊 20+ 文档智能竞品调研（飞书）", en: "📊 20+ Competitor Research (Feishu)" },
+        url: "https://ecnucwapzdad.feishu.cn/wiki/BBngw99Tois5c3kiacOcBasmnWe",
+      },
+      {
+        label: { zh: "🔬 文档解析技术拆解（飞书）", en: "🔬 Document Tech Breakdown (Feishu)" },
+        url: "https://ecnucwapzdad.feishu.cn/wiki/FVNwwap8Fi6weMkOz7Qc2rvknsi",
+      },
+      {
+        label: { zh: "💻 答于言端侧引擎 GitHub", en: "💻 DaYuYan Engine GitHub" },
+        url: "https://github.com/Maropion03/DaYuYan-engine",
+      },
+    ],
     bullets: [
       {
         zh: "接手图片问答 Demo，重定义简历评估、合同对比、票据核验等高敏场景，重构文件解析、结构化提取与场景结论链路；引入 PDF 逐页解析与 OCR，完成前后端 Demo 和答辩交付，获 AI PC 赛道创意赛亚军。",
@@ -423,6 +481,16 @@ export const experiences: Experience[] = [
       { zh: "0 → 1 独立全栈交付", en: "0 → 1 Solo Delivery" },
       { zh: "初稿耗时 2h → 3min", en: "Draft Time 2h → 3min" },
       { zh: "6 大模块 · 25 项验收标准", en: "6 Modules · 25 Criteria" },
+    ],
+    links: [
+      {
+        label: { zh: "🚀 PRD 评审工作台在线体验", en: "🚀 PRD Review Live Demo" },
+        url: "https://awesome-requirement-review-agent.vercel.app/single-page-shell.html",
+      },
+      {
+        label: { zh: "💻 GitHub 开源仓库", en: "💻 GitHub Repository" },
+        url: "https://github.com/Maropion03/awesome-requirement-review-agent",
+      },
     ],
     bullets: [
       {
@@ -538,5 +606,60 @@ export const education: Education[] = [
       zh: "GPA 3.86 / 5 · 专业前 10%",
       en: "GPA 3.86 / 5 · Top 10%",
     },
+  },
+];
+
+export interface SkillGroup {
+  code: string;
+  title: LocalText;
+  summary: LocalText;
+  items: { name: LocalText; tag: string }[];
+}
+
+export const skillGroups: SkillGroup[] = [
+  {
+    code: "01",
+    title: { zh: "AI 与大模型落地", en: "AI & LLM Product Delivery" },
+    summary: {
+      zh: "熟悉 Prompt Engineering、RAG、多模型路由与 Agent 协同，围绕用户任务设计结构化输出、状态反馈、异常处理、评测体系及 ALHF 闭环。",
+      en: "Experienced in Prompt Engineering, RAG, multi-model routing and multi-agent orchestration—designing structured outputs, state feedback, fallback handling, evaluation judges and ALHF loops.",
+    },
+    items: [
+      { name: { zh: "Prompt 工程与调优", en: "Prompt Engineering" }, tag: "CoT / Few-Shot" },
+      { name: { zh: "RAG 检索增强架构", en: "RAG Architecture" }, tag: "CHUNKING · RETRIEVAL" },
+      { name: { zh: "Agent 协同与纳管治理", en: "Agent Orchestration & A2A" }, tag: "MULTI-AGENT · MCP" },
+      { name: { zh: "评测体系与 ALHF 链路", en: "Eval Judges & ALHF" }, tag: "LLM / AGENT JUDGE" },
+      { name: { zh: "多模型路由与成本控制", en: "Model Routing & ROI" }, tag: "ROUTING · LATENCY" },
+    ],
+  },
+  {
+    code: "02",
+    title: { zh: "工程与技术工具", en: "Engineering & Tooling" },
+    summary: {
+      zh: "可使用 Python、SQL、FastAPI、React、TypeScript 等独立完成 AI 工作流验证、全栈原型开发与容器化部署。",
+      en: "Hands-on with Python, SQL, FastAPI, React and TypeScript to independently ship working AI workflows, full-stack prototypes and Docker deployments.",
+    },
+    items: [
+      { name: { zh: "Python 数据与模型处理", en: "Python Data & ML" }, tag: "PANDAS · SKLEARN" },
+      { name: { zh: "SQL 建模与分析", en: "SQL Modeling" }, tag: "CLEAN · QUERY" },
+      { name: { zh: "FastAPI 后端与流式服务", en: "FastAPI & Streaming" }, tag: "SSE · REST API" },
+      { name: { zh: "React · TypeScript 前端", en: "React & TypeScript" }, tag: "VITE · TAILWIND" },
+      { name: { zh: "CrewAI · ChromaDB · Docker", en: "CrewAI · ChromaDB" }, tag: "AGENT · VECTOR DB" },
+    ],
+  },
+  {
+    code: "03",
+    title: { zh: "产品规划与商业化", en: "Product Strategy & Execution" },
+    summary: {
+      zh: "具备需求挖掘、竞品深潜、PRD 撰写、MVP 裁剪与 UI/UX 设计能力，能够独立完成从 0 到 1 产品定义到可交互 Demo 的验证闭环。",
+      en: "Strong in user discovery, competitive teardown, PRD specification, MVP scoping and UI/UX design—closing the loop from 0-to-1 definition to interactive demo validation.",
+    },
+    items: [
+      { name: { zh: "场景挖掘与痛点定义", en: "Problem Discovery" }, tag: "USER INSIGHT" },
+      { name: { zh: "PRD 规划与验收标准", en: "PRD & Acceptance Spec" }, tag: "SPEC · GOVERNANCE" },
+      { name: { zh: "行业与竞品技术拆解", en: "Competitive Teardown" }, tag: "20+ PRODUCTS" },
+      { name: { zh: "MVP 敏捷裁剪与迭代", en: "MVP Scoping & Shipping" }, tag: "0 → 1 BUILD" },
+      { name: { zh: "AI 原生交互与 UX 设计", en: "AI-Native UX Design" }, tag: "HITL · WORKSPACE" },
+    ],
   },
 ];

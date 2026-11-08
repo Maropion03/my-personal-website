@@ -3,6 +3,7 @@ import {
   projects,
   experiences,
   education,
+  skillGroups,
   t,
   type Language,
   type Project,
@@ -20,6 +21,7 @@ const portrait = new URL("../../assets/hero-portrait.jpg", import.meta.url)
   .href;
 const favicon = new URL("../../assets/favicon.svg", import.meta.url).href;
 const wechatQR = new URL("../../assets/wechat-qr.jpg", import.meta.url).href;
+const feishuQR = new URL("../../assets/feishu-qr.png", import.meta.url).href;
 const e = (s: string) =>
   s
     .replaceAll("&", "&amp;")
@@ -48,7 +50,14 @@ let queued: number | null = null;
 let menuOpen = false;
 let timeline: gsap.core.Timeline | undefined;
 let dialogReturn: HTMLElement | null = null;
-let activeDialog: "works" | "experience" | "wechat" | Project | null = null;
+let activeDialog:
+  | "works"
+  | "experience"
+  | "skills"
+  | "wechat"
+  | Project
+  | null = null;
+let activeQrChannel: "wechat" | "feishu" = "wechat";
 let renderGeneration = 0;
 let selectedExperience =
   experiences.find((ex) => location.hash === `#internship-${ex.id}`)?.id ??
@@ -80,10 +89,89 @@ function organizationLogo(source: string, deferred = true): string {
   return `<span class="organization-logo"><img ${deferred ? "data-src" : "src"}="${e(source)}" alt="" width="64" height="64" /></span>`;
 }
 
+function experienceLinksMarkup(ex: Experience): string {
+  if (!ex.links?.length) return "";
+  return `<div class="internship-links" aria-label="${tr("相关文档与作品链接", "Related documents and links")}">${ex.links
+    .map(
+      (link) =>
+        `<a class="evidence-link" href="${e(link.url)}" target="_blank" rel="noopener noreferrer"><span>${e(t(link.label, lang))}</span><i aria-hidden="true">↗</i></a>`,
+    )
+    .join("")}</div>`;
+}
+
+function ragArchitectureSvg(compact = false): string {
+  const shortRisk = lang === "zh" ? "短频风险特征" : "Short-Window Risk";
+  const longSem = lang === "zh" ? "长文语义表征" : "Long-Context Semantics";
+  const chromaLabel =
+    lang === "zh"
+      ? "ChromaDB · 百份年报 MD&A 语义切块与靶向 RAG 检索"
+      : "ChromaDB · 100+ Annual Report MD&A Chunking & Targeted RAG";
+  const debateLabel =
+    lang === "zh"
+      ? "Multi-Agent 协同辩论流"
+      : "Multi-Agent Collaborative Debate Flow";
+  const extNode = lang === "zh" ? "外部监控" : "Monitor";
+  const intNode = lang === "zh" ? "内部审计" : "Auditor";
+  const judgeNode = lang === "zh" ? "主审法官" : "Chief Judge";
+  const footerMain =
+    lang === "zh"
+      ? "F1 领跑单模型基线 · 白盒证据溯源"
+      : "F1 Outperforms Single-Model Baseline · Traceable Citations";
+  const footerSub =
+    lang === "zh"
+      ? "1:3 极度不平衡控制集验证"
+      : "Validated on 1:3 Imbalanced Control Set";
+
+  return `<svg class="rag-diagram ${compact ? "rag-diagram--compact" : ""}" viewBox="0 0 420 290" fill="none" role="img" aria-label="${tr("双通道 RAG 与多智能体协同辩论架构图", "Dual-channel RAG and multi-agent debate architecture diagram")}">
+    <g font-family="IBM Plex Mono, PingFang SC, monospace">
+      <rect x="20" y="22" width="160" height="44" rx="3" fill="var(--paper)" stroke="var(--line)" stroke-width="1.2"/>
+      <text x="100" y="42" text-anchor="middle" fill="var(--accent)" font-size="11" font-weight="600">TextCNN</text>
+      <text x="100" y="57" text-anchor="middle" fill="var(--muted)" font-size="8.5">${e(shortRisk)}</text>
+
+      <rect x="240" y="22" width="160" height="44" rx="3" fill="var(--paper)" stroke="var(--line)" stroke-width="1.2"/>
+      <text x="320" y="42" text-anchor="middle" fill="var(--accent)" font-size="11" font-weight="600">FinBERT</text>
+      <text x="320" y="57" text-anchor="middle" fill="var(--muted)" font-size="8.5">${e(longSem)}</text>
+
+      <path d="M100 66 L100 90 M96 84 L100 90 L104 84" stroke="var(--accent)" stroke-width="1.3" fill="none"/>
+      <path d="M320 66 L320 90 M316 84 L320 90 L324 84" stroke="var(--accent)" stroke-width="1.3" fill="none"/>
+
+      <rect x="20" y="92" width="380" height="36" rx="3" fill="var(--paper)" stroke="var(--gold)" stroke-width="1.2"/>
+      <text x="210" y="114" text-anchor="middle" fill="var(--ink)" font-size="9.5" font-weight="600">${e(chromaLabel)}</text>
+
+      <path d="M210 128 L210 148 M206 142 L210 148 L214 142" stroke="var(--accent)" stroke-width="1.3" fill="none"/>
+
+      <rect x="20" y="150" width="380" height="90" rx="4" fill="var(--paper)" stroke="var(--accent)" stroke-width="1.4"/>
+      <text x="210" y="170" text-anchor="middle" fill="var(--accent)" font-size="10.5" font-weight="600">${e(debateLabel)}</text>
+
+      <g font-size="9">
+        <rect x="34" y="182" width="104" height="44" rx="3" fill="var(--paper-2)" stroke="var(--line)"/>
+        <text x="86" y="201" text-anchor="middle" fill="var(--ink)" font-weight="600">${e(extNode)}</text>
+        <text x="86" y="216" text-anchor="middle" fill="var(--muted)" font-size="8">External Signal</text>
+
+        <path d="M142 204 L154 204" stroke="var(--accent)" stroke-width="1.2"/>
+
+        <rect x="158" y="182" width="104" height="44" rx="3" fill="var(--paper-2)" stroke="var(--line)"/>
+        <text x="210" y="201" text-anchor="middle" fill="var(--ink)" font-weight="600">${e(intNode)}</text>
+        <text x="210" y="216" text-anchor="middle" fill="var(--muted)" font-size="8">Internal Audit</text>
+
+        <path d="M266 204 L278 204" stroke="var(--accent)" stroke-width="1.2"/>
+
+        <rect x="282" y="182" width="104" height="44" rx="3" fill="var(--paper-2)" stroke="var(--line)"/>
+        <text x="334" y="201" text-anchor="middle" fill="var(--ink)" font-weight="600">${e(judgeNode)}</text>
+        <text x="334" y="216" text-anchor="middle" fill="var(--muted)" font-size="8">Final Verdict</text>
+      </g>
+
+      <text x="210" y="262" text-anchor="middle" fill="var(--ink)" font-size="10" font-weight="600">${e(footerMain)}</text>
+      <text x="210" y="278" text-anchor="middle" fill="var(--muted)" font-size="8.5">${e(footerSub)}</text>
+    </g>
+  </svg>`;
+}
+
 function experienceDetail(ex: Experience): string {
   return `<div class="internship-identity">${organizationLogo(ex.logo)}<div><h3 id="internship-title-${ex.id}">${e(t(ex.company, lang))}</h3>${ex.department ? `<p class="internship-department">${e(t(ex.department, lang))}</p>` : ""}</div></div>
     <div class="internship-meta"><p>${e(t(ex.role, lang))}</p><p class="internship-period">${e(ex.period)}</p></div>
     <div class="internship-metrics" aria-label="${tr("核心成果指标", "Key impact metrics")}">${ex.metrics.map((m) => `<span class="metric-pill"><i aria-hidden="true"></i>${e(t(m, lang))}</span>`).join("")}</div>
+    ${experienceLinksMarkup(ex)}
     <p class="internship-summary">${e(t(ex.summary, lang))}</p>
     <ul class="internship-bullets">${ex.bullets.map((bullet) => `<li>${e(t(bullet, lang))}</li>`).join("")}</ul>`;
 }
@@ -142,7 +230,7 @@ function activateExperience(id: string, announce = false): void {
       gsap.set(panel, { autoAlpha: active ? 1 : 0, y: 0 });
       gsap.set(
         panel.querySelectorAll(
-          ".internship-identity, .internship-meta, .metric-pill, .internship-summary, .internship-bullets li",
+          ".internship-identity, .internship-meta, .metric-pill, .evidence-link, .internship-summary, .internship-bullets li",
         ),
         { clearProps: "transform,opacity" },
       );
@@ -184,7 +272,7 @@ function changeExperience(id: string, focus = false): void {
   markExperience(id);
 
   const toItems = to.querySelectorAll(
-    ".internship-identity, .internship-meta, .metric-pill, .internship-summary, .internship-bullets li",
+    ".internship-identity, .internship-meta, .metric-pill, .evidence-link, .internship-summary, .internship-bullets li",
   );
   gsap.set(from, { autoAlpha: 1, y: 0 });
   gsap.set(to, { autoAlpha: 1, y: 0 });
@@ -215,7 +303,7 @@ function changeExperience(id: string, focus = false): void {
       opacity: 1,
       y: 0,
       duration: 0.42,
-      stagger: 0.035,
+      stagger: 0.032,
       ease: "power3.out",
     },
     0.12,
@@ -245,13 +333,14 @@ function projectScene(project: Project, index: number): string {
       <div class="project-copy" data-copy>
         <p class="eyebrow">${e(t(project.category, lang))}</p>
         <h2 id="title-${project.id}">${e(t(project.title, lang))}</h2>
+        <div class="project-metrics" aria-label="${tr("项目核心指标", "Project highlights")}">${project.metrics.map((m) => `<span class="metric-pill"><i aria-hidden="true"></i>${e(t(m, lang))}</span>`).join("")}</div>
         <p class="project-summary">${e(t(project.summary, lang))}</p>
         <ul class="stack" aria-label="${tr("项目技术", "Project technologies")}">${project.stack.map((s) => `<li>${e(s)}</li>`).join("")}</ul>
         <div class="project-actions"><button class="button button--ink" data-project="${project.id}">${tr("看看这个项目", "Explore the project")} <span aria-hidden="true">↗</span></button>
         ${project.live ? `<a class="text-link" href="${e(project.live)}" target="_blank" rel="noopener noreferrer">${tr("在线体验", "Try it live")} <span aria-hidden="true">↗</span></a>` : `<a class="text-link" href="${e(project.github!)}" target="_blank" rel="noopener noreferrer">GitHub <span aria-hidden="true">↗</span></a>`}</div>
       </div>
     </div>
-    <button class="all-work-link text-link" data-dialog="works">${tr("全部作品", "All projects")} <span aria-hidden="true">↗</span></button>
+    <button class="all-work-link text-link" data-dialog="works">${tr("全部作品 (6)", "All projects (6)")} <span aria-hidden="true">↗</span></button>
   </section>`;
 }
 
@@ -309,10 +398,10 @@ function render(): void {
       ${experienceScene()}
       ${featured.map(projectScene).join("")}
       <section class="scene about-scene" id="about" data-chapter="about" aria-labelledby="about-title" inert>
-        <div class="scene-inner about-layout"><figure class="portrait" data-depth><div class="portrait-card"><img data-src="${e(portrait)}" alt="Maropion" loading="lazy" width="600" height="800" /><span class="portrait-pixel" aria-hidden="true"></span></div><figcaption>Maropion</figcaption></figure><div class="about-copy" data-copy><p class="eyebrow">${tr("认识一下", "A little about me")}</p><h2 id="about-title">${tr("从商业问题，\n走向 AI 体验。", "A business mind.\nA builder’s instinct.").replaceAll("\n", "<br>")}</h2><p class="about-intro">${tr("会计学背景，AI 产品经理与独立开发者。喜欢把模糊的想法，变成可以体验、讨论和验证的东西。", "An accounting background, an AI product perspective, and a habit of building. I like turning ambiguous ideas into something people can try, discuss and improve.")}</p><div class="education education--branded">${education.map((school) => `<div class="education-row">${organizationLogo(school.logo)}<div><h3>${e(t(school.school, lang))}</h3><p>${e(t(school.degree, lang))}</p><time>${e(school.period)}</time>${school.note ? `<p class="education-note">${e(t(school.note, lang))}</p>` : ""}</div></div>`).join("")}</div><a class="text-link" href="${e(resume)}" download="Maropion-Resume.pdf" data-track="cta_about_resume">${tr("下载完整简历", "Download my résumé")} <span aria-hidden="true">↗</span></a></div></div>
+        <div class="scene-inner about-layout"><figure class="portrait" data-depth><div class="portrait-card"><img data-src="${e(portrait)}" alt="Maropion" loading="lazy" width="600" height="800" /><span class="portrait-pixel" aria-hidden="true"></span></div><figcaption>Maropion</figcaption></figure><div class="about-copy" data-copy><p class="eyebrow">${tr("认识一下", "A little about me")}</p><h2 id="about-title">${tr("从商业问题，\n走向 AI 体验。", "A business mind.\nA builder’s instinct.").replaceAll("\n", "<br>")}</h2><p class="about-intro">${tr("会计学背景，AI 产品经理与独立开发者。喜欢把模糊的想法，变成可以体验、讨论和验证的东西。", "An accounting background, an AI product perspective, and a habit of building. I like turning ambiguous ideas into something people can try, discuss and improve.")}</p><div class="education education--branded">${education.map((school) => `<div class="education-row">${organizationLogo(school.logo)}<div><h3>${e(t(school.school, lang))}</h3><p>${e(t(school.degree, lang))}</p><time>${e(school.period)}</time>${school.note ? `<p class="education-note">${e(t(school.note, lang))}</p>` : ""}</div></div>`).join("")}</div><div class="about-actions"><button class="button button--ink" data-dialog="skills">${tr("能力图谱", "Capability map")} <span aria-hidden="true">↗</span></button><a class="text-link" href="${e(resume)}" download="Maropion-Resume.pdf" data-track="cta_about_resume">${tr("下载完整简历", "Download my résumé")} <span aria-hidden="true">↗</span></a></div></div></div>
       </section>
       <section class="scene contact-scene" id="contact" data-chapter="contact" aria-labelledby="contact-title" inert>
-        <div class="scene-inner contact-layout"><div data-copy><p class="eyebrow">${tr("下一个想法，从一次对话开始", "The next idea starts with a conversation")}</p><h2 id="contact-title">${tr("一起，\n做点有意思的。", "Let’s make\nsomething matter.").replaceAll("\n", "<br>")}</h2><p class="contact-intro">${tr("关于 AI 产品岗位，或一个值得做出来的项目。", "For an AI product role, or an idea worth bringing to life.")}</p><a class="email-link" href="mailto:maropion@163.com" data-track="cta_contact_email">maropion@163.com <span aria-hidden="true">↗</span></a><div class="contact-actions"><button class="button button--accent" data-dialog="wechat" data-track="cta_contact_qr">${tr("微信联系", "Say hello on WeChat")} <span aria-hidden="true">↗</span></button><a class="text-link" href="https://github.com/Maropion03" target="_blank" rel="noopener noreferrer">GitHub <span aria-hidden="true">↗</span></a><button class="text-link" data-copy="18565682722">${tr("复制手机号", "Copy phone number")}</button></div></div></div>
+        <div class="scene-inner contact-layout"><div data-copy><p class="eyebrow">${tr("下一个想法，从一次对话开始", "The next idea starts with a conversation")}</p><h2 id="contact-title">${tr("一起，\n做点有意思的。", "Let’s make\nsomething matter.").replaceAll("\n", "<br>")}</h2><p class="contact-intro">${tr("关于 AI 产品岗位，或一个值得做出来的项目。", "For an AI product role, or an idea worth bringing to life.")}</p><a class="email-link" href="mailto:maropion@163.com" data-track="cta_contact_email">maropion@163.com <span aria-hidden="true">↗</span></a><div class="contact-actions"><button class="button button--accent" data-dialog="wechat" data-track="cta_contact_qr">${tr("微信 / 飞书联系", "WeChat / Feishu")} <span aria-hidden="true">↗</span></button><a class="text-link" href="https://github.com/Maropion03" target="_blank" rel="noopener noreferrer">GitHub <span aria-hidden="true">↗</span></a><button class="text-link" data-copy="18565682722">${tr("复制手机号", "Copy phone number")}</button></div></div></div>
       </section>
     </main>
     <footer class="scene-footer">
@@ -418,7 +507,7 @@ function activate(index: number): void {
     });
     gsap.set(
       el.querySelectorAll(
-        "[data-copy] > *, [data-depth], .stack li, .education-row",
+        "[data-copy] > *, [data-depth], .stack li, .education-row, .metric-pill",
       ),
       { clearProps: "transform,opacity" },
     );
@@ -493,7 +582,7 @@ function go(index: number): void {
   const toCopyItems = toScene.querySelectorAll<HTMLElement>("[data-copy] > *");
   const toDepth = toScene.querySelector<HTMLElement>("[data-depth]");
   const toSubItems = toScene.querySelectorAll<HTMLElement>(
-    ".stack li, .education-row",
+    ".stack li, .education-row, .project-metrics .metric-pill",
   );
 
   fromScene.classList.add("is-outgoing");
@@ -594,7 +683,7 @@ function go(index: number): void {
         opacity: 1,
         y: 0,
         duration: 0.44,
-        stagger: 0.045,
+        stagger: 0.04,
         ease: "power2.out",
       },
       0.34,
@@ -625,6 +714,39 @@ function setMenu(value: boolean): void {
   if (value) nav?.querySelector("a")?.focus();
 }
 
+function renderQrDialogContent(): string {
+  const isWechat = activeQrChannel === "wechat";
+  const qrSrc = isWechat ? wechatQR : feishuQR;
+  const qrAlt = isWechat
+    ? tr("Maropion 的微信二维码", "Maropion’s WeChat QR code")
+    : tr("Maropion 的飞书二维码", "Maropion’s Feishu QR code");
+  const note = isWechat
+    ? tr(
+        "微信扫码添加，或直接复制下方微信号",
+        "Scan with WeChat, or copy the WeChat ID below",
+      )
+    : tr(
+        "飞书扫码即可直接发起对话",
+        "Scan with Feishu / Lark to start a conversation",
+      );
+
+  return `<p class="eyebrow">${tr("认识一下", "Let’s connect")}</p>
+    <h2 id="dialog-title">${tr("微信或飞书，随时聊聊。", "Connect on WeChat or Feishu.")}</h2>
+    <div class="qr-switcher" role="tablist" aria-label="${tr("选择联系渠道", "Choose contact channel")}">
+      <button type="button" role="tab" class="qr-switch-btn ${isWechat ? "is-active" : ""}" aria-selected="${isWechat}" data-qr-channel="wechat">${tr("微信 WeChat", "WeChat")}</button>
+      <button type="button" role="tab" class="qr-switch-btn ${!isWechat ? "is-active" : ""}" aria-selected="${!isWechat}" data-qr-channel="feishu">${tr("飞书 Feishu", "Feishu")}</button>
+    </div>
+    <div class="qr-card-frame">
+      <img class="wechat-qr" src="${e(qrSrc)}" alt="${qrAlt}" width="260" height="260" />
+      <p class="qr-note">${note}</p>
+    </div>
+    ${
+      isWechat
+        ? `<button class="button button--ink" data-copy="MRP18565682722">${tr("复制微信号", "Copy WeChat ID")} ↗</button>`
+        : `<button class="button button--ink" data-copy="18565682722">${tr("复制手机号", "Copy phone number")} ↗</button>`
+    }`;
+}
+
 function showDialog(value: typeof activeDialog): void {
   if (!value) return;
   activeDialog = value;
@@ -632,13 +754,44 @@ function showDialog(value: typeof activeDialog): void {
   if (!dialog.open) dialogReturn = document.activeElement as HTMLElement;
   const target = dialog.querySelector(".dialog-content")!;
   if (value === "works") {
-    target.innerHTML = `<p class="eyebrow">${tr("继续看看", "More to explore")}</p><h2 id="dialog-title">${tr("全部作品", "All projects")}</h2><div class="work-index">${projects.map((p) => `<button class="work-index-row" data-project="${p.id}">${p.image ? `<img src="${e(p.image)}" alt="" width="140" height="90" loading="lazy" />` : '<span class="research-mark">RAG</span>'}<span><strong>${e(t(p.subtitle, lang))}</strong><span>${e(t(p.category, lang))}</span></span><span aria-hidden="true">↗</span></button>`).join("")}</div>`;
+    target.innerHTML = `<p class="eyebrow">${tr("继续看看", "More to explore")}</p><h2 id="dialog-title">${tr("全部作品 (6)", "All projects (6)")}</h2><div class="work-index">${projects
+      .map(
+        (p) =>
+          `<button class="work-index-row" data-project="${p.id}">${
+            p.image
+              ? `<img src="${e(p.image)}" alt="" width="140" height="90" loading="lazy" />`
+              : `<span class="research-mark" aria-hidden="true"><span>TextCNN × FinBERT</span><strong>RAG + Agent</strong></span>`
+          }<span><strong>${e(t(p.subtitle, lang))}</strong><span>${e(t(p.category, lang))} · ${p.metrics.map((m) => e(t(m, lang))).slice(0, 2).join(" / ")}</span></span><span aria-hidden="true">↗</span></button>`,
+      )
+      .join("")}</div>`;
   } else if (value === "experience") {
-    target.innerHTML = `<p class="eyebrow">${tr("实践与学习", "Practice & learning")}</p><h2 id="dialog-title">${tr("完整经历", "Experience")}</h2><div class="full-experience">${experiences.map((ex) => `<article class="full-experience-entry"><div class="full-experience-heading">${organizationLogo(ex.logo, false)}<div><h3>${e(t(ex.company, lang))}</h3><p class="detail-role">${e(t(ex.role, lang))}</p>${ex.department ? `<p class="internship-department">${e(t(ex.department, lang))}</p>` : ""}<p class="internship-period">${e(ex.period)}</p></div></div><div class="internship-metrics">${ex.metrics.map((m) => `<span class="metric-pill"><i aria-hidden="true"></i>${e(t(m, lang))}</span>`).join("")}</div><p>${e(t(ex.summary, lang))}</p><ul class="internship-bullets">${ex.bullets.map((bullet) => `<li>${e(t(bullet, lang))}</li>`).join("")}</ul></article>`).join("")}</div><a class="button button--ink" href="${e(resume)}" download="Maropion-Resume.pdf">${tr("完整简历 PDF", "Full résumé PDF")} ↗</a>`;
+    target.innerHTML = `<p class="eyebrow">${tr("实践与学习", "Practice & learning")}</p><h2 id="dialog-title">${tr("完整实习经历", "Full Experience")}</h2><div class="full-experience">${experiences
+      .map(
+        (ex) =>
+          `<article class="full-experience-entry"><div class="full-experience-heading">${organizationLogo(ex.logo, false)}<div><h3>${e(t(ex.company, lang))}</h3><p class="detail-role">${e(t(ex.role, lang))}</p>${ex.department ? `<p class="internship-department">${e(t(ex.department, lang))}</p>` : ""}<p class="internship-period">${e(ex.period)}</p></div></div><div class="internship-metrics">${ex.metrics.map((m) => `<span class="metric-pill"><i aria-hidden="true"></i>${e(t(m, lang))}</span>`).join("")}</div>${experienceLinksMarkup(ex)}<p>${e(t(ex.summary, lang))}</p><ul class="internship-bullets">${ex.bullets.map((bullet) => `<li>${e(t(bullet, lang))}</li>`).join("")}</ul></article>`,
+      )
+      .join("")}</div><a class="button button--ink" href="${e(resume)}" download="Maropion-Resume.pdf">${tr("完整简历 PDF", "Full résumé PDF")} ↗</a>`;
+  } else if (value === "skills") {
+    target.innerHTML = `<p class="eyebrow">${tr("产品 × 工程 × 落地", "Product × Engineering × Delivery")}</p><h2 id="dialog-title">${tr("个人能力图谱", "Capability Map")}</h2><div class="skills-modal-grid">${skillGroups
+      .map(
+        (group) =>
+          `<section class="skill-modal-card"><span class="skill-modal-code">A_${e(group.code)}</span><h3>${e(t(group.title, lang))}</h3><ul class="skill-modal-list">${group.items
+            .map(
+              (item) =>
+                `<li><span>${e(t(item.name, lang))}</span><code>${e(item.tag)}</code></li>`,
+            )
+            .join("")}</ul><p class="skill-modal-desc">${e(t(group.summary, lang))}</p></section>`,
+      )
+      .join("")}</div>`;
   } else if (value === "wechat") {
-    target.innerHTML = `<p class="eyebrow">${tr("认识一下", "Let’s connect")}</p><h2 id="dialog-title">${tr("微信聊聊。", "Say hello on WeChat.")}</h2><img class="wechat-qr" src="${e(wechatQR)}" alt="${tr("Maropion 的微信二维码", "Maropion’s WeChat QR code")}" width="280" height="280" /><button class="button button--ink" data-copy="MRP18565682722">${tr("复制微信号", "Copy WeChat ID")} ↗</button>`;
+    target.innerHTML = renderQrDialogContent();
   } else {
-    target.innerHTML = `<p class="eyebrow">${e(t(value.category, lang))}</p><h2 id="dialog-title">${e(t(value.subtitle, lang))}</h2><p class="detail-role">${e(t(value.role, lang))}</p>${value.image ? `<img class="detail-image" src="${e(value.image)}" alt="${e(t(value.imageAlt, lang))}" />` : ""}<p class="detail-summary">${e(t(value.detail, lang))}</p><ul class="stack">${value.stack.map((s) => `<li>${e(s)}</li>`).join("")}</ul><div class="dialog-actions">${value.live ? `<a class="button button--accent" href="${e(value.live)}" target="_blank" rel="noopener noreferrer">${tr("在线体验", "Try it live")} ↗</a>` : ""}${value.github ? `<a class="text-link" href="${e(value.github)}" target="_blank" rel="noopener noreferrer">GitHub ↗</a>` : ""}</div>`;
+    const visualBlock = value.image
+      ? `<img class="detail-image" src="${e(value.image)}" alt="${e(t(value.imageAlt, lang))}" />`
+      : value.diagram === "rag-arch"
+        ? `<div class="detail-diagram">${ragArchitectureSvg(false)}</div>`
+        : "";
+    target.innerHTML = `<p class="eyebrow">${e(t(value.category, lang))}</p><h2 id="dialog-title">${e(t(value.subtitle, lang))}</h2><p class="detail-role">${e(t(value.role, lang))}</p><div class="internship-metrics">${value.metrics.map((m) => `<span class="metric-pill"><i aria-hidden="true"></i>${e(t(m, lang))}</span>`).join("")}</div>${visualBlock}<p class="detail-summary">${e(t(value.detail, lang))}</p><ul class="stack">${value.stack.map((s) => `<li>${e(s)}</li>`).join("")}</ul><div class="dialog-actions">${value.live ? `<a class="button button--accent" href="${e(value.live)}" target="_blank" rel="noopener noreferrer">${tr("在线体验", "Try it live")} ↗</a>` : ""}${value.github ? `<a class="text-link" href="${e(value.github)}" target="_blank" rel="noopener noreferrer">GitHub ↗</a>` : ""}<button class="text-link" data-dialog="works">${tr("返回全部作品", "Back to all projects")} ↗</button></div>`;
   }
   if (!dialog.open) dialog.showModal();
   dialog.querySelector<HTMLButtonElement>(".dialog-close")!.focus();
@@ -765,10 +918,23 @@ app.addEventListener("click", (event) => {
     event.preventDefault();
     changeExperience(target.dataset.experience);
   }
+  if (target.dataset.qrChannel) {
+    const nextChannel = target.dataset.qrChannel as "wechat" | "feishu";
+    if (nextChannel !== activeQrChannel) {
+      activeQrChannel = nextChannel;
+      const contentEl = document.querySelector(".dialog-content");
+      if (contentEl && activeDialog === "wechat") {
+        contentEl.innerHTML = renderQrDialogContent();
+      }
+    }
+    return;
+  }
   if (target.dataset.project)
     showDialog(projects.find((p) => p.id === target.dataset.project) ?? null);
   if (target.dataset.dialog)
-    showDialog(target.dataset.dialog as "works" | "experience" | "wechat");
+    showDialog(
+      target.dataset.dialog as "works" | "experience" | "skills" | "wechat",
+    );
   if (target.dataset.copy) void copy(target.dataset.copy);
   if (target.classList.contains("dialog-close"))
     document.querySelector<HTMLDialogElement>(".detail-dialog")!.close();
@@ -1010,6 +1176,7 @@ window.addEventListener("hashchange", () => {
   )?.id;
   go(indexForHash(location.hash));
   if (id) changeExperience(id);
+  if (location.hash === "#skills") showDialog("skills");
 });
 window.addEventListener("beforeunload", () => {
   timeline?.kill();
@@ -1024,3 +1191,4 @@ systemDark.addEventListener("change", () => {
 });
 current = indexForHash(location.hash);
 render();
+if (location.hash === "#skills") showDialog("skills");

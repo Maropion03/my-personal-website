@@ -244,11 +244,12 @@
 }
 
 /* Quantified highlight metric pills */
-.internship-metrics {
+.internship-metrics,
+.project-metrics {
   display: flex;
   flex-wrap: wrap;
   gap: 8px 10px;
-  margin-bottom: 18px;
+  margin-bottom: 16px;
 }
 .metric-pill {
   display: inline-flex;
@@ -280,10 +281,50 @@
   background: color-mix(in srgb, var(--accent) 16%, var(--paper));
 }
 
+/* External evidence links (Feishu docs, live demos, GitHub repos) */
+.internship-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 10px;
+  margin-bottom: 16px;
+}
+.evidence-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 11px;
+  font-family: var(--mono);
+  font-size: 11px;
+  line-height: 1.4;
+  color: var(--ink);
+  background: color-mix(in srgb, var(--paper-2) 90%, transparent);
+  border: 1px dashed color-mix(in srgb, var(--accent) 60%, var(--line));
+  border-radius: 2px;
+  transition:
+    transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1),
+    border-color 0.2s ease,
+    background 0.2s ease,
+    color 0.2s ease;
+}
+.evidence-link i {
+  font-style: normal;
+  color: var(--accent);
+  transition: transform 0.2s ease;
+}
+.evidence-link:hover {
+  transform: translateY(-2px);
+  border-style: solid;
+  border-color: var(--accent);
+  background: color-mix(in srgb, var(--accent) 14%, var(--paper));
+}
+.evidence-link:hover i {
+  transform: translate(2px, -2px);
+}
+
 .internship-summary {
   font-size: 16px;
   line-height: 1.68;
-  margin-bottom: 20px;
+  margin-bottom: 18px;
   max-width: 38em;
 }
 .internship-bullets {
@@ -294,7 +335,7 @@
 .internship-bullets li {
   position: relative;
   padding-left: 18px;
-  margin-bottom: 16px;
+  margin-bottom: 15px;
   font-size: 13px;
   line-height: 1.85;
   color: var(--muted);
@@ -394,14 +435,15 @@
   .internship-identity {
     margin-bottom: 14px;
   }
-  .internship-metrics {
-    margin-bottom: 12px;
+  .internship-metrics,
+  .internship-links {
+    margin-bottom: 11px;
   }
   .internship-summary {
-    margin-bottom: 14px;
+    margin-bottom: 12px;
   }
   .internship-bullets li {
-    margin-bottom: 12px;
+    margin-bottom: 11px;
   }
 }
 @media (max-width: 767px) {
@@ -492,22 +534,25 @@
     margin-top: 6px;
     font-size: 10px;
   }
-  .internship-metrics {
+  .internship-metrics,
+  .internship-links,
+  .project-metrics {
     gap: 6px;
-    margin-bottom: 14px;
+    margin-bottom: 12px;
   }
-  .metric-pill {
+  .metric-pill,
+  .evidence-link {
     font-size: 9px;
     padding: 4px 8px;
   }
   .internship-summary {
     font-size: 14px;
-    margin-bottom: 16px;
+    margin-bottom: 14px;
   }
   .internship-bullets li {
     font-size: 12px;
     line-height: 1.85;
-    margin-bottom: 14px;
+    margin-bottom: 12px;
     padding-left: 14px;
   }
   .education.education--branded {
@@ -581,14 +626,15 @@
   }
   .internship-meta {
     padding-bottom: 10px;
-    margin-bottom: 12px;
+    margin-bottom: 10px;
   }
-  .internship-metrics {
-    margin-bottom: 12px;
+  .internship-metrics,
+  .internship-links {
+    margin-bottom: 10px;
   }
   .internship-summary {
     font-size: 14px;
-    margin-bottom: 12px;
+    margin-bottom: 10px;
   }
   .internship-panel .internship-bullets li {
     display: -webkit-box;
@@ -597,7 +643,7 @@
     overflow: hidden;
     font-size: 12px;
     line-height: 1.8;
-    margin-bottom: 10px;
+    margin-bottom: 9px;
   }
 }
 @container internship (height < 420px) {

@@ -2066,3 +2066,174 @@ html[lang="zh-CN"] .contact-layout h2 {
     transform: none !important;
   }
 }
+
+/* Merged enhancements from maropion.fun (RAG architecture SVG, 3-pillar capability map, WeChat/Feishu QR switcher) */
+.about-actions {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  flex-wrap: wrap;
+}
+.research-mark {
+  background: var(--paper-2);
+  border: 1px solid var(--line);
+  border-radius: 2px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 3px;
+  width: 90px;
+  height: 65px;
+  font-family: var(--mono);
+  padding: 4px;
+  text-align: center;
+}
+.research-mark > span {
+  font-size: 7.5px;
+  color: var(--muted);
+  line-height: 1.2;
+}
+.research-mark > strong {
+  font-size: 10px;
+  color: var(--accent);
+  font-weight: 600;
+  line-height: 1.2;
+}
+.detail-diagram {
+  margin: 22px 0;
+  padding: clamp(14px, 2vw, 24px);
+  background: var(--paper-2);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+}
+.rag-diagram {
+  width: 100%;
+  max-width: 680px;
+  height: auto;
+  display: block;
+  margin: 0 auto;
+}
+.skills-modal-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 20px;
+  margin-top: 24px;
+}
+.skill-modal-card {
+  background: var(--paper-2);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: 22px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.skill-modal-code {
+  font-family: var(--mono);
+  font-size: 10px;
+  color: var(--accent);
+  letter-spacing: 0.08em;
+}
+.skill-modal-card h3 {
+  font-size: 18px;
+  margin: 0;
+  letter-spacing: -0.02em;
+}
+.skill-modal-list {
+  list-style: none;
+  padding: 0;
+  margin: 4px 0 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  flex: 1;
+}
+.skill-modal-list li {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 10px;
+  padding-bottom: 8px;
+  border-bottom: 1px dashed var(--line);
+  font-size: 12px;
+}
+.skill-modal-list li:last-child {
+  border-bottom: none;
+}
+.skill-modal-list code {
+  font-family: var(--mono);
+  font-size: 9.5px;
+  color: var(--accent);
+  white-space: nowrap;
+}
+.skill-modal-desc {
+  margin: 8px 0 0;
+  padding-top: 12px;
+  border-top: 1px solid var(--line);
+  font-size: 12px;
+  line-height: 1.75;
+  color: var(--muted);
+}
+.qr-switcher {
+  display: inline-flex;
+  gap: 4px;
+  padding: 4px;
+  background: var(--paper-2);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  margin: 8px auto 4px;
+}
+.qr-switch-btn {
+  font-family: var(--mono);
+  font-size: 11px;
+  padding: 8px 18px;
+  border-radius: 2px;
+  color: var(--muted);
+  transition:
+    background 0.2s ease,
+    color 0.2s ease;
+}
+.qr-switch-btn:hover {
+  color: var(--ink);
+}
+.qr-switch-btn.is-active {
+  background: var(--accent);
+  color: #251b13;
+  font-weight: 600;
+}
+.qr-card-frame {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  margin: 18px auto 22px;
+}
+.qr-card-frame .wechat-qr {
+  margin: 0 auto;
+  padding: 10px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+}
+.qr-note {
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--muted);
+  margin: 0;
+}
+@media (max-width: 860px) {
+  .skills-modal-grid {
+    grid-template-columns: 1fr;
+  }
+}
+@media (max-width: 767px) {
+  .about-actions {
+    grid-column: 1 / -1;
+    gap: 16px;
+    margin-top: 4px;
+  }
+  .project-copy .project-metrics {
+    order: 1;
+    margin: -4px 0 -4px;
+  }
+}
