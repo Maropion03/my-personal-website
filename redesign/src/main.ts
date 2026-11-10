@@ -66,7 +66,7 @@ let experienceBusy = false;
 let experienceQueued: string | null = null;
 let experienceTransition: gsap.core.Timeline | undefined;
 const experienceTransitionDuration = 0.58;
-const featured = projects.slice(0, 3);
+const featured = projects;
 const projectSceneIds = featured.map((project, index) =>
   index === 0 ? "projects" : `project-${project.id}`,
 );
@@ -84,9 +84,10 @@ const chapterLabels = () => [
   tr("联系", "Contact"),
 ];
 const chapterKeys = ["hero", "experience", "projects", "about", "contact"];
+const padSceneNum = (n: number) => String(n).padStart(2, "0");
 
 function organizationLogo(source: string, deferred = true): string {
-  return `<span class="organization-logo"><img ${deferred ? "data-src" : "src"}="${e(source)}" alt="" width="64" height="64" /></span>`;
+  return `<span class="organization-logo"><img ${deferred ? "data-src" : "src"}="${e(source)}" alt="" width="120" height="68" /></span>`;
 }
 
 function experienceLinksMarkup(ex: Experience): string {
@@ -319,14 +320,22 @@ function stepExperience(direction: number): void {
 }
 
 function projectScene(project: Project, index: number): string {
+  const mediaMarkup = project.image
+    ? `<img data-src="${e(project.image)}" alt="${e(t(project.imageAlt, lang))}" loading="lazy" width="1600" height="1000" />`
+    : `<div class="stage-rag-diagram">${ragArchitectureSvg(false)}</div>`;
+  const secondaryAction = project.live
+    ? `<a class="text-link" href="${e(project.live)}" target="_blank" rel="noopener noreferrer">${tr("在线体验", "Try it live")} <span aria-hidden="true">↗</span></a>`
+    : project.github
+      ? `<a class="text-link" href="${e(project.github)}" target="_blank" rel="noopener noreferrer">GitHub <span aria-hidden="true">↗</span></a>`
+      : "";
   return `<section class="scene project-scene project-scene--${project.id}" id="${projectSceneIds[index]}" data-chapter="projects" aria-labelledby="title-${project.id}" inert>
     <div class="scene-inner project-layout">
       <figure class="project-visual" data-depth>
         <div class="project-image-wrap">
           <span class="voxel-corner voxel-corner--tl" aria-hidden="true"></span>
           <span class="voxel-corner voxel-corner--br" aria-hidden="true"></span>
-          <span class="project-index" aria-hidden="true">0${index + 1} / 0${featured.length}</span>
-          <img data-src="${e(project.image!)}" alt="${e(t(project.imageAlt, lang))}" loading="lazy" width="1600" height="1000" />
+          <span class="project-index" aria-hidden="true">${padSceneNum(index + 1)} / ${padSceneNum(featured.length)}</span>
+          ${mediaMarkup}
         </div>
         <figcaption>${e(t(project.subtitle, lang))}</figcaption>
       </figure>
@@ -337,7 +346,7 @@ function projectScene(project: Project, index: number): string {
         <p class="project-summary">${e(t(project.summary, lang))}</p>
         <ul class="stack" aria-label="${tr("项目技术", "Project technologies")}">${project.stack.map((s) => `<li>${e(s)}</li>`).join("")}</ul>
         <div class="project-actions"><button class="button button--ink" data-project="${project.id}">${tr("看看这个项目", "Explore the project")} <span aria-hidden="true">↗</span></button>
-        ${project.live ? `<a class="text-link" href="${e(project.live)}" target="_blank" rel="noopener noreferrer">${tr("在线体验", "Try it live")} <span aria-hidden="true">↗</span></a>` : `<a class="text-link" href="${e(project.github!)}" target="_blank" rel="noopener noreferrer">GitHub <span aria-hidden="true">↗</span></a>`}</div>
+        ${secondaryAction}</div>
       </div>
     </div>
     <button class="all-work-link text-link" data-dialog="works">${tr("全部作品 (6)", "All projects (6)")} <span aria-hidden="true">↗</span></button>
@@ -355,7 +364,7 @@ function modeForScene(index: number): {
     return { mode: "experience", variant: 0, attr: "experience" };
   if (id === "about") return { mode: "about", variant: 0, attr: "about" };
   if (id === "contact") return { mode: "contact", variant: 0, attr: "contact" };
-  const pIdx = Math.max(0, projectSceneIds.indexOf(id));
+  const pIdx = Math.max(0, projectSceneIds.indexOf(id)) % 3;
   return {
     mode: "projects",
     variant: pIdx,
@@ -401,13 +410,13 @@ function render(): void {
         <div class="scene-inner about-layout"><figure class="portrait" data-depth><div class="portrait-card"><img data-src="${e(portrait)}" alt="Maropion" loading="lazy" width="600" height="800" /><span class="portrait-pixel" aria-hidden="true"></span></div><figcaption>Maropion</figcaption></figure><div class="about-copy" data-copy><p class="eyebrow">${tr("认识一下", "A little about me")}</p><h2 id="about-title">${tr("从商业问题，\n走向 AI 体验。", "A business mind.\nA builder’s instinct.").replaceAll("\n", "<br>")}</h2><p class="about-intro">${tr("会计学背景，AI 产品经理与独立开发者。喜欢把模糊的想法，变成可以体验、讨论和验证的东西。", "An accounting background, an AI product perspective, and a habit of building. I like turning ambiguous ideas into something people can try, discuss and improve.")}</p><div class="education education--branded">${education.map((school) => `<div class="education-row">${organizationLogo(school.logo)}<div><h3>${e(t(school.school, lang))}</h3><p>${e(t(school.degree, lang))}</p><time>${e(school.period)}</time>${school.note ? `<p class="education-note">${e(t(school.note, lang))}</p>` : ""}</div></div>`).join("")}</div><div class="about-actions"><button class="button button--ink" data-dialog="skills">${tr("能力图谱", "Capability map")} <span aria-hidden="true">↗</span></button><a class="text-link" href="${e(resume)}" download="Maropion-Resume.pdf" data-track="cta_about_resume">${tr("下载完整简历", "Download my résumé")} <span aria-hidden="true">↗</span></a></div></div></div>
       </section>
       <section class="scene contact-scene" id="contact" data-chapter="contact" aria-labelledby="contact-title" inert>
-        <div class="scene-inner contact-layout"><div data-copy><p class="eyebrow">${tr("下一个想法，从一次对话开始", "The next idea starts with a conversation")}</p><h2 id="contact-title">${tr("一起，\n做点有意思的。", "Let’s make\nsomething matter.").replaceAll("\n", "<br>")}</h2><p class="contact-intro">${tr("关于 AI 产品岗位，或一个值得做出来的项目。", "For an AI product role, or an idea worth bringing to life.")}</p><a class="email-link" href="mailto:maropion@163.com" data-track="cta_contact_email">maropion@163.com <span aria-hidden="true">↗</span></a><div class="contact-actions"><button class="button button--accent" data-dialog="wechat" data-track="cta_contact_qr">${tr("微信 / 飞书联系", "WeChat / Feishu")} <span aria-hidden="true">↗</span></button><a class="text-link" href="https://github.com/Maropion03" target="_blank" rel="noopener noreferrer">GitHub <span aria-hidden="true">↗</span></a><button class="text-link" data-copy="18565682722">${tr("复制手机号", "Copy phone number")}</button></div></div></div>
+        <div class="scene-inner contact-layout"><div data-copy><p class="eyebrow">${tr("下一个想法，从一次对话开始", "The next idea starts with a conversation")}</p><h2 id="contact-title">${tr("一起，\n做点有意思的。", "Let’s make\nsomething matter.").replaceAll("\n", "<br>")}</h2><p class="contact-intro">${tr("关于 AI 产品岗位，或一个值得做出来的项目。", "For an AI product role, or an idea worth bringing to life.")}</p><a class="email-link" href="mailto:maropion@163.com" data-track="cta_contact_email">maropion@163.com <span aria-hidden="true">↗</span></a><div class="contact-actions"><button class="button button--accent" data-dialog="wechat" data-qr-open="wechat" data-track="cta_contact_qr">${tr("微信扫码", "WeChat QR")} <span aria-hidden="true">↗</span></button><button class="button button--ink" data-dialog="wechat" data-qr-open="feishu" data-track="cta_contact_feishu">${tr("飞书扫码", "Feishu QR")} <span aria-hidden="true">↗</span></button><a class="text-link" href="https://github.com/Maropion03" target="_blank" rel="noopener noreferrer">GitHub <span aria-hidden="true">↗</span></a><button class="text-link" data-copy="18565682722">${tr("复制手机号", "Copy phone number")}</button></div></div></div>
       </section>
     </main>
     <footer class="scene-footer">
       <p>© 2026 Maropion</p>
       <div class="scene-progress" aria-hidden="true">
-        <span class="scene-counter">01 / 07</span>
+        <span class="scene-counter">01 / ${padSceneNum(sceneIds.length)}</span>
         <span class="scene-progress-track"><i class="scene-progress-fill"></i></span>
         <span class="chapter-name"></span>
       </div>
@@ -484,7 +493,7 @@ function updateFooterProgress(index: number): void {
   if (chapterEl) chapterEl.textContent = label;
   const counterEl = document.querySelector(".scene-counter");
   if (counterEl)
-    counterEl.textContent = `0${index + 1} / 0${sceneIds.length}`;
+    counterEl.textContent = `${padSceneNum(index + 1)} / ${padSceneNum(sceneIds.length)}`;
   const fillEl = document.querySelector<HTMLElement>(".scene-progress-fill");
   if (fillEl) {
     const ratio = (index + 1) / sceneIds.length;
@@ -917,6 +926,9 @@ app.addEventListener("click", (event) => {
       return;
     event.preventDefault();
     changeExperience(target.dataset.experience);
+  }
+  if (target.dataset.qrOpen) {
+    activeQrChannel = target.dataset.qrOpen as "wechat" | "feishu";
   }
   if (target.dataset.qrChannel) {
     const nextChannel = target.dataset.qrChannel as "wechat" | "feishu";
