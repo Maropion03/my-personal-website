@@ -86,8 +86,12 @@ const chapterLabels = () => [
 const chapterKeys = ["hero", "experience", "projects", "about", "contact"];
 const padSceneNum = (n: number) => String(n).padStart(2, "0");
 
-function organizationLogo(source: string, deferred = true): string {
-  return `<span class="organization-logo"><img ${deferred ? "data-src" : "src"}="${e(source)}" alt="" width="120" height="68" /></span>`;
+function organizationLogo(
+  source: string,
+  id: string,
+  deferred = true,
+): string {
+  return `<span class="organization-logo" data-org="${e(id)}"><img ${deferred ? "data-src" : "src"}="${e(source)}" alt="" width="136" height="64" /></span>`;
 }
 
 function experienceLinksMarkup(ex: Experience): string {
@@ -169,7 +173,7 @@ function ragArchitectureSvg(compact = false): string {
 }
 
 function experienceDetail(ex: Experience): string {
-  return `<div class="internship-identity">${organizationLogo(ex.logo)}<div><h3 id="internship-title-${ex.id}">${e(t(ex.company, lang))}</h3>${ex.department ? `<p class="internship-department">${e(t(ex.department, lang))}</p>` : ""}</div></div>
+  return `<div class="internship-identity">${organizationLogo(ex.logo, ex.id)}<div><h3 id="internship-title-${ex.id}">${e(t(ex.company, lang))}</h3>${ex.department ? `<p class="internship-department">${e(t(ex.department, lang))}</p>` : ""}</div></div>
     <div class="internship-meta"><p>${e(t(ex.role, lang))}</p><p class="internship-period">${e(ex.period)}</p></div>
     <div class="internship-metrics" aria-label="${tr("核心成果指标", "Key impact metrics")}">${ex.metrics.map((m) => `<span class="metric-pill"><i aria-hidden="true"></i>${e(t(m, lang))}</span>`).join("")}</div>
     ${experienceLinksMarkup(ex)}
@@ -407,7 +411,7 @@ function render(): void {
       ${experienceScene()}
       ${featured.map(projectScene).join("")}
       <section class="scene about-scene" id="about" data-chapter="about" aria-labelledby="about-title" inert>
-        <div class="scene-inner about-layout"><figure class="portrait" data-depth><div class="portrait-card"><img data-src="${e(portrait)}" alt="Maropion" loading="lazy" width="600" height="800" /><span class="portrait-pixel" aria-hidden="true"></span></div><figcaption>Maropion</figcaption></figure><div class="about-copy" data-copy><p class="eyebrow">${tr("认识一下", "A little about me")}</p><h2 id="about-title">${tr("从商业问题，\n走向 AI 体验。", "A business mind.\nA builder’s instinct.").replaceAll("\n", "<br>")}</h2><p class="about-intro">${tr("会计学背景，AI 产品经理与独立开发者。喜欢把模糊的想法，变成可以体验、讨论和验证的东西。", "An accounting background, an AI product perspective, and a habit of building. I like turning ambiguous ideas into something people can try, discuss and improve.")}</p><div class="education education--branded">${education.map((school) => `<div class="education-row">${organizationLogo(school.logo)}<div><h3>${e(t(school.school, lang))}</h3><p>${e(t(school.degree, lang))}</p><time>${e(school.period)}</time>${school.note ? `<p class="education-note">${e(t(school.note, lang))}</p>` : ""}</div></div>`).join("")}</div><div class="about-actions"><button class="button button--ink" data-dialog="skills">${tr("能力图谱", "Capability map")} <span aria-hidden="true">↗</span></button><a class="text-link" href="${e(resume)}" download="Maropion-Resume.pdf" data-track="cta_about_resume">${tr("下载完整简历", "Download my résumé")} <span aria-hidden="true">↗</span></a></div></div></div>
+        <div class="scene-inner about-layout"><figure class="portrait" data-depth><div class="portrait-card"><img data-src="${e(portrait)}" alt="Maropion" loading="lazy" width="600" height="800" /><span class="portrait-pixel" aria-hidden="true"></span></div><figcaption>Maropion</figcaption></figure><div class="about-copy" data-copy><p class="eyebrow">${tr("认识一下", "A little about me")}</p><h2 id="about-title">${tr("从商业问题，\n走向 AI 体验。", "A business mind.\nA builder’s instinct.").replaceAll("\n", "<br>")}</h2><p class="about-intro">${tr("会计学背景，AI 产品经理与独立开发者。喜欢把模糊的想法，变成可以体验、讨论和验证的东西。", "An accounting background, an AI product perspective, and a habit of building. I like turning ambiguous ideas into something people can try, discuss and improve.")}</p><div class="education education--branded">${education.map((school) => `<div class="education-row">${organizationLogo(school.logo, school.id)}<div><h3>${e(t(school.school, lang))}</h3><p>${e(t(school.degree, lang))}</p><time>${e(school.period)}</time>${school.note ? `<p class="education-note">${e(t(school.note, lang))}</p>` : ""}</div></div>`).join("")}</div><div class="about-actions"><button class="button button--ink" data-dialog="skills">${tr("能力图谱", "Capability map")} <span aria-hidden="true">↗</span></button><a class="text-link" href="${e(resume)}" download="Maropion-Resume.pdf" data-track="cta_about_resume">${tr("下载完整简历", "Download my résumé")} <span aria-hidden="true">↗</span></a></div></div></div>
       </section>
       <section class="scene contact-scene" id="contact" data-chapter="contact" aria-labelledby="contact-title" inert>
         <div class="scene-inner contact-layout"><div data-copy><p class="eyebrow">${tr("下一个想法，从一次对话开始", "The next idea starts with a conversation")}</p><h2 id="contact-title">${tr("一起，\n做点有意思的。", "Let’s make\nsomething matter.").replaceAll("\n", "<br>")}</h2><p class="contact-intro">${tr("关于 AI 产品岗位，或一个值得做出来的项目。", "For an AI product role, or an idea worth bringing to life.")}</p><a class="email-link" href="mailto:maropion@163.com" data-track="cta_contact_email">maropion@163.com <span aria-hidden="true">↗</span></a><div class="contact-actions"><button class="button button--accent" data-dialog="wechat" data-qr-open="wechat" data-track="cta_contact_qr">${tr("微信扫码", "WeChat QR")} <span aria-hidden="true">↗</span></button><button class="button button--ink" data-dialog="wechat" data-qr-open="feishu" data-track="cta_contact_feishu">${tr("飞书扫码", "Feishu QR")} <span aria-hidden="true">↗</span></button><a class="text-link" href="https://github.com/Maropion03" target="_blank" rel="noopener noreferrer">GitHub <span aria-hidden="true">↗</span></a><button class="text-link" data-copy="18565682722">${tr("复制手机号", "Copy phone number")}</button></div></div></div>
@@ -777,7 +781,7 @@ function showDialog(value: typeof activeDialog): void {
     target.innerHTML = `<p class="eyebrow">${tr("实践与学习", "Practice & learning")}</p><h2 id="dialog-title">${tr("完整实习经历", "Full Experience")}</h2><div class="full-experience">${experiences
       .map(
         (ex) =>
-          `<article class="full-experience-entry"><div class="full-experience-heading">${organizationLogo(ex.logo, false)}<div><h3>${e(t(ex.company, lang))}</h3><p class="detail-role">${e(t(ex.role, lang))}</p>${ex.department ? `<p class="internship-department">${e(t(ex.department, lang))}</p>` : ""}<p class="internship-period">${e(ex.period)}</p></div></div><div class="internship-metrics">${ex.metrics.map((m) => `<span class="metric-pill"><i aria-hidden="true"></i>${e(t(m, lang))}</span>`).join("")}</div>${experienceLinksMarkup(ex)}<p>${e(t(ex.summary, lang))}</p><ul class="internship-bullets">${ex.bullets.map((bullet) => `<li>${e(t(bullet, lang))}</li>`).join("")}</ul></article>`,
+          `<article class="full-experience-entry"><div class="full-experience-heading">${organizationLogo(ex.logo, ex.id, false)}<div><h3>${e(t(ex.company, lang))}</h3><p class="detail-role">${e(t(ex.role, lang))}</p>${ex.department ? `<p class="internship-department">${e(t(ex.department, lang))}</p>` : ""}<p class="internship-period">${e(ex.period)}</p></div></div><div class="internship-metrics">${ex.metrics.map((m) => `<span class="metric-pill"><i aria-hidden="true"></i>${e(t(m, lang))}</span>`).join("")}</div>${experienceLinksMarkup(ex)}<p>${e(t(ex.summary, lang))}</p><ul class="internship-bullets">${ex.bullets.map((bullet) => `<li>${e(t(bullet, lang))}</li>`).join("")}</ul></article>`,
       )
       .join("")}</div><a class="button button--ink" href="${e(resume)}" download="Maropion-Resume.pdf">${tr("完整简历 PDF", "Full résumé PDF")} ↗</a>`;
   } else if (value === "skills") {

@@ -249,12 +249,13 @@ export interface Experience {
   bullets: LocalText[];
 }
 
-const logo = (name: string) => `${import.meta.env.BASE_URL}logos/${name}.svg`;
+const logoFile = (filename: string) =>
+  `${import.meta.env.BASE_URL}logos/${filename}`;
 
 export const experiences: Experience[] = [
   {
     id: "tencent",
-    logo: logo("tencent"),
+    logo: logoFile("tencent-logo-0.png"),
     company: {
       zh: "腾讯 · 微信事业群",
       en: "Tencent · WXG",
@@ -286,7 +287,7 @@ export const experiences: Experience[] = [
   },
   {
     id: "cecloud",
-    logo: logo("cecloud"),
+    logo: logoFile("CECloud-650d59ed9627e5b22b670be5a148e046.png"),
     company: {
       zh: "中国电子云",
       en: "CEC Cloud",
@@ -327,7 +328,7 @@ export const experiences: Experience[] = [
   },
   {
     id: "baidu",
-    logo: logo("baidu"),
+    logo: logoFile("170_a_6643_8ae1b640.png"),
     company: {
       zh: "百度 MEG",
       en: "Baidu MEG",
@@ -367,7 +368,7 @@ export const experiences: Experience[] = [
   },
   {
     id: "meituan",
-    logo: logo("meituan"),
+    logo: logoFile("images.jpeg"),
     company: {
       zh: "美团 · 点评",
       en: "Meituan / Dianping",
@@ -413,7 +414,7 @@ export const experiences: Experience[] = [
   },
   {
     id: "somark",
-    logo: logo("somark"),
+    logo: logoFile("34b1d657-d8b2-4fbe-bd92-8ad56400ed8d.png"),
     company: {
       zh: "上海守扣科技",
       en: "SoMark",
@@ -463,7 +464,7 @@ export const experiences: Experience[] = [
   },
   {
     id: "annpoint",
-    logo: logo("annpoint"),
+    logo: logoFile("ScreenShot_2026-11-02_132041_902@2x.png"),
     company: {
       zh: "广州安点科技",
       en: "Annpoint",
@@ -505,7 +506,7 @@ export const experiences: Experience[] = [
   },
   {
     id: "gtht",
-    logo: logo("gtht"),
+    logo: logoFile("ScreenShot_2026-11-02_131452_627@2x.png"),
     company: {
       zh: "国泰海通证券",
       en: "Guotai Haitong Securities",
@@ -536,7 +537,7 @@ export const experiences: Experience[] = [
   },
   {
     id: "shinewing",
-    logo: logo("shinewing"),
+    logo: logoFile("Corp+ShingWing+logo.webp"),
     company: {
       zh: "信永中和会计师事务所",
       en: "ShineWing",
@@ -575,7 +576,7 @@ export interface Education {
 export const education: Education[] = [
   {
     id: "cityu",
-    logo: logo("cityu"),
+    logo: logoFile("cityu.svg"),
     school: {
       zh: "香港城市大学",
       en: "City University of Hong Kong",
@@ -592,7 +593,7 @@ export const education: Education[] = [
   },
   {
     id: "gdufe",
-    logo: logo("gdufe"),
+    logo: logoFile("gdufe.svg"),
     school: {
       zh: "广东财经大学",
       en: "Guangdong University of Finance and Economics",
