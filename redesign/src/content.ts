@@ -576,7 +576,7 @@ export interface Education {
 export const education: Education[] = [
   {
     id: "cityu",
-    logo: logoFile("cityu.svg"),
+    logo: logoFile("CityU_logo.svg.webp"),
     school: {
       zh: "香港城市大学",
       en: "City University of Hong Kong",
