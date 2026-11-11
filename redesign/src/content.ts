@@ -587,8 +587,8 @@ export const education: Education[] = [
     },
     period: "2026.09 - 2027.06",
     note: {
-      zh: "QS 62 · 商业 GenAI / 金融科技与 AI / 预测建模",
-      en: "QS 62 · GenAI in Business, FinTech & Predictive Modeling",
+      zh: "QS 52 · 商业 GenAI / 金融科技与 AI / 预测建模",
+      en: "QS 52 · GenAI in Business, FinTech & Predictive Modeling",
     },
   },
   {
