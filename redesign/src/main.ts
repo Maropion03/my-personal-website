@@ -393,13 +393,15 @@ function render(): void {
     <nav id="mobile-nav" class="mobile-nav" aria-label="${tr("移动导航", "Mobile navigation")}" inert>${chapterKeys.map((id, i) => `<a href="#${id}" data-go="${id}">${labels[i]} <span aria-hidden="true">↗</span></a>`).join("")}</nav>
     <main class="stage" id="main" tabindex="-1" aria-label="${tr("Maropion 个人作品集", "Maropion portfolio")}">
       <div class="stage-voxels" aria-hidden="true">
-        <i style="--speed: 1.2"></i>
-        <i style="--speed: -0.9"></i>
-        <i style="--speed: 1.5"></i>
-        <i style="--speed: -1.1"></i>
-        <i style="--speed: 0.7"></i>
+        <i style="--speed: 1.25"></i>
+        <i style="--speed: -0.95"></i>
+        <i style="--speed: 1.55"></i>
+        <i style="--speed: -1.15"></i>
+        <i style="--speed: 0.75"></i>
         <i style="--speed: -1.4"></i>
-        <i style="--speed: 1.0"></i>
+        <i style="--speed: 1.05"></i>
+        <i style="--speed: -0.8"></i>
+        <i style="--speed: 1.35"></i>
       </div>
       <div class="character" tabindex="0" role="img" aria-label="${tr("原创体素水母，可拖动旋转，也可用左右方向键旋转", "Original voxel jellyfish. Drag or use left and right arrow keys to rotate.")}" data-mode="hero"><img class="character-fallback" src="${e(favicon)}" data-fallback-src="${import.meta.env.BASE_URL}images/jellyfish-concept.png" width="1200" height="1328" alt="" /></div>
       <section class="scene hero-scene" id="hero" data-chapter="hero" aria-labelledby="hero-title">
@@ -581,9 +583,12 @@ function go(index: number): void {
 
   const stage = document.querySelector<HTMLElement>(".stage")!;
   stage.style.setProperty("--scene-index", String(index));
+  stage.style.setProperty("--warp-dir", String(direction));
+  stage.classList.add("is-warping");
   updateFooterProgress(index);
 
   if (reduced.matches) {
+    stage.classList.remove("is-warping");
     activate(index);
     return;
   }
@@ -603,22 +608,25 @@ function go(index: number): void {
   fromScene.inert = true;
   gsap.set(fromScene, { autoAlpha: 1 });
   gsap.set(toScene, { autoAlpha: 1 });
-  gsap.set(toInner, { scale: 0.97, z: -60 });
-  gsap.set(toCopyItems, { opacity: 0, y: direction * 28 });
+  gsap.set(toInner, { scale: 0.94, z: -90, filter: "blur(6px)" });
+  gsap.set(toCopyItems, { opacity: 0, y: direction * 34 });
   if (toDepth) {
     gsap.set(toDepth, {
       opacity: 0,
-      y: direction * 36,
-      scale: 0.94,
-      rotateX: direction * -5,
+      y: direction * 44,
+      scale: 0.9,
+      rotateX: direction * -7,
     });
   }
   if (toSubItems.length) {
-    gsap.set(toSubItems, { opacity: 0, y: 12 });
+    gsap.set(toSubItems, { opacity: 0, y: 14 });
   }
 
   timeline = gsap.timeline({
     onComplete: () => {
+      stage.classList.remove("is-warping");
+      gsap.set(fromInner, { clearProps: "filter" });
+      gsap.set(toInner, { clearProps: "filter" });
       activate(index);
       busy = false;
       const next = queued;
@@ -627,13 +635,14 @@ function go(index: number): void {
     },
   });
 
-  // Outgoing scene glides and fades out cleanly
+  // Outgoing scene glides and fades out with depth blur
   timeline.to(
     fromInner,
     {
-      y: direction * -32,
-      scale: 1.02,
-      z: 20,
+      y: direction * -40,
+      scale: 1.04,
+      z: 35,
+      filter: "blur(5px)",
       duration: 0.42,
       ease: "power2.in",
     },
@@ -645,16 +654,17 @@ function go(index: number): void {
     0.04,
   );
 
-  // Incoming scene container settles into place
+  // Incoming scene container settles into sharp focus
   timeline.to(
     toInner,
     {
       scale: 1,
       z: 0,
+      filter: "blur(0px)",
       duration: sceneTransitionDuration,
       ease: "power3.out",
     },
-    0.1,
+    0.08,
   );
 
   // Visual / depth container rises with 3D perspective
@@ -878,7 +888,7 @@ function wire(): void {
   });
 }
 
-// Smooth 3D cursor parallax loop for stage voxels and depth frames
+// Smooth 3D cursor parallax & interactive spotlight loop for stage voxels and depth frames
 let targetPx = 0;
 let targetPy = 0;
 let curPx = 0;
@@ -887,12 +897,14 @@ let parallaxRaf = 0;
 
 function stepParallax(): void {
   parallaxRaf = 0;
-  curPx += (targetPx - curPx) * 0.1;
-  curPy += (targetPy - curPy) * 0.1;
+  curPx += (targetPx - curPx) * 0.11;
+  curPy += (targetPy - curPy) * 0.11;
   const stage = document.querySelector<HTMLElement>(".stage");
   if (stage) {
     stage.style.setProperty("--px", curPx.toFixed(4));
     stage.style.setProperty("--py", curPy.toFixed(4));
+    stage.style.setProperty("--cx", `${((curPx * 0.5 + 0.5) * 100).toFixed(1)}%`);
+    stage.style.setProperty("--cy", `${((curPy * 0.5 + 0.5) * 100).toFixed(1)}%`);
   }
   if (Math.abs(targetPx - curPx) > 0.001 || Math.abs(targetPy - curPy) > 0.001) {
     parallaxRaf = requestAnimationFrame(stepParallax);

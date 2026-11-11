@@ -260,14 +260,45 @@ a:active {
   outline: none;
   background:
     radial-gradient(
-      circle at calc(75% + var(--px, 0) * 3%) calc(38% + var(--py, 0) * 3%),
-      color-mix(in srgb, var(--cream) 28%, transparent) 0%,
-      transparent 52%
+      640px circle at var(--cx, 72%) var(--cy, 42%),
+      color-mix(in srgb, var(--accent) 16%, transparent) 0%,
+      color-mix(in srgb, var(--gold) 11%, transparent) 38%,
+      transparent 70%
+    ),
+    radial-gradient(
+      circle at calc(76% + var(--px, 0) * 5%) calc(38% + var(--py, 0) * 5%),
+      color-mix(in srgb, var(--cream) 36%, transparent) 0%,
+      transparent 56%
     ),
     var(--paper);
 }
+.stage::before {
+  content: "";
+  position: absolute;
+  inset: -12%;
+  pointer-events: none;
+  z-index: 0;
+  background-image:
+    linear-gradient(to right, color-mix(in srgb, var(--line) 45%, transparent) 1px, transparent 1px),
+    linear-gradient(to bottom, color-mix(in srgb, var(--line) 45%, transparent) 1px, transparent 1px);
+  background-size: 64px 64px;
+  mask-image: radial-gradient(
+    ellipse 78% 72% at calc(68% + var(--px, 0) * 6%) calc(45% + var(--py, 0) * 6%),
+    rgba(0, 0, 0, 0.55) 0%,
+    rgba(0, 0, 0, 0.14) 55%,
+    transparent 82%
+  );
+  transform: translate3d(
+      calc(var(--px, 0) * -16px),
+      calc(var(--py, 0) * -16px - var(--scene-index, 0) * 20px),
+      0
+    )
+    rotateX(calc(var(--py, 0) * -3deg))
+    rotateY(calc(var(--px, 0) * 3deg));
+  transition: transform 0.65s cubic-bezier(0.22, 1, 0.36, 1);
+}
 
-/* Global floating voxel particles (replaces rigid static blocks) */
+/* Global floating voxel clusters with stepped 3D shadows and warp streaks */
 .stage-voxels {
   position: absolute;
   inset: 0;
@@ -279,11 +310,19 @@ a:active {
   display: block;
   position: absolute;
   transform: translate3d(
-    calc(var(--px, 0) * var(--speed, 1) * 18px),
-    calc(var(--py, 0) * var(--speed, 1) * 18px - var(--scene-index, 0) * 14px),
+    calc(var(--px, 0) * var(--speed, 1) * 26px),
+    calc(var(--py, 0) * var(--speed, 1) * 26px - var(--scene-index, 0) * 18px),
     0
   );
-  transition: transform 0.6s cubic-bezier(0.22, 1, 0.36, 1);
+  transition: transform 0.65s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.stage.is-warping .stage-voxels i {
+  transform: translate3d(
+      calc(var(--px, 0) * var(--speed, 1) * 34px),
+      calc(var(--py, 0) * var(--speed, 1) * 34px - var(--scene-index, 0) * 18px + var(--warp-dir, 1) * -44px),
+      0
+    )
+    scaleY(1.45);
 }
 .stage-voxels i::before {
   content: "";
@@ -291,88 +330,117 @@ a:active {
   width: 100%;
   height: 100%;
   background: var(--voxel-color, var(--accent));
-  animation: voxel-float var(--float-dur, 6s) ease-in-out infinite alternate;
+  box-shadow: var(--voxel-shadow, 8px -8px 0 color-mix(in srgb, var(--gold) 55%, transparent));
+  animation: voxel-float var(--float-dur, 5.5s) ease-in-out infinite alternate;
   animation-delay: var(--float-delay, 0s);
 }
 .stage-voxels i:nth-child(1) {
   right: 38%;
-  top: 16%;
+  top: 15%;
   width: 16px;
   height: 16px;
-  opacity: 0.65;
+  opacity: 0.72;
   --voxel-color: var(--gold);
-  --float-dur: 5.2s;
+  --voxel-shadow: 8px 8px 0 color-mix(in srgb, var(--accent) 55%, transparent);
+  --float-dur: 4.8s;
 }
 .stage-voxels i:nth-child(2) {
-  right: 9%;
-  top: 14%;
-  width: 44px;
-  height: 44px;
+  right: 8%;
+  top: 13%;
+  width: 42px;
+  height: 42px;
   opacity: 0.85;
   --voxel-color: var(--cream);
-  --float-dur: 7.4s;
+  --voxel-shadow: -12px 12px 0 color-mix(in srgb, var(--gold) 50%, transparent);
+  --float-dur: 6.6s;
   --float-delay: -1.5s;
 }
 .stage-voxels i:nth-child(2)::before {
   transform: rotate(45deg);
 }
 .stage-voxels i:nth-child(3) {
-  right: 46%;
+  right: 45%;
   bottom: 14%;
-  width: 34px;
-  height: 34px;
-  opacity: 0.48;
+  width: 30px;
+  height: 30px;
+  opacity: 0.56;
   --voxel-color: var(--gold);
-  --float-dur: 6.3s;
+  --voxel-shadow: 10px -10px 0 color-mix(in srgb, var(--accent) 45%, transparent);
+  --float-dur: 5.8s;
   --float-delay: -2.8s;
 }
 .stage-voxels i:nth-child(4) {
   right: 8%;
   bottom: 16%;
-  width: 13px;
-  height: 13px;
-  opacity: 0.6;
+  width: 14px;
+  height: 14px;
+  opacity: 0.7;
   --voxel-color: var(--accent);
-  --float-dur: 4.8s;
+  --voxel-shadow: -6px -6px 0 color-mix(in srgb, var(--gold) 65%, transparent);
+  --float-dur: 4.4s;
   --float-delay: -0.9s;
 }
 .stage-voxels i:nth-child(5) {
   right: 43%;
-  top: 22%;
-  width: 9px;
-  height: 9px;
-  opacity: 0.4;
+  top: 24%;
+  width: 10px;
+  height: 10px;
+  opacity: 0.52;
   --voxel-color: var(--accent);
-  --float-dur: 5.6s;
+  --float-dur: 5.1s;
   --float-delay: -3.2s;
 }
 .stage-voxels i:nth-child(6) {
-  left: 6%;
-  top: 20%;
-  width: 12px;
-  height: 12px;
-  opacity: 0.35;
+  left: 5%;
+  top: 18%;
+  width: 14px;
+  height: 14px;
+  opacity: 0.45;
   --voxel-color: var(--gold);
-  --float-dur: 6.8s;
+  --float-dur: 6.2s;
   --float-delay: -2.1s;
 }
 .stage-voxels i:nth-child(7) {
   left: 14%;
-  bottom: 14%;
-  width: 20px;
-  height: 20px;
-  opacity: 0.38;
+  bottom: 13%;
+  width: 22px;
+  height: 22px;
+  opacity: 0.46;
   --voxel-color: var(--cream);
-  --float-dur: 7.1s;
+  --voxel-shadow: 9px -9px 0 color-mix(in srgb, var(--accent) 42%, transparent);
+  --float-dur: 6.4s;
   --float-delay: -4s;
+}
+.stage-voxels i:nth-child(8) {
+  right: 26%;
+  top: 10%;
+  width: 11px;
+  height: 11px;
+  opacity: 0.58;
+  --voxel-color: var(--accent);
+  --float-dur: 4.5s;
+  --float-delay: -1.8s;
+}
+.stage-voxels i:nth-child(9) {
+  right: 22%;
+  bottom: 11%;
+  width: 18px;
+  height: 18px;
+  opacity: 0.54;
+  --voxel-color: var(--gold);
+  --float-dur: 5.4s;
+  --float-delay: -3.6s;
 }
 
 @keyframes voxel-float {
   0% {
-    transform: translate3d(0, 0, 0) rotate(0deg);
+    transform: translate3d(0, 0, 0) rotate(0deg) scale(1);
+  }
+  50% {
+    transform: translate3d(6px, -11px, 0) rotate(4deg) scale(1.06);
   }
   100% {
-    transform: translate3d(4px, -14px, 0) rotate(6deg);
+    transform: translate3d(-4px, -20px, 0) rotate(-6deg) scale(0.96);
   }
 }
 
@@ -614,7 +682,7 @@ h3 {
   gap: 28px;
 }
 
-/* All-scene 3D Jellyfish companion with smooth GPU-composited chapter choreography */
+/* All-scene 3D Jellyfish companion with bioluminescent aura & GPU chapter choreography */
 .character {
   position: absolute;
   z-index: var(--layer-character);
@@ -628,8 +696,34 @@ h3 {
   will-change: transform, opacity;
   transform: translate3d(0, 0, 0) scale(1) rotate(0deg);
   transition:
-    transform 0.85s cubic-bezier(0.22, 1, 0.36, 1),
+    transform 0.9s cubic-bezier(0.22, 1, 0.36, 1),
     opacity 0.65s ease;
+}
+.character::before {
+  content: "";
+  position: absolute;
+  inset: 14% 12%;
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 0;
+  background: radial-gradient(
+    circle,
+    color-mix(in srgb, var(--accent) 26%, transparent) 0%,
+    color-mix(in srgb, var(--gold) 16%, transparent) 42%,
+    transparent 72%
+  );
+  filter: blur(22px);
+  animation: aura-breathe 4.2s ease-in-out infinite alternate;
+}
+@keyframes aura-breathe {
+  0% {
+    transform: scale(0.92) translateY(6px);
+    opacity: 0.65;
+  }
+  100% {
+    transform: scale(1.12) translateY(-8px);
+    opacity: 1;
+  }
 }
 .character[data-mode="hero"] {
   z-index: var(--layer-character-front);
@@ -666,33 +760,33 @@ h3 {
 }
 .character[data-mode="experience"] {
   pointer-events: none;
-  opacity: 0.22;
-  transform: translate3d(20%, 5%, 0) scale(0.76) rotate(-8deg);
+  opacity: 0.46;
+  transform: translate3d(18%, 3%, 0) scale(0.82) rotate(-7deg);
 }
 .character[data-mode="projects-0"] {
   pointer-events: none;
-  opacity: 0.2;
-  transform: translate3d(24%, -5%, 0) scale(0.72) rotate(6deg);
+  opacity: 0.44;
+  transform: translate3d(20%, -4%, 0) scale(0.78) rotate(6deg);
 }
 .character[data-mode="projects-1"] {
   pointer-events: none;
-  opacity: 0.22;
-  transform: translate3d(16%, 11%, 0) scale(0.74) rotate(-6deg);
+  opacity: 0.48;
+  transform: translate3d(14%, 9%, 0) scale(0.8) rotate(-6deg);
 }
 .character[data-mode="projects-2"] {
   pointer-events: none;
-  opacity: 0.2;
-  transform: translate3d(22%, 2%, 0) scale(0.76) rotate(4deg);
+  opacity: 0.45;
+  transform: translate3d(19%, 1%, 0) scale(0.82) rotate(5deg);
 }
 .character[data-mode="about"] {
   pointer-events: none;
-  opacity: 0.22;
-  transform: translate3d(20%, 9%, 0) scale(0.75) rotate(-5deg);
+  opacity: 0.46;
+  transform: translate3d(18%, 7%, 0) scale(0.8) rotate(-5deg);
 }
 .character[data-mode="contact"] {
-  opacity: 0.78;
-  pointer-events: none;
-  transform: translate3d(9%, 5%, 0) scale(0.92) rotate(0deg);
+  opacity: 0.88;
+  pointer-events: auto;
+  transform: translate3d(7%, 3%, 0) scale(0.95) rotate(-2deg);
 }
 
 .character-hint {
