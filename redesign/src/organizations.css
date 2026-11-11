@@ -1,10 +1,11 @@
 .organization-logo {
-  display: grid;
-  place-items: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   flex: 0 0 auto;
   width: 136px;
   height: 64px;
-  padding: 5px 8px;
+  padding: 6px 10px;
   background: #ffffff;
   border: 1px solid #e8e2d7;
   border-radius: 4px;
@@ -22,28 +23,12 @@
   display: block;
   width: 100%;
   height: 100%;
+  min-width: 0;
+  min-height: 0;
+  max-width: 100%;
+  max-height: 100%;
   object-fit: contain;
-  transform-origin: center;
-}
-/* Compensate for built-in white canvas padding in square/padded logo images without altering raw files */
-.organization-logo[data-org="tencent"] img {
-  object-fit: cover;
-  transform: scale(1.06);
-}
-.organization-logo[data-org="shinewing"] img {
-  object-fit: cover;
-}
-.organization-logo[data-org="cecloud"] img {
-  transform: scale(1.16);
-}
-.organization-logo[data-org="meituan"] img {
-  transform: scale(1.18);
-}
-.organization-logo[data-org="somark"] img {
-  transform: scale(1.14);
-}
-.organization-logo[data-org="gtht"] img {
-  transform: scale(1.1);
+  object-position: center center;
 }
 .internship-layout {
   display: grid;
