@@ -30,47 +30,47 @@ const MODE_PRESETS: Record<
     tiltZ: 0.04,
     tiltX: 0.02,
     scale: 1.04,
-    bobSpeed: 1.05,
-    swimRadius: 0.85,
+    bobSpeed: 1.0,
+    swimRadius: 0.75,
   },
   experience: {
     rotY: -0.52,
     tiltZ: -0.12,
     tiltX: 0.08,
     scale: 0.9,
-    bobSpeed: 0.92,
-    swimRadius: 0.65,
+    bobSpeed: 0.9,
+    swimRadius: 0.55,
   },
   projects: {
     rotY: 0.62,
     tiltZ: 0.1,
     tiltX: -0.06,
     scale: 0.92,
-    bobSpeed: 0.98,
-    swimRadius: 0.75,
+    bobSpeed: 0.95,
+    swimRadius: 0.65,
   },
   about: {
     rotY: -0.36,
     tiltZ: -0.07,
     tiltX: 0.05,
     scale: 0.88,
-    bobSpeed: 0.88,
-    swimRadius: 0.6,
+    bobSpeed: 0.86,
+    swimRadius: 0.5,
   },
   contact: {
     rotY: -0.2,
     tiltZ: -0.08,
     tiltX: 0.04,
     scale: 0.98,
-    bobSpeed: 1.0,
-    swimRadius: 0.8,
+    bobSpeed: 0.96,
+    swimRadius: 0.7,
   },
 };
 
 /**
- * Biomimetic 3D Voxel Jellyfish with GPU-driven bell undulation,
- * bioluminescent traveling waves, cursor-tracking expressive eyes,
- * 12 multi-layered spring-whip tentacles, and an orbital voxel vortex.
+ * Biomimetic 3D Voxel Jellyfish with C1-continuous phase accumulators,
+ * cylindrical polar-angle rotational water drag on tentacles,
+ * smooth envelope-damped bioluminescent waves, and cursor-tracking eyes.
  */
 export function createJellyfish(host: HTMLElement): JellyfishController {
   const reduce = matchMedia("(prefers-reduced-motion: reduce)");
@@ -137,24 +137,22 @@ export function createJellyfish(host: HTMLElement): JellyfishController {
       uniform float uGlow;
       uniform float uBreath;
       varying vec3 vColor;
-      varying float vEnergy;
       void main() {
         vec4 instPos = instanceMatrix * vec4(0.0, 0.0, 0.0, 1.0);
         float radial = length(instPos.xz);
         float rimFactor = smoothstep(3.5, 9.5, radial);
         float angle = atan(instPos.z, instPos.x);
 
-        // Biomimetic bell rim wave + propulsion contraction/flare
-        float ripple = sin(uTime * 3.2 - radial * 0.58 + angle * 2.0) * 0.28 * rimFactor;
-        float flare = -uBreath * 1.35 * rimFactor;
+        // Biomimetic bell rim wave + smooth propulsion contraction/flare
+        float ripple = sin(uTime * 3.0 - radial * 0.55 + angle * 2.0) * 0.25 * rimFactor;
+        float flare = -uBreath * 1.25 * rimFactor;
         vec2 radialDir = radial > 0.001 ? normalize(instPos.xz) : vec2(0.0);
 
-        vec3 localPos = position;
-        vec4 worldPos = instanceMatrix * vec4(localPos, 1.0);
-        worldPos.xz += radialDir * (flare + ripple * 0.45);
-        worldPos.y += ripple + uBreath * (1.0 - rimFactor) * 0.85;
+        vec4 localWorld = instanceMatrix * vec4(position, 1.0);
+        localWorld.xz += radialDir * (flare + ripple * 0.4);
+        localWorld.y += ripple + uBreath * (1.0 - rimFactor) * 0.75;
 
-        worldPos = modelMatrix * worldPos;
+        vec4 worldPos = modelMatrix * localWorld;
         vec3 worldNormal = normalize(mat3(modelMatrix * instanceMatrix) * normal);
 
         vec3 keyLight = normalize(vec3(-0.55, 1.0, 0.85));
@@ -162,22 +160,20 @@ export function createJellyfish(host: HTMLElement): JellyfishController {
         vec3 viewDir = normalize(cameraPosition - worldPos.xyz);
 
         float diffuse = max(dot(worldNormal, keyLight), 0.0);
-        float rim = pow(1.0 - max(dot(worldNormal, viewDir), 0.0), 2.2) * 0.42;
-        float backRim = max(dot(worldNormal, rimLight), 0.0) * 0.25;
+        float rim = pow(1.0 - max(dot(worldNormal, viewDir), 0.0), 2.2) * 0.4;
+        float backRim = max(dot(worldNormal, rimLight), 0.0) * 0.24;
 
-        // Traveling bioluminescent wave from apex to bell rim
-        float bioWave = max(0.0, sin(instPos.y * 0.55 - radial * 0.35 + uTime * 3.8));
-        float burstWave = max(0.0, sin(worldPos.y * 0.4 - uTime * 7.5)) * uGlow;
+        // Traveling bioluminescent wave in local bell coordinates (never jitters on rotation)
+        float bioWave = max(0.0, sin(instPos.y * 0.55 - radial * 0.35 + uTime * 3.4));
+        float burstWave = max(0.0, sin(instPos.y * 0.45 - uTime * 5.2)) * uGlow;
 
-        vec3 biolumColor = vec3(1.0, 0.72, 0.28) * (bioWave * 0.22 + burstWave * 0.42);
+        vec3 biolumColor = vec3(1.0, 0.72, 0.28) * (bioWave * 0.2 + burstWave * 0.36);
         vColor = instanceColor * (0.56 + diffuse * 0.58 + rim + backRim) + biolumColor;
-        vEnergy = bioWave * 0.3 + uGlow * 0.7;
         gl_Position = projectionMatrix * viewMatrix * worldPos;
       }
     `,
     fragmentShader: `
       varying vec3 vColor;
-      varying float vEnergy;
       void main() {
         gl_FragColor = vec4(vColor, 1.0);
         #include <tonemapping_fragment>
@@ -197,16 +193,17 @@ export function createJellyfish(host: HTMLElement): JellyfishController {
       uniform float uGlow;
       varying vec3 vColor;
       void main() {
+        vec4 localInst = instanceMatrix * vec4(position, 1.0);
         vec3 worldNormal = normalize(mat3(modelMatrix * instanceMatrix) * normal);
-        vec4 worldPos = modelMatrix * instanceMatrix * vec4(position, 1.0);
+        vec4 worldPos = modelMatrix * localInst;
         vec3 light = normalize(vec3(-0.5, 1.0, 0.85));
         vec3 rimLight = normalize(vec3(0.7, -0.3, -0.6));
         float diffuse = max(dot(worldNormal, light), 0.0);
         float rim = max(dot(worldNormal, rimLight), 0.0) * 0.3;
 
-        // Bioluminescent energy traveling down tentacles
-        float stream = max(0.0, sin(worldPos.y * 0.45 + uTime * 4.6));
-        float glowBoost = stream * (0.2 + uGlow * 0.45);
+        // Use local Y (localInst.y) so rotation never causes shader phase flicker
+        float stream = max(0.0, sin(localInst.y * 0.45 + uTime * 4.2));
+        float glowBoost = stream * (0.18 + uGlow * 0.38);
         vec3 warmGlow = vec3(1.0, 0.68, 0.25) * glowBoost;
 
         vColor = instanceColor * (0.58 + diffuse * 0.54 + rim) + warmGlow;
@@ -245,7 +242,6 @@ export function createJellyfish(host: HTMLElement): JellyfishController {
       }
     }
   }
-  // Scalloped luminous sub-bell rim & inner core
   for (let x = -7; x <= 7; x++) {
     for (let z = -7; z <= 7; z++) {
       const r2 = x * x + z * z;
@@ -351,8 +347,7 @@ export function createJellyfish(host: HTMLElement): JellyfishController {
     const angle =
       (ringIdx * Math.PI) / 3 + (isInner ? Math.PI / 6 + 0.15 : 0.38);
     return {
-      cosA: Math.cos(angle),
-      sinA: Math.sin(angle),
+      angle,
       baseRadius: isInner ? 2.15 : 4.15,
       length: isInner
         ? 0.48 + (ringIdx % 2) * 0.08
@@ -365,7 +360,7 @@ export function createJellyfish(host: HTMLElement): JellyfishController {
     const u = j / (segments - 1);
     return {
       u,
-      uLag: Math.pow(u, 1.55),
+      uLag: Math.pow(u, 1.5),
       j,
       scaleOuter: 1.04 - u * 0.38,
       scaleInner: 0.88 - u * 0.35,
@@ -406,89 +401,95 @@ export function createJellyfish(host: HTMLElement): JellyfishController {
   });
   scene.add(particles);
 
+  /**
+   * Uses monotonically accumulated phase (wavePhase, particlePhase) and
+   * cylindrical polar-angle rotational drag (rotSwirl) so rotating the
+   * jellyfish never causes phase jumps or erratic X-axis twitching.
+   */
   const updateTentaclesAndParticles = (
-    time: number,
-    pulseEnergy: number,
+    wavePhase: number,
+    particlePhase: number,
+    smoothGlow: number,
     breathContract: number,
-    trailX: number,
-    trailY: number,
+    rotSwirl: number,
   ) => {
-    const waveSpeed = 1.08 + pulseEnergy * 0.55;
-    const timeWave = time * 1.65 * waveSpeed;
-    const timeZ = time * 1.38 * waveSpeed;
-    const curlAmp = 2.45 + pulseEnergy * 0.95;
-    const spreadSlope = 0.72 - breathContract * 1.2 - pulseEnergy * 0.3;
-    const tipFlare = 5.8 + pulseEnergy * 2.4 - breathContract * 2.0;
-    const zAmp = 2.05 + pulseEnergy * 0.75;
+    const curlAmp = 2.35 + smoothGlow * 0.65;
+    const spreadSlope = 0.68 - breathContract * 0.9 - smoothGlow * 0.2;
+    const tipFlare = 5.6 + smoothGlow * 1.6 - breathContract * 1.5;
+    const zAmp = 1.95 + smoothGlow * 0.55;
 
     for (let sIdx = 0; sIdx < strandCount; sIdx++) {
-      const { cosA, sinA, baseRadius, length, isInner, strand } =
-        strandMeta[sIdx];
+      const { angle, baseRadius, length, isInner, strand } = strandMeta[sIdx];
       const strandOffset = sIdx * segments;
-      const phaseX = strand * 1.15 - timeWave;
-      const phaseZ = strand * 0.95 - timeZ;
+      const phaseX = strand * 1.15 - wavePhase * 1.6;
+      const phaseZ = strand * 0.95 - wavePhase * 1.32;
       const ampScale = isInner ? 0.72 : 1.0;
 
       for (let j = 0; j < segments; j++) {
         const { u, uLag, scaleOuter, scaleInner, tipLift, tipSpread } =
           segmentMeta[j];
         const scale = isInner
-          ? scaleInner * (1 + Math.sin(u * 6 - timeWave) * 0.12)
+          ? scaleInner * (1 + Math.sin(u * 5.5 - wavePhase * 1.5) * 0.1)
           : scaleOuter;
 
-        // Traveling fluid wave + helical twist + velocity drag trail
+        // Cylindrical polar-angle swirl: tentacles trail smoothly along the circular arc when rotating
+        const laggedAngle = angle - rotSwirl * uLag * (isInner ? 0.55 : 0.85);
+        const cosA = Math.cos(laggedAngle);
+        const sinA = Math.sin(laggedAngle);
+
         const waveX =
-          Math.sin(u * 5.2 + phaseX) * (0.22 + u * curlAmp * ampScale);
+          Math.sin(u * 5.0 + phaseX) * (0.2 + u * curlAmp * ampScale);
         const waveZ =
-          Math.cos(u * 4.4 + phaseZ) * (0.18 + u * zAmp * ampScale);
+          Math.cos(u * 4.2 + phaseZ) * (0.18 + u * zAmp * ampScale);
         const spread =
           baseRadius +
           u * spreadSlope +
           tipSpread * tipFlare * (isInner ? 0.55 : 1.0);
 
-        const dragOffsetX = -trailX * uLag * 4.2;
-        const dragOffsetY = -trailY * uLag * 2.8;
+        // Gentle centrifugal flare when spinning rapidly
+        const spinLift = Math.min(1.2, Math.abs(rotSwirl) * 0.45) * uLag;
 
         const base = (strandOffset + j) * 16;
         tentacleArray[base] = scale;
         tentacleArray[base + 5] = scale;
         tentacleArray[base + 10] = scale;
-        tentacleArray[base + 12] = cosA * spread + waveX + dragOffsetX;
+        tentacleArray[base + 12] = cosA * (spread + spinLift) + waveX;
         tentacleArray[base + 13] =
-          -1.6 - j * length + tipLift * (isInner ? 0.6 : 1.0) + dragOffsetY;
-        tentacleArray[base + 14] = sinA * spread + waveZ;
+          -1.6 - j * length + tipLift * (isInner ? 0.6 : 1.0) + spinLift * 0.35;
+        tentacleArray[base + 14] = sinA * (spread + spinLift) + waveZ;
       }
     }
     tentacles.instanceMatrix.needsUpdate = true;
 
     for (let i = 0; i < particleCount; i++) {
       const p = particleSeeds[i];
-      const climb = time * p.speed * (2.4 + pulseEnergy * 1.5);
+      // Monotonic particlePhase guarantees zero vertical jumping when pulseEnergy changes
+      const climb = particlePhase * p.speed * 2.4;
       const yOffset = ((p.baseY + climb + 16) % 30) - 16;
       const fadeEdge = Math.min(
         1,
         Math.min((yOffset + 16) * 0.22, (14 - yOffset) * 0.22),
       );
-      const orbitSpeed = p.isCloseRing ? 0.68 : 0.38;
+      const orbitSpeed = p.isCloseRing ? 0.65 : 0.36;
       const orbit =
         p.angle +
-        time * orbitSpeed * (i % 2 === 0 ? 1 : -0.7) +
-        Math.sin(time * 0.5 + p.phase) * 0.3;
+        particlePhase * orbitSpeed * (i % 2 === 0 ? 1 : -0.7) +
+        Math.sin(particlePhase * 0.5 + p.phase) * 0.28;
       const r =
         p.radius +
-        Math.cos(time * 0.8 + p.phase) * 1.35 +
-        pulseEnergy * (p.isCloseRing ? 2.4 : 1.2);
+        Math.cos(particlePhase * 0.75 + p.phase) * 1.25 +
+        smoothGlow * (p.isCloseRing ? 1.6 : 0.8);
       dummy.position.set(
         Math.cos(orbit) * r,
         yOffset,
         Math.sin(orbit) * r - 1.5,
       );
-      const s = Math.max(0.01, p.size * fadeEdge * (1 + pulseEnergy * 0.55));
+      const s = Math.max(0.01, p.size * fadeEdge * (1 + smoothGlow * 0.4));
       dummy.scale.setScalar(s);
       dummy.rotation.set(
-        time * 0.85 + p.phase,
-        time * 0.65 + p.phase,
-        time * 0.35,
+        particlePhase * 0.8 + p.phase,
+        particlePhase * 0.6 + p.phase,
+        particlePhase * 0.3,
       );
       dummy.updateMatrix();
       particles.setMatrixAt(i, dummy.matrix);
@@ -514,14 +515,14 @@ export function createJellyfish(host: HTMLElement): JellyfishController {
   let pointerY = 0;
   let smoothPointerX = 0;
   let smoothPointerY = 0;
-  let prevSculptureX = 0;
-  let prevSculptureY = 0;
-  let trailVelX = 0;
-  let trailVelY = 0;
-  let pulseEnergy = 0.35; // Start with a welcoming initial pulse
+  let rotSwirl = 0;
+  let pulseEnergy = 0.3;
+  let smoothPulse = 0.0;
   let blinkTimer = 0;
   let lastTime = 0;
   let elapsed = 0;
+  let wavePhase = 0;
+  let particlePhase = 0;
   let raf = 0;
   let compiled = false;
 
@@ -531,59 +532,65 @@ export function createJellyfish(host: HTMLElement): JellyfishController {
     const dt = Math.min(0.05, (now - lastTime) / 1000 || 0.016);
     lastTime = now;
     const preset = MODE_PRESETS[currentMode];
+
+    const lerpFast = 1 - Math.exp(-dt * 8.0);
+    const lerpSmooth = 1 - Math.exp(-dt * 5.5);
+
     if (!reduce.matches) {
-      elapsed += dt * (preset.bobSpeed + pulseEnergy * 0.75);
-      pulseEnergy = Math.max(0, pulseEnergy - dt * 1.35);
+      pulseEnergy = Math.max(0, pulseEnergy - dt * 1.15);
+      smoothPulse += (pulseEnergy - smoothPulse) * lerpSmooth;
+      elapsed += dt * preset.bobSpeed;
+      // Monotonically advancing phases: speed changes never rewind or jump positions!
+      wavePhase += dt * (preset.bobSpeed + smoothPulse * 0.45);
+      particlePhase += dt * (1.0 + smoothPulse * 0.4);
     } else {
       pulseEnergy = 0;
+      smoothPulse = 0;
     }
 
-    const lerpFast = 1 - Math.exp(-dt * 9.5);
-    const lerpSmooth = 1 - Math.exp(-dt * 6.5);
-    smoothPointerX += (pointerX - smoothPointerX) * lerpFast;
-    smoothPointerY += (pointerY - smoothPointerY) * lerpFast;
+    smoothPointerX += (pointerX - smoothPointerX) * lerpSmooth;
+    smoothPointerY += (pointerY - smoothPointerY) * lerpSmooth;
 
-    // Asymmetric biomimetic swimming rhythm: quick contraction snap, graceful glide
-    const swimPhase = elapsed * 2.15;
+    // Asymmetric biomimetic swimming rhythm: gentle contraction & glide
+    const swimPhase = elapsed * 2.05;
     const rawSin = Math.sin(swimPhase);
     const asymmetricPulse =
-      rawSin > 0 ? Math.pow(rawSin, 0.68) : -Math.pow(-rawSin, 1.35);
+      rawSin > 0 ? Math.pow(rawSin, 0.72) : -Math.pow(-rawSin, 1.3);
 
     const figure8X = reduce.matches
       ? 0
-      : Math.sin(elapsed * 0.68) * preset.swimRadius +
-        smoothPointerX * 0.95;
+      : Math.sin(elapsed * 0.65) * preset.swimRadius +
+        smoothPointerX * 0.75;
     const figure8Y = reduce.matches
       ? 0
-      : Math.sin(elapsed * 1.36) * 0.85 +
-        asymmetricPulse * 0.42 +
-        pulseEnergy * 1.25 -
-        smoothPointerY * 0.75;
+      : Math.sin(elapsed * 1.3) * 0.78 +
+        asymmetricPulse * 0.38 +
+        smoothPulse * 0.95 -
+        smoothPointerY * 0.6;
 
-    // Compute velocity trail for fluid tentacle lag
-    const instVelX = (figure8X - prevSculptureX) / Math.max(0.008, dt);
-    const instVelY = (figure8Y - prevSculptureY) / Math.max(0.008, dt);
-    prevSculptureX = figure8X;
-    prevSculptureY = figure8Y;
-    trailVelX += (instVelX * 0.08 + (targetRotation - rotation) * 1.4 - trailVelX) * lerpSmooth;
-    trailVelY += (instVelY * 0.08 - trailVelY) * lerpSmooth;
+    // Compute smooth rotational delta for cylindrical tentacle water-drag
+    const desiredRot =
+      targetRotation +
+      smoothPointerX * 0.28 +
+      (reduce.matches ? 0 : Math.sin(elapsed * 0.42) * 0.09);
+    const prevRot = rotation;
+    rotation += (desiredRot - rotation) * lerpFast;
+    const stepRotVel = (rotation - prevRot) / Math.max(0.008, dt);
+    // Clamp and low-pass filter rotational swirl so tentacles trail without twitching
+    const clampedSwirl = Math.max(-1.6, Math.min(1.6, stepRotVel * 0.22));
+    rotSwirl += (clampedSwirl - rotSwirl) * lerpSmooth;
 
-    rotation +=
-      (targetRotation +
-        smoothPointerX * 0.34 +
-        (reduce.matches ? 0 : Math.sin(elapsed * 0.45) * 0.12) -
-        rotation) *
-      lerpFast;
     tiltZ +=
       (targetTiltZ -
-        smoothPointerX * 0.14 +
-        (reduce.matches ? 0 : Math.cos(elapsed * 0.68) * 0.075) -
+        smoothPointerX * 0.11 -
+        rotSwirl * 0.08 +
+        (reduce.matches ? 0 : Math.cos(elapsed * 0.65) * 0.06) -
         tiltZ) *
       lerpSmooth;
     tiltX +=
       (targetTiltX +
-        smoothPointerY * 0.18 +
-        (reduce.matches ? 0 : asymmetricPulse * 0.06) -
+        smoothPointerY * 0.14 +
+        (reduce.matches ? 0 : asymmetricPulse * 0.05) -
         tiltX) *
       lerpSmooth;
     baseScale += (targetScale - baseScale) * lerpSmooth;
@@ -593,62 +600,65 @@ export function createJellyfish(host: HTMLElement): JellyfishController {
     sculpture.rotation.x = tiltX;
     sculpture.position.x = figure8X;
     sculpture.position.y = figure8Y;
-    sculpture.scale.setScalar(baseScale * (1 + pulseEnergy * 0.04));
+    sculpture.scale.setScalar(baseScale * (1 + smoothPulse * 0.035));
 
-    // Biomimetic bell contraction & expansion squash-and-stretch
+    // Biomimetic bell contraction & expansion driven by smoothPulse (never raw spiky pulseEnergy)
     const breath = reduce.matches
       ? 0
-      : asymmetricPulse * 0.075 + pulseEnergy * 0.14;
+      : asymmetricPulse * 0.068 + smoothPulse * 0.11;
     bellGroup.scale.set(
-      1 - breath * 0.92,
-      1 + breath * 1.28,
-      1 - breath * 0.92,
+      1 - breath * 0.88,
+      1 + breath * 1.2,
+      1 - breath * 0.88,
     );
 
-    // Expressive eye tracking + happy squint on pulse + natural double-blink
+    // Natural eye blink every ~4.4s + smooth happy squint (no hard boolean threshold flicker!)
     blinkTimer += dt;
-    const blinkCycle = blinkTimer % 4.2;
-    const isBlinking =
-      !reduce.matches &&
-      ((blinkCycle > 3.95 && blinkCycle < 4.1) || pulseEnergy > 0.65);
-    const eyeScaleY = pulseEnergy > 0.65 ? 0.28 : isBlinking ? 0.12 : 1.0;
-    const eyeScaleX = pulseEnergy > 0.65 ? 1.18 : 1.0;
+    const blinkCycle = blinkTimer % 4.4;
+    const blinkFactor =
+      !reduce.matches && blinkCycle > 4.18
+        ? Math.sin(((blinkCycle - 4.18) / 0.22) * Math.PI)
+        : 0;
+    const happySquint = Math.max(0, Math.min(1, (smoothPulse - 0.35) * 1.4));
+    const closeAmount = Math.max(blinkFactor * 0.88, happySquint * 0.62);
+    const eyeScaleY = 1.0 - closeAmount;
+    const eyeScaleX = 1.0 + happySquint * 0.14;
 
     for (const p of pupilMeshes) {
-      const lookX = smoothPointerX * 0.42;
-      const lookY = -smoothPointerY * 0.32 + (pulseEnergy > 0.65 ? 0.18 : 0);
+      const lookX = smoothPointerX * 0.38;
+      const lookY = -smoothPointerY * 0.28 + happySquint * 0.14;
       p.eye.position.x = p.baseX + lookX;
       p.eye.position.y = 0.55 + lookY;
       p.eye.scale.set(eyeScaleX, eyeScaleY, 1);
 
-      p.sparkle.position.x = p.baseX - 0.18 + lookX * 1.25;
-      p.sparkle.position.y = 1.0 + lookY * 1.25;
-      p.sparkle.visible = !isBlinking || pulseEnergy > 0.65;
+      p.sparkle.position.x = p.baseX - 0.18 + lookX * 1.2;
+      p.sparkle.position.y = 1.0 + lookY * 1.2;
+      p.sparkle.visible = blinkFactor < 0.65;
 
-      p.subSparkle.position.x = p.baseX + 0.24 + lookX * 1.15;
-      p.subSparkle.position.y = 0.22 + lookY * 1.15;
-      p.subSparkle.visible = !isBlinking;
+      p.subSparkle.position.x = p.baseX + 0.24 + lookX * 1.1;
+      p.subSparkle.position.y = 0.22 + lookY * 1.1;
+      p.subSparkle.visible = blinkFactor < 0.55;
     }
 
-    bellMaterial.uniforms.uTime.value = elapsed;
-    bellMaterial.uniforms.uGlow.value = pulseEnergy;
+    bellMaterial.uniforms.uTime.value = wavePhase;
+    bellMaterial.uniforms.uGlow.value = smoothPulse;
     bellMaterial.uniforms.uBreath.value = breath;
-    tentacleMaterial.uniforms.uTime.value = elapsed;
-    tentacleMaterial.uniforms.uGlow.value = pulseEnergy;
+    tentacleMaterial.uniforms.uTime.value = wavePhase;
+    tentacleMaterial.uniforms.uGlow.value = smoothPulse;
 
     updateTentaclesAndParticles(
-      reduce.matches ? 0 : elapsed,
-      pulseEnergy,
+      reduce.matches ? 0 : wavePhase,
+      reduce.matches ? 0 : particlePhase,
+      smoothPulse,
       breath,
-      trailVelX,
-      trailVelY,
+      rotSwirl,
     );
     renderer.render(scene, camera);
     host.dataset.ready = "true";
     if (
       !reduce.matches ||
       dragging ||
-      Math.abs(targetRotation - rotation) > 0.001 ||
+      Math.abs(desiredRot - rotation) > 0.001 ||
       Math.abs(targetScale - baseScale) > 0.001
     )
       raf = requestAnimationFrame(render);
@@ -672,7 +682,7 @@ export function createJellyfish(host: HTMLElement): JellyfishController {
     dragging = true;
     lastX = event.clientX;
     lastY = event.clientY;
-    pulseEnergy = Math.min(1.25, pulseEnergy + 0.85);
+    pulseEnergy = Math.min(0.85, pulseEnergy + 0.45);
     host.setPointerCapture(event.pointerId);
     host.classList.add("is-dragging");
     schedule();
@@ -681,16 +691,15 @@ export function createJellyfish(host: HTMLElement): JellyfishController {
     if (dragging) {
       const dx = event.clientX - lastX;
       const dy = event.clientY - lastY;
-      targetRotation += dx * 0.011;
-      targetTiltX = Math.max(-0.35, Math.min(0.35, targetTiltX + dy * 0.004));
-      pulseEnergy = Math.min(1.1, pulseEnergy + Math.abs(dx) * 0.0025);
+      targetRotation += dx * 0.0095;
+      targetTiltX = Math.max(-0.28, Math.min(0.28, targetTiltX + dy * 0.003));
       lastX = event.clientX;
       lastY = event.clientY;
       schedule();
     }
   };
   const windowMove = (event: PointerEvent) => {
-    if (reduce.matches) return;
+    if (dragging || reduce.matches) return;
     pointerX = (event.clientX / Math.max(1, innerWidth) - 0.5) * 2;
     pointerY = (event.clientY / Math.max(1, innerHeight) - 0.5) * 2;
     schedule();
@@ -704,8 +713,8 @@ export function createJellyfish(host: HTMLElement): JellyfishController {
     if (event.key === "ArrowLeft" || event.key === "ArrowRight") {
       event.stopPropagation();
       event.preventDefault();
-      targetRotation += event.key === "ArrowLeft" ? -0.35 : 0.35;
-      pulseEnergy = Math.min(1.2, pulseEnergy + 0.55);
+      targetRotation += event.key === "ArrowLeft" ? -0.32 : 0.32;
+      pulseEnergy = Math.min(0.85, pulseEnergy + 0.38);
       schedule();
     }
   };
@@ -762,8 +771,8 @@ export function createJellyfish(host: HTMLElement): JellyfishController {
     },
     pulse(direction = 1) {
       if (reduce.matches) return;
-      pulseEnergy = Math.min(1.3, pulseEnergy + 0.9);
-      targetRotation += direction * 0.42;
+      pulseEnergy = Math.min(0.95, pulseEnergy + 0.55);
+      targetRotation += direction * 0.36;
       schedule();
     },
     dispose() {
