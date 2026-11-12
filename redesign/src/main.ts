@@ -137,31 +137,34 @@ function ragArchitectureSvg(compact = false): string {
       <text x="320" y="42" text-anchor="middle" fill="var(--accent)" font-size="11" font-weight="600">FinBERT</text>
       <text x="320" y="57" text-anchor="middle" fill="var(--muted)" font-size="8.5">${e(longSem)}</text>
 
-      <path d="M100 66 L100 90 M96 84 L100 90 L104 84" stroke="var(--accent)" stroke-width="1.3" fill="none"/>
-      <path d="M320 66 L320 90 M316 84 L320 90 L324 84" stroke="var(--accent)" stroke-width="1.3" fill="none"/>
+      <path class="rag-flow" d="M100 66 L100 90" stroke="var(--accent)" stroke-width="1.4" fill="none"/>
+      <path d="M96 84 L100 90 L104 84" stroke="var(--accent)" stroke-width="1.3" fill="none"/>
+      <path class="rag-flow" d="M320 66 L320 90" stroke="var(--accent)" stroke-width="1.4" fill="none"/>
+      <path d="M316 84 L320 90 L324 84" stroke="var(--accent)" stroke-width="1.3" fill="none"/>
 
       <rect x="20" y="92" width="380" height="36" rx="3" fill="var(--paper)" stroke="var(--gold)" stroke-width="1.2"/>
       <text x="210" y="114" text-anchor="middle" fill="var(--ink)" font-size="9.5" font-weight="600">${e(chromaLabel)}</text>
 
-      <path d="M210 128 L210 148 M206 142 L210 148 L214 142" stroke="var(--accent)" stroke-width="1.3" fill="none"/>
+      <path class="rag-flow" d="M210 128 L210 148" stroke="var(--accent)" stroke-width="1.4" fill="none"/>
+      <path d="M206 142 L210 148 L214 142" stroke="var(--accent)" stroke-width="1.3" fill="none"/>
 
       <rect x="20" y="150" width="380" height="90" rx="4" fill="var(--paper)" stroke="var(--accent)" stroke-width="1.4"/>
       <text x="210" y="170" text-anchor="middle" fill="var(--accent)" font-size="10.5" font-weight="600">${e(debateLabel)}</text>
 
       <g font-size="9">
-        <rect x="34" y="182" width="104" height="44" rx="3" fill="var(--paper-2)" stroke="var(--line)"/>
+        <rect class="rag-pulse-node" x="34" y="182" width="104" height="44" rx="3" fill="var(--paper-2)" stroke="var(--line)"/>
         <text x="86" y="201" text-anchor="middle" fill="var(--ink)" font-weight="600">${e(extNode)}</text>
         <text x="86" y="216" text-anchor="middle" fill="var(--muted)" font-size="8">External Signal</text>
 
-        <path d="M142 204 L154 204" stroke="var(--accent)" stroke-width="1.2"/>
+        <path class="rag-flow" d="M142 204 L154 204" stroke="var(--accent)" stroke-width="1.4"/>
 
-        <rect x="158" y="182" width="104" height="44" rx="3" fill="var(--paper-2)" stroke="var(--line)"/>
+        <rect class="rag-pulse-node rag-pulse-node--2" x="158" y="182" width="104" height="44" rx="3" fill="var(--paper-2)" stroke="var(--line)"/>
         <text x="210" y="201" text-anchor="middle" fill="var(--ink)" font-weight="600">${e(intNode)}</text>
         <text x="210" y="216" text-anchor="middle" fill="var(--muted)" font-size="8">Internal Audit</text>
 
-        <path d="M266 204 L278 204" stroke="var(--accent)" stroke-width="1.2"/>
+        <path class="rag-flow" d="M266 204 L278 204" stroke="var(--accent)" stroke-width="1.4"/>
 
-        <rect x="282" y="182" width="104" height="44" rx="3" fill="var(--paper-2)" stroke="var(--line)"/>
+        <rect class="rag-pulse-node rag-pulse-node--3" x="282" y="182" width="104" height="44" rx="3" fill="var(--paper-2)" stroke="var(--line)"/>
         <text x="334" y="201" text-anchor="middle" fill="var(--ink)" font-weight="600">${e(judgeNode)}</text>
         <text x="334" y="216" text-anchor="middle" fill="var(--muted)" font-size="8">Final Verdict</text>
       </g>
@@ -421,9 +424,9 @@ function render(): void {
     </main>
     <footer class="scene-footer">
       <p>© 2026 Maropion</p>
-      <div class="scene-progress" aria-hidden="true">
+      <div class="scene-progress">
         <span class="scene-counter">01 / ${padSceneNum(sceneIds.length)}</span>
-        <span class="scene-progress-track"><i class="scene-progress-fill"></i></span>
+        <div class="scene-pips" role="navigation" aria-label="${tr("章节快速跳转", "Quick scene jump")}">${sceneIds.map((id, i) => `<button type="button" class="scene-pip" data-scene-index="${i}" aria-label="${tr("跳转到第", "Jump to scene")} ${i + 1} (${e(id)})"></button>`).join("")}</div>
         <span class="chapter-name"></span>
       </div>
       <div class="scene-controls"><button data-step="-1" aria-label="${tr("上一幕", "Previous scene")}"><span aria-hidden="true">←</span><span>${tr("上一幕", "Previous")}</span></button><button data-step="1" aria-label="${tr("下一幕", "Next scene")}"><span>${tr("下一幕", "Next")}</span><span aria-hidden="true">→</span></button></div>
@@ -500,11 +503,10 @@ function updateFooterProgress(index: number): void {
   const counterEl = document.querySelector(".scene-counter");
   if (counterEl)
     counterEl.textContent = `${padSceneNum(index + 1)} / ${padSceneNum(sceneIds.length)}`;
-  const fillEl = document.querySelector<HTMLElement>(".scene-progress-fill");
-  if (fillEl) {
-    const ratio = (index + 1) / sceneIds.length;
-    fillEl.style.transform = `scaleX(${ratio.toFixed(3)})`;
-  }
+  document.querySelectorAll<HTMLElement>(".scene-pip").forEach((pip, i) => {
+    pip.classList.toggle("is-active", i === index);
+    pip.classList.toggle("is-passed", i < index);
+  });
 }
 
 function activate(index: number): void {
@@ -551,6 +553,7 @@ function activate(index: number): void {
   document.querySelector<HTMLButtonElement>('[data-step="1"]')!.disabled =
     index === sceneIds.length - 1;
   updateFooterProgress(index);
+  scrambleReveal(document.querySelector<HTMLElement>(`#${sceneIds[index]} .eyebrow`));
   const label = chapterLabels()[chapterKeys.indexOf(chapters[index])];
   const title =
     document.querySelector(`#${sceneIds[index]} h1, #${sceneIds[index]} h2`)
@@ -863,6 +866,65 @@ async function copy(value: string): Promise<void> {
   toastTimer = setTimeout(() => toast.classList.remove("is-visible"), 3200);
 }
 
+const SCRAMBLE_CHARS = "01ABCDEF#/*+=-_";
+function scrambleReveal(el: HTMLElement | null): void {
+  if (!el || reduced.matches) return;
+  const original = el.dataset.origText ?? el.textContent ?? "";
+  el.dataset.origText = original;
+  if (!original.trim()) return;
+  let frame = 0;
+  const totalFrames = 12;
+  const timer = setInterval(() => {
+    frame++;
+    const progress = frame / totalFrames;
+    const revealed = Math.floor(original.length * progress);
+    let out = "";
+    for (let i = 0; i < original.length; i++) {
+      const ch = original[i];
+      if (i < revealed || ch === " " || ch === "·" || ch === "/") {
+        out += ch;
+      } else {
+        out += SCRAMBLE_CHARS[(i * 7 + frame * 3) % SCRAMBLE_CHARS.length];
+      }
+    }
+    el.textContent = out;
+    if (frame >= totalFrames) {
+      clearInterval(timer);
+      el.textContent = original;
+    }
+  }, 24);
+}
+
+function spawnPixelBurst(x: number, y: number): void {
+  if (reduced.matches) return;
+  const colors = ["var(--accent)", "var(--gold)", "var(--cream)"];
+  for (let i = 0; i < 7; i++) {
+    const spark = document.createElement("span");
+    spark.className = "pixel-spark";
+    const size = 4 + (i % 3) * 2;
+    spark.style.width = `${size}px`;
+    spark.style.height = `${size}px`;
+    spark.style.setProperty("--spark-color", colors[i % colors.length]);
+    document.body.append(spark);
+    const angle = (Math.PI * 2 * i) / 7 + (Math.random() - 0.5) * 0.45;
+    const dist = 22 + Math.random() * 26;
+    gsap.fromTo(
+      spark,
+      { x: x - size / 2, y: y - size / 2, opacity: 1, scale: 1, rotation: 0 },
+      {
+        x: x + Math.cos(angle) * dist,
+        y: y + Math.sin(angle) * dist - 8,
+        opacity: 0,
+        scale: 0.2,
+        rotation: (i % 2 === 0 ? 1 : -1) * 140,
+        duration: 0.46 + Math.random() * 0.16,
+        ease: "power3.out",
+        onComplete: () => spark.remove(),
+      },
+    );
+  }
+}
+
 function wire(): void {
   document
     .querySelector<HTMLDialogElement>(".detail-dialog")!
@@ -871,19 +933,37 @@ function wire(): void {
       if (dialogReturn?.isConnected) dialogReturn.focus();
     });
 
-  // Subtle magnetic pull on primary buttons
+  // Magnetic pull on primary buttons
   document.querySelectorAll<HTMLElement>(".button").forEach((btn) => {
     btn.addEventListener("pointermove", (e) => {
       if (reduced.matches || innerWidth < 768) return;
       const rect = btn.getBoundingClientRect();
-      const bx = ((e.clientX - rect.left) / rect.width - 0.5) * 8;
-      const by = ((e.clientY - rect.top) / rect.height - 0.5) * 6;
+      const bx = ((e.clientX - rect.left) / rect.width - 0.5) * 10;
+      const by = ((e.clientY - rect.top) / rect.height - 0.5) * 8;
       btn.style.setProperty("--bx", `${bx.toFixed(1)}px`);
       btn.style.setProperty("--by", `${by.toFixed(1)}px`);
     });
     btn.addEventListener("pointerleave", () => {
       btn.style.setProperty("--bx", "0px");
       btn.style.setProperty("--by", "0px");
+    });
+  });
+
+  // Local 3D tilt + specular glare tracking on project showcases
+  document.querySelectorAll<HTMLElement>(".project-image-wrap").forEach((wrap) => {
+    wrap.addEventListener("pointermove", (e) => {
+      if (reduced.matches || innerWidth < 768) return;
+      const rect = wrap.getBoundingClientRect();
+      const nx = ((e.clientX - rect.left) / rect.width - 0.5) * 2;
+      const ny = ((e.clientY - rect.top) / rect.height - 0.5) * 2;
+      wrap.style.setProperty("--rx", nx.toFixed(3));
+      wrap.style.setProperty("--ry", ny.toFixed(3));
+      wrap.style.setProperty("--gx", `${(((nx + 1) * 0.5) * 100).toFixed(1)}%`);
+      wrap.style.setProperty("--gy", `${(((ny + 1) * 0.5) * 100).toFixed(1)}%`);
+    });
+    wrap.addEventListener("pointerleave", () => {
+      wrap.style.removeProperty("--rx");
+      wrap.style.removeProperty("--ry");
     });
   });
 }
@@ -923,8 +1003,21 @@ window.addEventListener(
 );
 
 app.addEventListener("click", (event) => {
-  const target = (event.target as Element).closest<HTMLElement>("a,button");
+  const target = (event.target as Element).closest<HTMLElement>(
+    "a,button,.metric-pill,.character",
+  );
   if (!target) return;
+  if (
+    event instanceof MouseEvent &&
+    event.clientX > 0 &&
+    target.matches(".button,.metric-pill,.evidence-link,.scene-pip,.internship-node,.character")
+  ) {
+    spawnPixelBurst(event.clientX, event.clientY);
+  }
+  if (target.dataset.sceneIndex !== undefined) {
+    go(Number(target.dataset.sceneIndex));
+    return;
+  }
   if (target.dataset.go) {
     event.preventDefault();
     go(indexForHash(target.dataset.go));
